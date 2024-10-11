@@ -1,9 +1,13 @@
+'use client';
+
 import { Button } from "@/components/ui/base/button";
 import { Input } from "@/components/ui/Input";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Login = () => {
+    const router = useRouter()
   return (
     <div className="h-screen bg-gray-200 flex items-center p-4">
       <div className="hidden lg:flex items-center justify-center flex-1 lg:basis-1/2 2xl:basis-2/3">
@@ -38,7 +42,9 @@ const Login = () => {
           placeholder="Password"
           type="password"
         />
-        <Button className="w-full bg-[#1b1d21] rounded-full py-6 max-w-sm">Login</Button>
+        <Button className="w-full bg-[#1b1d21] rounded-full py-6 max-w-sm" onClick={() => {
+            router.push('/dashboard')
+        }}>Login</Button>
       </div>
     </div>
   );
