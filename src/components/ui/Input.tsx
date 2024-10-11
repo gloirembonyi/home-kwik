@@ -23,6 +23,7 @@ interface InputProps {
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   }>;
+  className?: string;
 }
 
 export function Input({
@@ -36,6 +37,7 @@ export function Input({
   hideToggle,
   textColor,
   Component,
+  className,
 }: InputProps) {
   const [internalValue, setInternalValue] = useState(value || "");
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility

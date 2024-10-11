@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
-import { Inter, Poppins } from "next/font/google";
-import App from "./_app";
 import { AuthProvider } from "@/hooks/useAuth";
+import type { Metadata } from "next";
+import { Inter, Poppins } from "next/font/google";
+import localFont from "next/font/local";
+import App from "./_app";
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

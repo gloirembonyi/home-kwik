@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getErrorMessage } from "@/lib/utils";
@@ -6,6 +6,8 @@ import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { login } from "./useApi";
+import { RecoilRoot } from "recoil";
+
 interface IUser {
   firstName: string;
   lastName: string;
@@ -85,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
       }}
     >
-      {children}
+      <RecoilRoot>{children}</RecoilRoot>
     </AuthContext.Provider>
   );
 }
