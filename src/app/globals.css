@@ -12,6 +12,47 @@ body {
   }
 }
 
+/* globals.css */
+/* Font fallback definitions */
+@font-face {
+  font-family: 'GeistSans';
+  src: local('system-ui'),
+       local('arial'),
+       url('/fonts/GeistVF.woff') format('woff');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* styles/globals.css */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMonoVF.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Geist Mono', sans-serif;
+}
+
+
+@font-face {
+  font-family: 'GeistMono';
+  src: local('monospace'),
+       url('/fonts/GeistMonoVF.woff') format('woff');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -77,4 +118,20 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  animation: gradient 6s linear infinite;
+}
+
+.bg-300\% {
+  background-size: 300% 300%;
 }

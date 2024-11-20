@@ -1,0 +1,450 @@
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/base/card';
+import { Button } from '@/components/ui/base/button';
+import { Filter, Star, MapPin } from 'lucide-react';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/base/alert-dialog';
+import { Badge } from '@/components/ui/base/badge';
+
+interface Location {
+  lat: number;
+  lng: number;
+}
+
+interface Vehicle {
+  model: string;
+  plateNumber: string;
+  type: 'standard' | 'premium';
+}
+
+interface Driver {
+  id: string;
+  name: string;
+  status: 'available' | 'busy' | 'offline';
+  location: Location;
+  vehicle: Vehicle;
+  rating: number;
+  totalRides: number;
+}
+
+interface MapFilters {
+  status: ('available' | 'busy' | 'offline')[];
+  vehicleType: ('standard' | 'premium')[];
+}
+
+interface MapStats {
+  totalDrivers: number;
+  availableDrivers: number;
+  busyDrivers: number;
+  averageRating: number;
+}
+
+const LiveMap: React.FC = () => {
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [filters, setFilters] = useState<MapFilters>({
+    status: ['available', 'busy'],
+    vehicleType: ['standard', 'premium']
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [mapCenter, setMapCenter] = useState<Location>({ lat: 40.7128, lng: -74.0060 });
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [markers, setMarkers] = useState<Map<string, google.maps.Marker>>(new Map());
+  const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
+
+  // Memoized stats calculation
+  const stats = useMemo(() => {
+    const activeDrivers = drivers.filter(d => d.status !== 'offline');
+    return {
+      totalDrivers: drivers.length,
+      availableDrivers: drivers.filter(d => d.status === 'available').length,
+      busyDrivers: drivers.filter(d => d.status === 'busy').length,
+      averageRating: activeDrivers.length 
+        ? Number((activeDrivers.reduce((acc, d) => acc + d.rating, 0) / activeDrivers.length).toFixed(1))
+        : 0
+    };
+  }, [drivers]);
+
+  // Filter drivers based on current filters
+  const filteredDrivers = useMemo(() => 
+    drivers.filter(driver => 
+      filters.status.includes(driver.status) &&
+      filters.vehicleType.includes(driver.vehicle.type)
+    ),
+    [drivers, filters]
+  );
+
+  const createMarkerIcon = useCallback((status: Driver['status'], selected: boolean = false) => ({
+    path: window.google?.maps.SymbolPath.CIRCLE,
+    scale: selected ? 10 : 8,
+    fillColor: status === 'available' ? '#22c55e' : 
+              status === 'busy' ? '#eab308' : '#6b7280',
+    fillOpacity: 1,
+    strokeWeight: selected ? 3 : 2,
+    strokeColor: '#ffffff'
+  }), []);
+
+  const initializeMap = useCallback(async () => {
+    if (!window.google) {
+      setMapError('Google Maps failed to load. Please refresh the page.');
+      return null;
+    }
+
+    try {
+      const mapInstance = new window.google.maps.Map(
+        document.getElementById('map-container')!,
+        {
+          zoom: 13,
+          center: mapCenter,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ],
+          mapTypeControl: false,
+          fullscreenControl: false,
+          streetViewControl: false
+        }
+      );
+
+      // Initialize user location marker
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          (position) => {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            if (!userMarker) {
+              const marker = new window.google.maps.Marker({
+                position: userLocation,
+                map: mapInstance,
+                icon: {
+                  path: window.google.maps.SymbolPath.CIRCLE,
+                  scale: 8,
+                  fillColor: '#3b82f6',
+                  fillOpacity: 1,
+                  strokeWeight: 2,
+                  strokeColor: '#ffffff'
+                },
+                title: 'Your Location'
+              });
+              setUserMarker(marker);
+            } else {
+              userMarker.setPosition(userLocation);
+            }
+
+            setMapCenter(userLocation);
+            mapInstance.panTo(userLocation);
+          },
+          (error) => {
+            console.warn('Error getting location:', error);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 30000,
+            timeout: 27000
+          }
+        );
+      }
+
+      setMap(mapInstance);
+      return mapInstance;
+    } catch (error) {
+      setMapError('Failed to initialize map. Please check your internet connection.');
+      return null;
+    }
+  }, [mapCenter, userMarker]);
+
+  const updateDriverMarkers = useCallback((mapInstance: google.maps.Map, currentDrivers: Driver[]) => {
+    const newMarkers = new Map(markers);
+    const bounds = new window.google.maps.LatLngBounds();
+    
+    // Update or create markers for current drivers
+    currentDrivers.forEach(driver => {
+      if (!filters.status.includes(driver.status) || 
+          !filters.vehicleType.includes(driver.vehicle.type)) {
+        // Remove markers for filtered-out drivers
+        if (newMarkers.has(driver.id)) {
+          newMarkers.get(driver.id)?.setMap(null);
+          newMarkers.delete(driver.id);
+        }
+        return;
+      }
+
+      const isSelected = selectedDriver?.id === driver.id;
+      const position = new window.google.maps.LatLng(driver.location);
+      
+      if (newMarkers.has(driver.id)) {
+        // Update existing marker
+        const marker = newMarkers.get(driver.id)!;
+        marker.setPosition(position);
+        marker.setIcon(createMarkerIcon(driver.status, isSelected));
+      } else {
+        // Create new marker
+        const marker = new window.google.maps.Marker({
+          position,
+          map: mapInstance,
+          icon: createMarkerIcon(driver.status, isSelected),
+          title: driver.name
+        });
+
+        marker.addListener('click', () => {
+          setSelectedDriver(driver);
+        });
+
+        newMarkers.set(driver.id, marker);
+      }
+
+      bounds.extend(position);
+    });
+
+    // Remove markers for drivers no longer in the list
+    markers.forEach((marker, driverId) => {
+      if (!currentDrivers.find(d => d.id === driverId)) {
+        marker.setMap(null);
+        newMarkers.delete(driverId);
+      }
+    });
+
+    setMarkers(newMarkers);
+
+    // Adjust bounds if we have visible markers
+    if (newMarkers.size > 0) {
+      // Include user location in bounds if available
+      if (userMarker) {
+        bounds.extend(userMarker.getPosition()!);
+      }
+      mapInstance.fitBounds(bounds);
+    }
+  }, [filters, markers, selectedDriver, createMarkerIcon, userMarker]);
+
+  useEffect(() => {
+    const setup = async () => {
+      setLoading(true);
+      const mapInstance = await initializeMap();
+      
+      if (mapInstance && drivers.length > 0) {
+        updateDriverMarkers(mapInstance, drivers);
+      }
+      
+      setLoading(false);
+    };
+
+    setup();
+
+    return () => {
+      markers.forEach(marker => marker.setMap(null));
+      userMarker?.setMap(null);
+    };
+  }, [initializeMap, updateDriverMarkers, drivers]);
+
+  // Mock driver updates for development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const generateMockDriver = (id: string): Driver => ({
+        id,
+        name: `Driver ${id}`,
+        status: ['available', 'busy', 'offline'][Math.floor(Math.random() * 3)] as Driver['status'],
+        location: {
+          lat: mapCenter.lat + (Math.random() - 0.5) * 0.1,
+          lng: mapCenter.lng + (Math.random() - 0.5) * 0.1
+        },
+        vehicle: {
+          model: ['Toyota Camry', 'Honda Accord', 'Tesla Model 3'][Math.floor(Math.random() * 3)],
+          plateNumber: `ABC${id}`,
+          type: Math.random() > 0.5 ? 'standard' : 'premium'
+        },
+        rating: Number((3.5 + Math.random() * 1.5).toFixed(1)),
+        totalRides: Math.floor(50 + Math.random() * 200)
+      });
+
+      const mockDrivers = Array.from({ length: 10 }, (_, i) => 
+        generateMockDriver((i + 1).toString())
+      );
+      setDrivers(mockDrivers);
+
+      const interval = setInterval(() => {
+        setDrivers(prev => prev.map(driver => ({
+          ...driver,
+          location: {
+            lat: driver.location.lat + (Math.random() - 0.5) * 0.002,
+            lng: driver.location.lng + (Math.random() - 0.5) * 0.002
+          },
+          status: Math.random() > 0.9 
+            ? ['available', 'busy', 'offline'][Math.floor(Math.random() * 3)] as Driver['status']
+            : driver.status
+        })));
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }
+  }, [mapCenter]);
+
+  const handleFilterChange = (type: keyof MapFilters, value: string) => {
+    setFilters(prev => {
+      const updated = { ...prev };
+      const index = updated[type].indexOf(value as any);
+      
+      if (index === -1) {
+        updated[type].push(value as any);
+      } else {
+        updated[type].splice(index, 1);
+      }
+      
+      return updated;
+    });
+  };
+
+  const getStatusColor = (status: Driver['status']) => {
+    switch (status) {
+      case 'available': return 'bg-green-500';
+      case 'busy': return 'bg-yellow-500';
+      case 'offline': return 'bg-gray-500';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Live Map</h2>
+          <p className="text-sm text-muted-foreground">
+            Tracking {filteredDrivers.length} drivers • {stats.availableDrivers} available
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="gap-1">
+            <Star className="h-4 w-4" />
+            {stats.averageRating} avg rating
+          </Badge>
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => setShowFilters(true)}
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Card className="md:col-span-2">
+          <CardContent className="p-0">
+            {mapError ? (
+              <div className="h-[600px] w-full bg-muted rounded-lg flex items-center justify-center">
+                <p className="text-destructive flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {mapError}
+                </p>
+              </div>
+            ) : (
+              <div 
+                id="map-container" 
+                className="h-[600px] w-full rounded-lg"
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Drivers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {loading ? (
+                <p className="text-center text-muted-foreground">Loading drivers...</p>
+              ) : filteredDrivers.length === 0 ? (
+                <p className="text-center text-muted-foreground">No drivers match the current filters</p>
+              ) : (
+                filteredDrivers.map(driver => (
+                  <div
+                    key={driver.id}
+                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                      selectedDriver?.id === driver.id
+                        ? 'bg-primary/5 border-primary shadow-sm'
+                        : 'hover:bg-muted/50 border-transparent'
+                    }`}
+                    onClick={() => {
+                      setSelectedDriver(driver);
+                      map?.panTo(driver.location);
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${getStatusColor(driver.status)}`} />
+                        <span className="font-medium">{driver.name}</span>
+                      </div>
+                      <Badge variant="secondary" className="capitalize">
+                        {driver.vehicle.type}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      <p>{driver.vehicle.model}</p>
+                      <p>{driver.vehicle.plateNumber}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                        <span>{driver.rating}</span>
+                        <span className="text-xs">({driver.totalRides} rides)</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <AlertDialog open={showFilters} onOpenChange={setShowFilters}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Filter Drivers</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium mb-2">Driver Status</h4>
+                  <div className="flex gap-2">
+                    {['available', 'busy', 'offline'].map(status => (
+                      <Button
+                        key={status}
+                        variant={filters.status.includes(status as any) ? 'default' : 'outline'}
+                        onClick={() => handleFilterChange('status', status)}
+                        className="capitalize"
+                      >
+                        {status}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-medium mb-2">Vehicle Type</h4>
+                  <div className="flex gap-2">
+                    {['standard', 'premium'].map(type => (
+                      <Button
+                        key={type}
+                        variant={filters.vehicleType.includes(type as any) ? 'default' : 'outline'}
+                        onClick={() => handleFilterChange('vehicleType', type)}
+                        className="capitalize"
+                      >
+                        {type}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default LiveMap;

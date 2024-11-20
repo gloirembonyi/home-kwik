@@ -9,14 +9,10 @@ import { Label } from "./base/label";
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 
-interface InputProps {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label?: string;
-  placeholder?: string;
-  type: string;
   Icon?: IconType | React.ComponentType<any>;
-  value?: string | any;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   hideToggle?: string;
   textColor?: string;
   Component?: React.ComponentType<{
@@ -38,6 +34,9 @@ export function Input({
   textColor,
   Component,
   className,
+  onFocus, // Added onFocus prop here
+  onBlur, // Added onBlur prop here
+  ...rest // Spread other input props
 }: InputProps) {
   const [internalValue, setInternalValue] = useState(value || "");
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
@@ -92,12 +91,15 @@ export function Input({
             placeholder={label || placeholder}
             value={internalValue}
             onChange={handleChange}
+            onFocus={onFocus} // Pass down onFocus
+            onBlur={onBlur}   // Pass down onBlur
             className={cn(
               Icon || type === "password"
                 ? "border-none focus-visible:outline-none focus:outline-none focus-visible:!ring-0"
                 : "focus-visible:outline-none focus:outline-none focus-visible:!ring-0",
               "border-gray-300"
             )}
+            {...rest} // Pass down other props
           />
           {type === "password" && (
             <button
@@ -110,7 +112,8 @@ export function Input({
           )}
         </div>
       )}
-      {showInput && Component && <Component {...{ value, onChange }} />}
+      {showInput && Component && <Component {...{ value: typeof value === "string" ? value : undefined, onChange }} />}
+
     </div>
   );
 }
