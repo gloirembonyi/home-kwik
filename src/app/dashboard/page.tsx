@@ -514,7 +514,7 @@ const Dashboard = () => {
                     </div> */}
                     </div>
                     <div>
-                      <KwikRideAdminDashboard />
+                      {/* <KwikRideAdminDashboard /> */}
                       <PeakHours />
                     </div>
 
