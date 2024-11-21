@@ -1,9 +1,54 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/base/card';
 import { Button } from '@/components/ui/base/button';
 import { Filter, Star, MapPin } from 'lucide-react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/base/alert-dialog';
 import { Badge } from '@/components/ui/base/badge';
+
+
+// Google Maps Script Loader Component
+const useGoogleMaps = (apiKey: string) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check if Google Maps is already loaded
+    if (window.google?.maps) {
+      setIsLoaded(true);
+      return;
+    }
+
+    // Function to load the Google Maps script
+    const loadGoogleMapsScript = () => {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey='AIzaSyCLJz38ahbx-KPMWTHeHF5pQHZtio2kgEM'}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        setIsLoaded(true);
+      };
+
+      script.onerror = () => {
+        setLoadError('Failed to load Google Maps script');
+      };
+
+      document.head.appendChild(script);
+
+      return () => {
+        document.head.removeChild(script);
+      };
+    };
+
+    const cleanup = loadGoogleMapsScript();
+
+    return () => {
+      cleanup?.();
+    };
+  }, [apiKey]);
+
+  return { isLoaded, loadError };
+};
 
 interface Location {
   lat: number;
@@ -13,7 +58,7 @@ interface Location {
 interface Vehicle {
   model: string;
   plateNumber: string;
-  type: 'standard' | 'premium';
+  type: 'old' | 'new';
 }
 
 interface Driver {
@@ -28,7 +73,7 @@ interface Driver {
 
 interface MapFilters {
   status: ('available' | 'busy' | 'offline')[];
-  vehicleType: ('standard' | 'premium')[];
+  vehicleType: ('old' | 'new')[];
 }
 
 interface MapStats {
@@ -39,12 +84,14 @@ interface MapStats {
 }
 
 const LiveMap: React.FC = () => {
+  const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyCLJz38ahbx-KPMWTHeHF5pQHZtio2kgEM';
+  const { isLoaded, loadError } = useGoogleMaps(GOOGLE_MAPS_API_KEY);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [filters, setFilters] = useState<MapFilters>({
     status: ['available', 'busy'],
-    vehicleType: ['standard', 'premium']
+    vehicleType: ['old', 'new']
   });
   const [showFilters, setShowFilters] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -52,6 +99,15 @@ const LiveMap: React.FC = () => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<Map<string, google.maps.Marker>>(new Map());
   const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  
+  if (!GOOGLE_MAPS_API_KEY) {
+    return (
+      <div className="text-destructive">
+        Google Maps API key is missing. Please configure it in your environment.
+      </div>
+    );
+  }
 
   // Memoized stats calculation
   const stats = useMemo(() => {
@@ -86,14 +142,14 @@ const LiveMap: React.FC = () => {
   }), []);
 
   const initializeMap = useCallback(async () => {
-    if (!window.google) {
-      setMapError('Google Maps failed to load. Please refresh the page.');
+    if (!isLoaded || !mapContainerRef.current) {
+      setMapError(isLoaded ? 'Map container not found' : 'Google Maps failed to load');
       return null;
     }
 
     try {
       const mapInstance = new window.google.maps.Map(
-        document.getElementById('map-container')!,
+        mapContainerRef.current,
         {
           zoom: 13,
           center: mapCenter,
@@ -168,7 +224,7 @@ const LiveMap: React.FC = () => {
     currentDrivers.forEach(driver => {
       if (!filters.status.includes(driver.status) || 
           !filters.vehicleType.includes(driver.vehicle.type)) {
-        // Remove markers for filtered-out drivers
+  
         if (newMarkers.has(driver.id)) {
           newMarkers.get(driver.id)?.setMap(null);
           newMarkers.delete(driver.id);
@@ -180,7 +236,7 @@ const LiveMap: React.FC = () => {
       const position = new window.google.maps.LatLng(driver.location);
       
       if (newMarkers.has(driver.id)) {
-        // Update existing marker
+        // Update marker
         const marker = newMarkers.get(driver.id)!;
         marker.setPosition(position);
         marker.setIcon(createMarkerIcon(driver.status, isSelected));
@@ -213,9 +269,8 @@ const LiveMap: React.FC = () => {
 
     setMarkers(newMarkers);
 
-    // Adjust bounds if we have visible markers
+    // bounds if we have visible markers
     if (newMarkers.size > 0) {
-      // Include user location in bounds if available
       if (userMarker) {
         bounds.extend(userMarker.getPosition()!);
       }
@@ -223,16 +278,20 @@ const LiveMap: React.FC = () => {
     }
   }, [filters, markers, selectedDriver, createMarkerIcon, userMarker]);
 
-  useEffect(() => {
+   // the main useEffect
+   useEffect(() => {
     const setup = async () => {
-      setLoading(true);
-      const mapInstance = await initializeMap();
       
-      if (mapInstance && drivers.length > 0) {
-        updateDriverMarkers(mapInstance, drivers);
+      if (isLoaded) {
+        setLoading(true);
+        const mapInstance = await initializeMap();
+        
+        if (mapInstance && drivers.length > 0) {
+          updateDriverMarkers(mapInstance, drivers);
+        }
+        
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     setup();
@@ -241,7 +300,7 @@ const LiveMap: React.FC = () => {
       markers.forEach(marker => marker.setMap(null));
       userMarker?.setMap(null);
     };
-  }, [initializeMap, updateDriverMarkers, drivers]);
+  }, [isLoaded, initializeMap, updateDriverMarkers, drivers]);
 
   // Mock driver updates for development
   useEffect(() => {
@@ -257,7 +316,7 @@ const LiveMap: React.FC = () => {
         vehicle: {
           model: ['Toyota Camry', 'Honda Accord', 'Tesla Model 3'][Math.floor(Math.random() * 3)],
           plateNumber: `ABC${id}`,
-          type: Math.random() > 0.5 ? 'standard' : 'premium'
+          type: Math.random() > 0.5 ? 'old' : 'new'
         },
         rating: Number((3.5 + Math.random() * 1.5).toFixed(1)),
         totalRides: Math.floor(50 + Math.random() * 200)
@@ -336,16 +395,20 @@ const LiveMap: React.FC = () => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card className="md:col-span-2">
           <CardContent className="p-0">
-            {mapError ? (
+            {(mapError || loadError) ? (
               <div className="h-[600px] w-full bg-muted rounded-lg flex items-center justify-center">
                 <p className="text-destructive flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  {mapError}
+                  {mapError || loadError}
                 </p>
+              </div>
+            ) : !isLoaded ? (
+              <div className="h-[600px] w-full bg-muted rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground">Loading map...</p>
               </div>
             ) : (
               <div 
-                id="map-container" 
+                ref={mapContainerRef}
                 className="h-[600px] w-full rounded-lg"
               />
             )}
@@ -426,7 +489,7 @@ const LiveMap: React.FC = () => {
                 <div>
                   <h4 className="font-medium mb-2">Vehicle Type</h4>
                   <div className="flex gap-2">
-                    {['standard', 'premium'].map(type => (
+                    {['old', 'new'].map(type => (
                       <Button
                         key={type}
                         variant={filters.vehicleType.includes(type as any) ? 'default' : 'outline'}

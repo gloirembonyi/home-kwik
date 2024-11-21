@@ -446,6 +446,9 @@ const Dashboard = () => {
                     <TabsTrigger value="users" className="px-3">
                       User Insights
                     </TabsTrigger>
+                    <TabsTrigger value="other" className="px-3">
+                      freatures
+                    </TabsTrigger>
                   </TabsList>
 
                   {/* Overview Tab Content */}
@@ -570,8 +573,6 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <RideAnalytics />
-
-                      <TaskBoard />
                     </div>
 
                     {/* Add more ride-specific charts and analysis here */}
@@ -641,18 +642,31 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <UserDashboard />
-
+                    </div>
+                  </TabsContent>
+                  {/* features we will need */}
+                  <TabsContent value="other" className="space-y-6">
+                    {/* Ride Analytics Content */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    
+                    </div>
+                    <div>
                       <RiderHistory />
                       <DriverHistory />
+                      <LiveChat />
+                      <TicketDashboard />
+                      <TaskBoard />
+                      <LiveMap />
                     </div>
+
+                    {/* Add more ride-specific charts and analysis here */}
                   </TabsContent>
                 </Tabs>
 
                 {/* Real-time Activity Feed */}
                 <Card>
                   <div>
-                  <LiveChat />
-                  <TicketDashboard />
+                  
                     <ActivityFeed />
                   </div>
                 </Card>

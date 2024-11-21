@@ -1,65 +1,39 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import useAuth from "@/hooks/useAuth";
-import Sidebar from "@/components/layout/Sidebar/page";
-import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
 
 const App = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [isLoginPage, setIsLoginPage] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<TimeRange>('week');
-  
-  const refreshData = () => {
-    // refresh data from API
-  };
 
   useEffect(() => {
     const pathname = window.location.pathname;
     setIsLoginPage(pathname === "/login");
 
-    // If not authenticated and not on the login page, redirect to login
     if (!isAuthenticated && pathname !== "/login") {
+      // Redirect unauthenticated users to login
       router.push("/login");
     } else {
-      // If authenticated or on login page, set loading to false
+      // Allow authenticated users or login page to load
       setIsLoading(false);
     }
   }, [isAuthenticated, router]);
 
   if (isLoading) {
-    return null; // Show nothing while checking authentication
+    return null; // Show nothing while loading
   }
 
-  // If it's the login page, render only the children
+  // Render only the children for login page
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  // Render layout with sidebar and header for all other pages
-  return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <Sidebar />
-      
-      {/* Main content area */}
-      <div className="flex flex-col flex-1">
-        {/* Header */}
-        <DashboardHeader 
-      timeRange={timeRange}
-      setTimeRange={setTimeRange}
-      refreshData={refreshData}
-    />
-        
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4 bg-gray-100">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
+  // Render authenticated layout for other pages
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
 };
 
 export default App;
