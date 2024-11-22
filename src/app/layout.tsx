@@ -10,7 +10,7 @@ import 'leaflet/dist/leaflet.css';
 
 // Configure Geist Sans
 const geistSans = localFont({
-  src: '../fonts/GeistVF.woff2',
+  src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
   display: 'swap',
   preload: true,
@@ -19,7 +19,7 @@ const geistSans = localFont({
 
 // Configure Geist Mono
 const geistMono = localFont({
-  src: '../fonts/GeistMonoVF.woff2',
+  src: './fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
   display: 'swap',
   preload: true,
