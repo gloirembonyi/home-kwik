@@ -246,6 +246,8 @@ const Dashboard = () => {
           ? rawData.peakHours.map((ph: PeakHourData) => ({
               hour: typeof ph.hour === "number" ? ph.hour : parseInt(ph.hour),
               rides: ph.rides,
+              avgWaitTime: ph.avgWaitTime ?? 0,  // Added this
+              utilization: ph.utilization ?? 0    // Added this
             }))
           : [],
         customerSatisfaction: Array.isArray(rawData.customerSatisfaction)
