@@ -76,7 +76,6 @@ import {
 import { Skeleton } from "@/components/ui/base/skeleton";
 import { Progress } from "@/components/ui/base/progress";
 import { AnalyticsApiService } from "@/services/analyticsService";
-import { AnalyticsService } from "@/services/analytics";
 import { RideChart } from "@/components/charts/RideChart";
 import UserActivityChart from "@/components/charts/UserActivityChart";
 import LiveMap from "@/components/map/LiveMap";
@@ -99,6 +98,72 @@ import LiveChat from "@/components/support/LiveChat";
 import TicketDashboard from "@/components/support/TicketDashboard";
 import KwikRideAdminDashboard from "@/components/support/AI/page";
 //Analytics Service
+
+
+export class AnalyticsService {
+  private static instance: AnalyticsService;
+  private isInitialized = false;
+  private rollbar: Rollbar = new Rollbar();
+
+  private constructor() {
+    this.initializeServices();
+  }
+
+  static getInstance() {
+    if (!AnalyticsService.instance) {
+      AnalyticsService.instance = new AnalyticsService();
+    }
+    return AnalyticsService.instance;
+  }
+
+  private initializeServices() {
+    if (this.isInitialized) return;
+
+    try {
+      if (process.env.NEXT_PUBLIC_ENV === "production") {
+        if (process.env.NEXT_PUBLIC_ROLLBAR_TOKEN) {
+          this.rollbar = new Rollbar({
+            accessToken: process.env.NEXT_PUBLIC_ROLLBAR_TOKEN,
+            environment: process.env.NEXT_PUBLIC_ENV,
+            captureUncaught: true,
+            captureUnhandledRejections: true,
+          });
+        }
+
+        if (process.env.NEXT_PUBLIC_HOTJAR_ID) {
+          const hotjarId = parseInt(process.env.NEXT_PUBLIC_HOTJAR_ID || "0");
+          const hjsv = parseInt(process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION || "6");
+          hotjar.initialize({ id: hotjarId, sv: hjsv });
+        }
+
+        if (process.env.NEXT_PUBLIC_MIXPANEL_TOKEN) {
+          mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
+        }
+      }
+
+      this.isInitialized = true;
+    } catch (error) {
+      console.error("Failed to initialize analytics services:", error);
+    }
+  }
+
+  trackEvent(eventName: string, properties?: Record<string, any>) {
+    try {
+      mixpanel.track(eventName, properties);
+      hotjar.event(eventName);
+    } catch (error) {
+      console.error("Failed to track event:", error);
+    }
+  }
+
+  trackError(error: Error, context?: Record<string, any>) {
+    try {
+      this.rollbar.error(error, context);
+    } catch (rollbarError) {
+      console.error("Failed to track error:", rollbarError);
+    }
+  }
+}
 
 // Error Boundary
 class ErrorBoundary extends React.Component<
