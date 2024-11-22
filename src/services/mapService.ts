@@ -30,7 +30,7 @@ class MapService {
 
   private connectWebSocket() {
     try {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_ENDPOINT || 'wss://your-api-endpoint/drivers';
+      const wsUrl = process.env.NEXT_PUBLIC_WS_ENDPOINT || '';
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
