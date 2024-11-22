@@ -6,25 +6,6 @@ import Rollbar from "rollbar";
 import { hotjar } from "react-hotjar";
 import mixpanel from "mixpanel-browser";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-  Legend,
-  RadialBarChart,
-  RadialBar,
-} from "recharts";
-import {
   Users,
   Car,
   Star,

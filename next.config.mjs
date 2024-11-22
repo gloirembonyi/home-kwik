@@ -41,6 +41,10 @@ const nextConfig = {
     // Add experimental features here if needed
     // serverActions: true,
     // typedRoutes: true,
+    fontLoaders: [
+      { loader: '@next/font/google' },
+      { loader: '@next/font/local' }
+    ],
   },
 
   // Customize dist directory if needed
