@@ -23,7 +23,7 @@ const useGoogleMaps = (apiKey: string) => {
     // Function to load the Google Maps script
     const loadGoogleMapsScript = () => {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey='AIzaSyCLJz38ahbx-KPMWTHeHF5pQHZtio2kgEM'}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey=''}&libraries=places`;
       script.async = true;
       script.defer = true;
 
