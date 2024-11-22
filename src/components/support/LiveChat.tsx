@@ -1,3 +1,5 @@
+"use client";
+
 // components/support/LiveChat.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ScrollArea } from "@/components/ui/base/scroll-area";
