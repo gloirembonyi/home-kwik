@@ -1,8 +1,9 @@
 // analyticsService.ts
+import { ApiResponse, ActiveUsersResponse, RegisteredUsersResponse, RidesResponse, DriverRatingsResponse, RideMetricsResponse, DriverUtilizationResponse, RatioResponse, EarningsResponse, GrowthResponse, PopularRoutesResponse, PeakHoursResponse, CustomerSatisfactionResponse } from '@/types/types';
 import axios, { AxiosResponse } from 'axios';
 
-const BASE_URL = '';
 
+const BASE_URL = '';
 
 // Request configuration
 const createAxiosConfig = () => {
@@ -17,9 +18,9 @@ const createAxiosConfig = () => {
 
 export class AnalyticsApiService {
   private static instance: AnalyticsApiService;
+  
   private constructor() {
     // Initialize axios interceptors
-    
     axios.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token');
@@ -87,26 +88,26 @@ export class AnalyticsApiService {
       ]);
   
       return {
-        activeUsers: activeUsers?.data?.count || 0,
-        registeredUsers: registeredUsers?.data?.count || 0,
-        totalRides: rides?.data?.total || 0,
-        averageRating: driverRatings?.data?.average || 0,
-        rideStats: rides?.data?.timeline || [],
-        driverStats: driverRatings?.data?.distribution || [],
-        userActivities: this.transformToUserActivities(activeUsers?.data?.timeline || []),
-        revenueData: this.transformToRevenueData(earnings?.data?.timeline || []),
-        completionRate: rides?.data?.completionRate || 0,
-        cancellationRate: rides?.data?.cancellationRate || 0,
-        riderToDriverRatio: riderRatio?.data?.ratio || 0,
-        averageRideDistance: rideDistance?.data?.average || 0,
-        averageRideDuration: rideDuration?.data?.average || 0,
-        driverUtilization: driverUtilization?.data?.rate || 0,
-        driverEarnings: earnings?.data?.total || 0,
-        growthRate: growthRate?.data?.rate || 0,
-        peakHours: peakHours?.data?.hours || [],
-        popularRoutes: popularRoutes?.data?.routes || [],
-        userGrowth: this.transformToUserGrowth(growthRate?.data?.timeline || []),
-        customerSatisfaction: satisfaction?.data?.metrics || []
+        activeUsers: activeUsers.data.data.count || 0,
+        registeredUsers: registeredUsers.data.data.count || 0,
+        totalRides: rides.data.data.total || 0,
+        averageRating: driverRatings.data.data.average || 0,
+        rideStats: rides.data.data.timeline || [],
+        driverStats: driverRatings.data.data.distribution || [],
+        userActivities: this.transformToUserActivities(activeUsers.data.data.timeline || []),
+        revenueData: this.transformToRevenueData(earnings.data.data.timeline || []),
+        completionRate: rides.data.data.completionRate || 0,
+        cancellationRate: rides.data.data.cancellationRate || 0,
+        riderToDriverRatio: riderRatio.data.data.ratio || 0,
+        averageRideDistance: rideDistance.data.data.average || 0,
+        averageRideDuration: rideDuration.data.data.average || 0,
+        driverUtilization: driverUtilization.data.data.rate || 0,
+        driverEarnings: earnings.data.data.total || 0,
+        growthRate: growthRate.data.data.rate || 0,
+        peakHours: peakHours.data.data.hours || [],
+        popularRoutes: popularRoutes.data.data.routes || [],
+        userGrowth: this.transformToUserGrowth(growthRate.data.data.timeline || []),
+        customerSatisfaction: satisfaction.data.data.metrics || []
       };
     } catch (error) {
       console.error('Dashboard data fetch error:', error);
@@ -207,5 +208,3 @@ export class AnalyticsApiService {
     }
   }
 }
-
-

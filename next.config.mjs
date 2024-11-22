@@ -28,19 +28,19 @@ const nextConfig = {
     domains: [], // Add any image domains you need
     remotePatterns: [
       // Add any remote patterns for images if needed
-      // {
-      //   protocol: 'https',
-      //   hostname: 'example.com',
-      //   pathname: '/**',
-      // },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        pathname: '/**',
+      },
     ],
   },
 
   // Enable experimental features if needed
   experimental: {
     // Add experimental features here if needed
-    // serverActions: true,
-    // typedRoutes: true,
+    serverActions: true,
+    typedRoutes: true,
     fontLoaders: [
       { loader: '@next/font/google' },
       { loader: '@next/font/local' }

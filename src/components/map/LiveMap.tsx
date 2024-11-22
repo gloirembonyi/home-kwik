@@ -67,10 +67,14 @@ interface Driver {
   id: string;
   name: string;
   status: 'available' | 'busy' | 'offline';
-  location: Location;
-  vehicle: Vehicle;
+  location: Location
   rating: number;
   totalRides: number;
+  vehicle: {
+    model: string;
+    plateNumber: string;
+    type: 'old' | 'new';
+  };
 }
 
 interface MapFilters {
@@ -86,7 +90,7 @@ interface MapStats {
 }
 
 const LiveMap: React.FC = () => {
-  const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyCLJz38ahbx-KPMWTHeHF5pQHZtio2kgEM';
+  const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
   const { isLoaded, loadError } = useGoogleMaps(GOOGLE_MAPS_API_KEY);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
@@ -349,14 +353,16 @@ const LiveMap: React.FC = () => {
   const handleFilterChange = (type: keyof MapFilters, value: string) => {
     setFilters(prev => {
       const updated = { ...prev };
-      const index = updated[type].indexOf(value as any);
-      
+      const index = updated[type].indexOf(value);
+  
       if (index === -1) {
-        updated[type].push(value as any);
+        // Add value to array if it doesn't exist
+        updated[type] = [...updated[type], value];
       } else {
-        updated[type].splice(index, 1);
+        // Remove value from array if it exists
+        updated[type] = updated[type].filter((v) => v !== value);
       }
-      
+  
       return updated;
     });
   };
