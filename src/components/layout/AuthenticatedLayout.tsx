@@ -1,11 +1,12 @@
-// components/layout/AuthenticatedLayout.tsx
 "use client";
 import React, { useState } from "react";
 import Sidebar from "@/components/layout/Sidebar/page";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
 
+// Define the TimeRange type
+type TimeRange = "day" | "week" | "month" | "quarter";
 const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
-  const [timeRange, setTimeRange] = useState<TimeRange>("week");
+  const [timeRange, setTimeRange] = useState<TimeRange>('day');
 
   const refreshData = () => {
     // Refresh data from API
@@ -19,10 +20,10 @@ const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex flex-col flex-1">
         {/* Header */}
         <DashboardHeader
-          timeRange={timeRange}
-          setTimeRange={setTimeRange}
-          refreshData={refreshData}
-        />
+        timeRange={timeRange}
+        setTimeRange={setTimeRange}
+        refreshData={refreshData}
+      />
         {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 bg-gray-100">
           {children}

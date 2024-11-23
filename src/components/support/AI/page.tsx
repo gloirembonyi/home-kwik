@@ -28,11 +28,37 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 
-// AI Services Integration
+// Define types for the application
+interface AIInsight {
+  title: string;
+  description: string;
+  impact: 'high' | 'medium' | 'low';
+}
+
+interface RidePrediction {
+  predictedRides: number;
+  estimatedRevenue: number;
+}
+
+interface DashboardData {
+  totalUsers: number;
+  activeDrivers: number;
+  completedRides: number;
+  revenue: number;
+  aiInsights: AIInsight[];
+  ridePredictions: RidePrediction | null;
+}
+
+interface RideData {
+  name: string;
+  rides: number;
+  revenue: number;
+}
+
+// AI Services with proper typing
 const AIServices = {
-  async generateInsights(data) {
+  async generateInsights(data: DashboardData): Promise<AIInsight[]> {
     try {
-      // Placeholder for actual AI API call (OpenAI/Google Gemini)
       const response = await fetch('/api/ai-insights', {
         method: 'POST',
         body: JSON.stringify(data)
@@ -44,7 +70,7 @@ const AIServices = {
     }
   },
 
-  async predictRideTrends(historicalData: { name: string; rides: number; revenue: number; }[]) {
+  async predictRideTrends(historicalData: RideData[]): Promise<RidePrediction | null> {
     try {
       const response = await fetch('/api/ai-predictions', {
         method: 'POST',
@@ -59,8 +85,8 @@ const AIServices = {
 };
 
 // Advanced Analytics Dashboard
-const KwikRideAIDashboard = () => {
-  const [dashboardData, setDashboardData] = useState({
+const KwikRideAIDashboard: React.FC = () => {
+  const [dashboardData, setDashboardData] = useState<DashboardData>({
     totalUsers: 5420,
     activeDrivers: 872,
     completedRides: 24563,
@@ -72,7 +98,7 @@ const KwikRideAIDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Sample chart data
-  const rideData = [
+  const rideData: RideData[] = [
     { name: 'Jan', rides: 400, revenue: 50000 },
     { name: 'Feb', rides: 300, revenue: 45000 },
     { name: 'Mar', rides: 200, revenue: 40000 },

@@ -39,13 +39,13 @@ export interface IUserData {
 }
 
 // Interface for action history
-interface ActionHistoryRecord {
+export interface ActionHistoryRecord {
   action: string;
   timestamp: string;
 }
 
 // Action handlers interface
-interface ActionHandlers {
+export interface ActionHandlers {
   onEdit: (row: IUserToDelete) => void;
   onShare: (row: IUserToDelete) => void;
   onArchive: (row: IUserToDelete) => void;
@@ -54,7 +54,7 @@ interface ActionHandlers {
 }
 
 // Type definitions for API responses
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   count: number;
   total: number;
   average: number;
@@ -76,17 +76,17 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-interface ActiveUsersResponse {
+export interface ActiveUsersResponse {
   count: number;
   timeline: Array<{ date: string; count: number }>;
 }
 
-interface RegisteredUsersResponse {
+export interface RegisteredUsersResponse {
   count: number;
   growth: number;
 }
 
-interface RidesResponse {
+export interface RidesResponse {
   total: number;
   timeline: Array<{
     date: string;
@@ -97,7 +97,7 @@ interface RidesResponse {
   cancellationRate: number;
 }
 
-interface DriverRatingsResponse {
+export interface DriverRatingsResponse {
   average: number;
   distribution: Array<{
     rating: number;
@@ -113,7 +113,7 @@ interface RideMetricsResponse {
   }>;
 }
 
-interface DriverUtilizationResponse {
+export interface DriverUtilizationResponse {
   rate: number;
   timeline: Array<{
     date: string;
@@ -121,7 +121,7 @@ interface DriverUtilizationResponse {
   }>;
 }
 
-interface RatioResponse {
+export interface RatioResponse {
   ratio: number;
   trend: Array<{
     date: string;
@@ -137,7 +137,7 @@ interface EarningsResponse {
   }>;
 }
 
-interface GrowthResponse {
+export interface GrowthResponse {
   rate: number;
   timeline: Array<{
     date: string;
@@ -145,7 +145,7 @@ interface GrowthResponse {
   }>;
 }
 
-interface PopularRoutesResponse {
+export interface PopularRoutesResponse {
   routes: Array<{
     route: string;
     count: number;
@@ -153,14 +153,14 @@ interface PopularRoutesResponse {
   }>;
 }
 
-interface PeakHoursResponse {
+export interface PeakHoursResponse {
   hours: Array<{
     hour: number;
     rides: number;
   }>;
 }
 
-interface CustomerSatisfactionResponse {
+export interface CustomerSatisfactionResponse {
   metrics: Array<{
     category: string;
     score: number;
@@ -168,7 +168,7 @@ interface CustomerSatisfactionResponse {
 }
 
 // Define TypeScript interfaces
-interface RatingData {
+export interface RatingData {
   rating: string;
   frequency: number;
   percentageChange: number;
@@ -183,20 +183,20 @@ interface TooltipProps {
   label?: string;
 }
 
-interface ChartProps {
+export interface ChartProps {
   data?: RatingData[];
   loading?: boolean;
   error?: string | null;
 }
 
-interface ChartCardProps {
+export interface ChartCardProps {
   title: string;
   description?: string;
   children: React.ReactNode;
   loading?: boolean;
 }
 
-interface DashboardGridProps {
+export interface DashboardGridProps {
   metrics?: {
     driverStats?: RatingData[];
   };

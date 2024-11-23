@@ -27,7 +27,7 @@ interface Message {
   content: string;
   sender: 'user' | 'agent' | 'system';
   timestamp: Date;
-  attachments?: string[]; // Optional attachments
+  attachments?: string[];
   status: 'sent' | 'delivered' | 'read' | 'failed';
 }
 
@@ -46,8 +46,10 @@ interface Chat {
   messages: Message[];
   lastActivity: Date;
   department?: string;
-  priority?: 'low' | 'medium' | 'high';
+  priority: 'low' | 'medium' | 'high';
 }
+
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
 const LiveChat: React.FC = () => {
   // State management with more comprehensive types
@@ -59,7 +61,13 @@ const LiveChat: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Sample initial data (would be replaced with actual data fetching)
-  const createChat = (id: string, customerName: string, agentName: string, department: string, priority: string): Chat => ({
+  const createChat = (
+    id: string, 
+    customerName: string, 
+    agentName: string, 
+    department: string, 
+    priority: 'low' | 'medium' | 'high'
+  ): Chat => ({
     id,
     customer: {
       id: `USR-${id}`,
@@ -100,6 +108,20 @@ const LiveChat: React.FC = () => {
   }, []);
 
   // Advanced message sending logic
+
+  const getPriorityBadgeVariant = (priority: 'low' | 'medium' | 'high'): BadgeVariant => {
+    switch (priority) {
+      case 'high':
+        return 'destructive';
+      case 'medium':
+        return 'secondary';
+      case 'low':
+        return 'outline';
+      default:
+        return 'default';
+    }
+  }; 
+
   const sendMessage = () => {
     if (!activeChat || (!message.trim() && attachments.length === 0)) return;
 
@@ -177,12 +199,7 @@ const LiveChat: React.FC = () => {
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="font-semibold">{chat.customer.name}</span>
-                      <Badge 
-                        variant={
-                          chat.priority === 'high' ? 'destructive' : 
-                          chat.priority === 'medium' ? 'warning' : 'secondary'
-                        }
-                      >
+                      <Badge variant={getPriorityBadgeVariant(chat.priority)}>
                         {chat.priority}
                       </Badge>
                     </div>

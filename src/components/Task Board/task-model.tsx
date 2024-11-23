@@ -16,11 +16,37 @@ import {
 import { cn } from "@/lib/utils";
 import { Input } from '../ui/Input';
 
+// Define interfaces for the component
+interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+type Priority = 'Low' | 'Medium' | 'High';
+
+interface Task {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  priority: Priority;
+  date: string;
+  category: string;
+  progress: number;
+  team: string[];
+  starred: boolean;
+  tags: string[];
+  subtasks: Subtask[];
+  createdAt?: string;
+}
+
 interface TaskModalProps {
   showModal: boolean;
   setShowModal: (show: boolean) => void;
-  addNewTask: (task: any) => void;
-  
+  addNewTask: (task: Task) => void;
   categories: Array<{ id: string; name: string }>;
 }
 
@@ -31,7 +57,7 @@ const priorityColors = {
 };
 
 const TaskModal = ({ showModal, setShowModal, addNewTask, categories }: TaskModalProps) => {
-  const initialTaskState = {
+  const initialTaskState: Task = {
     id: crypto.randomUUID(),
     icon: '📝',
     title: '',
@@ -48,7 +74,7 @@ const TaskModal = ({ showModal, setShowModal, addNewTask, categories }: TaskModa
     subtasks: []
   };
 
-  const [newTask, setNewTask] = useState(initialTaskState);
+  const [newTask, setNewTask] = useState<Task>(initialTaskState);
   const [newTag, setNewTag] = useState('');
   const [newSubtask, setNewSubtask] = useState('');
   const [newTeamMember, setNewTeamMember] = useState('');
@@ -229,39 +255,39 @@ const TaskModal = ({ showModal, setShowModal, addNewTask, categories }: TaskModa
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Priority</label>
-              <Select
-                value={newTask.priority}
-                onValueChange={(value) => setNewTask({ ...newTask, priority: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Priority Level</SelectLabel>
-                    <SelectItem value="Low">
-                      <div className="flex items-center gap-2">
-                        <Flag className="h-4 w-4 text-blue-500" />
-                        <span>Low Priority</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Medium">
-                      <div className="flex items-center gap-2">
-                        <Flag className="h-4 w-4 text-yellow-500" />
-                        <span>Medium Priority</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="High">
-                      <div className="flex items-center gap-2">
-                        <Flag className="h-4 w-4 text-red-500" />
-                        <span>High Priority</span>
-                      </div>
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+        <label className="text-sm font-medium">Priority</label>
+        <Select
+          value={newTask.priority}
+          onValueChange={(value: Priority) => setNewTask({ ...newTask, priority: value })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Priority Level</SelectLabel>
+              <SelectItem value="Low">
+                <div className="flex items-center gap-2">
+                  <Flag className="h-4 w-4 text-blue-500" />
+                  <span>Low Priority</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="Medium">
+                <div className="flex items-center gap-2">
+                  <Flag className="h-4 w-4 text-yellow-500" />
+                  <span>Medium Priority</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="High">
+                <div className="flex items-center gap-2">
+                  <Flag className="h-4 w-4 text-red-500" />
+                  <span>High Priority</span>
+                </div>
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
           </div>
 
           <div className="space-y-2">
@@ -309,19 +335,18 @@ const TaskModal = ({ showModal, setShowModal, addNewTask, categories }: TaskModa
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {newTask.tags.map(tag => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="flex items-center gap-1 px-3 py-1"
+            <div className="space-y-2 mt-2">
+              {newTask.subtasks.map((subtask: Subtask) => (
+                <div
+                  key={subtask.id}
+                  className="flex items-center justify-between bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  {tag}
+                  <span className="text-sm">{subtask.title}</span>
                   <X
-                    className="h-3 w-3 cursor-pointer hover:text-red-500"
-                    onClick={() => handleRemoveTag(tag)}
+                    className="h-4 w-4 cursor-pointer text-gray-500 hover:text-red-500"
+                    onClick={() => handleRemoveSubtask(subtask.id)}
                   />
-                </Badge>
+                </div>
               ))}
             </div>
           </div>

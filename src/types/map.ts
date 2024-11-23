@@ -41,4 +41,13 @@ export interface Driver {
   }
 
 
-  
+  export interface DriverStatus {
+    center: [number, number];
+    zoom: number;
+    selectedDriver: Driver | null;
+    drivers: Driver[];
+    filters: {
+      status: ('available' | 'busy' | 'offline')[];
+      vehicleType: ('standard' | 'premium')[];
+    };
+  }

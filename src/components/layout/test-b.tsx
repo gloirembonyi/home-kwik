@@ -238,7 +238,7 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
         {expanded[item.key] && (
           <div className="mt-1 space-y-1 animate-slideDown">
             {item.subItems.map((subItem, index) => (
-              <Link key={index} href={subItem.path}>
+              <Link key={`${item.key}-${index}`} href={subItem.path as any}>
                 <Button
                   variant="ghost"
                   className={cn(

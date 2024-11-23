@@ -1,14 +1,28 @@
 // components/Sidebar.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  BarChart3, Car, Users, Navigation, Shield,
-  Bell, MessageSquare, Star, MessageCircle,
-  ChevronDown, Menu, Gauge, UserCog, CarFront,
-  ClipboardList, LogOut, Settings, Home,
-  BookOpen
-} from 'lucide-react';
+  BarChart3,
+  Car,
+  Users,
+  Navigation,
+  Shield,
+  Bell,
+  MessageSquare,
+  Star,
+  MessageCircle,
+  ChevronDown,
+  Menu,
+  Gauge,
+  UserCog,
+  CarFront,
+  ClipboardList,
+  LogOut,
+  Settings,
+  Home,
+  BookOpen,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/base/button";
 import {
@@ -18,9 +32,13 @@ import {
 } from "@/components/ui/base/tooltip";
 import { ScrollArea } from "@/components/ui/base/scroll-area";
 import { Separator } from "@/components/ui/base/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/base/avatar";
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/base/avatar";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface SubItem {
   title: string;
@@ -58,8 +76,8 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -69,120 +87,226 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
   }, [isSidebarOpen, onSidebarChange]);
 
   const toggleMenu = (key: string) => {
-    setExpanded(prev => ({
+    setExpanded((prev) => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
   const menuItems: MenuItem[] = [
     {
-      key: 'dashboard',
+      key: "dashboard",
       icon: <Home className="text-emerald-400" />,
-      title: 'Dashboard',
+      title: "Dashboard",
       subItems: [
-        { title: 'Overview', icon: <Home className="h-4 w-4" />, path: '/dashboard/UserOverview' },
-        { title: 'Settings', icon: <Settings className="h-4 w-4" />, path: '/dashboard/settings' },
-      ]
+        {
+          title: "Overview",
+          icon: <Home className="h-4 w-4" />,
+          path: "/dashboard/UserOverview",
+        },
+        {
+          title: "Settings",
+          icon: <Settings className="h-4 w-4" />,
+          path: "/dashboard/settings",
+        },
+      ],
     },
     {
-        key: 'analytics',
-        icon: <BarChart3 className="text-blue-400" />,
-        title: 'Analytics & Reports',
-        subItems: [
-          { title: 'Ride Statistics', icon: <Gauge className="h-4 w-4" />, path: '/analytics/rides' },
-          { title: 'Driver Performance', icon: <UserCog className="h-4 w-4" />, path: '/analytics/drivers' },
-          { title: 'Growth Analysis', icon: <BarChart3 className="h-4 w-4" />, path: '/analytics/Growth' },
-        ]
-      },
-      {
-        key: 'drivers',
-        icon: <Users className="text-green-400" />,
-        title: 'Driver Management',
-        subItems: [
-          { title: 'Driver Registration', icon: <UserCog className="h-4 w-4" />, path: '/drivers/register' },
-          { title: 'Driver Profiles', icon: <Users className="h-4 w-4" />, path: '/drivers/profiles' },
-          { title: 'Earnings Tracking', icon: <BarChart3 className="h-4 w-4" />, path: '/drivers/earnings' },
-        ]
-      },
-      {
-        key: 'vehicles',
-        icon: <Car className="text-yellow-400" />,
-        title: 'Vehicle Management',
-        subItems: [
-          { title: 'Vehicle Registry', icon: <CarFront className="h-4 w-4" />, path: '/vehicles/registry' },
-          { title: 'Assignment', icon: <ClipboardList className="h-4 w-4" />, path: '/vehicles/assignment' },
-        ]
-      },
-      {
-        key: 'rides',
-        icon: <Navigation className="text-purple-400" />,
-        title: 'Ride Management',
-        subItems: [
-          { title: 'Ride Requests', icon: <ClipboardList className="h-4 w-4" />, path: '/rides/requests' },
-          { title: 'Status Tracking', icon: <Gauge className="h-4 w-4" />, path: '/rides/status' },
-        ]
-      },
-      {
-        key: 'users',
-        icon: <Users className="text-pink-400" />,
-        title: 'User Management',
-        subItems: [
-          { title: 'User Profiles', icon: <Users className="h-4 w-4" />, path: '/users/profiles' },
-          { title: 'Role Management', icon: <Shield className="h-4 w-4" />, path: '/users/roles' },
-        ]
-      },
-      {
-        key: 'security',
-        icon: <Shield className="text-red-400" />,
-        title: 'Security',
-        subItems: [
-          { title: 'Authentication', icon: <Shield className="h-4 w-4" />, path: '/security/auth' },
-          { title: 'Access Control', icon: <UserCog className="h-4 w-4" />, path: '/security/access' },
-        ]
-      },
-      {
-        key: 'notifications',
-        icon: <Bell className="text-amber-400" />,
-        title: 'Notifications',
-        subItems: [
-          { title: 'Management', icon: <Bell className="h-4 w-4" />, path: '/notifications/manage' },
-          { title: 'Test Notifications', icon: <MessageCircle className="h-4 w-4" />, path: '/notifications/test' },
-        ]
-      },
-      {
-        key: 'support',
-        icon: <MessageCircle className="text-indigo-400" />,
-        title: 'Customer Support',
-        subItems: [
-          { title: 'Ticket Dashboard', icon: <ClipboardList className="h-4 w-4" />, path: '/support/tickets' },
-          { title: 'Live Chat', icon: <MessageSquare className="h-4 w-4" />, path: '/support/chat' },
-          { title: 'Support Analytics', icon: <BarChart3 className="h-4 w-4" />, path: '/support/analytics' },
-          { title: 'Knowledge Base', icon: <BookOpen className="h-4 w-4" />, path: '/support/knowledge' },
-        ]
-      },
-      {
-        key: 'reviews',
-        icon: <Star className="text-yellow-400" />,
-        title: 'Reviews',
-        subItems: [
-          { title: 'Ride Reviews', icon: <Star className="h-4 w-4" />, path: '/reviews/rides' },
-          { title: 'Driver Reviews', icon: <Star className="h-4 w-4" />, path: '/reviews/drivers' },
-        ]
-      },
-      {
-        key: 'sms',
-        icon: <MessageSquare className="text-teal-400" />,
-        title: 'SMS',
-        subItems: [
-          { title: 'Bulk SMS', icon: <MessageSquare className="h-4 w-4" />, path: '/sms/bulk' },
-          { title: 'Individual SMS', icon: <MessageCircle className="h-4 w-4" />, path: '/sms/individual' },
-        ]
-      },
+      key: "analytics",
+      icon: <BarChart3 className="text-blue-400" />,
+      title: "Analytics & Reports",
+      subItems: [
+        {
+          title: "Ride Statistics",
+          icon: <Gauge className="h-4 w-4" />,
+          path: "/analytics/rides",
+        },
+        {
+          title: "Driver Performance",
+          icon: <UserCog className="h-4 w-4" />,
+          path: "/analytics/drivers",
+        },
+        {
+          title: "Growth Analysis",
+          icon: <BarChart3 className="h-4 w-4" />,
+          path: "/analytics/Growth",
+        },
+      ],
+    },
+    {
+      key: "drivers",
+      icon: <Users className="text-green-400" />,
+      title: "Driver Management",
+      subItems: [
+        {
+          title: "Driver Registration",
+          icon: <UserCog className="h-4 w-4" />,
+          path: "/drivers/register",
+        },
+        {
+          title: "Driver Profiles",
+          icon: <Users className="h-4 w-4" />,
+          path: "/drivers/profiles",
+        },
+        {
+          title: "Earnings Tracking",
+          icon: <BarChart3 className="h-4 w-4" />,
+          path: "/drivers/earnings",
+        },
+      ],
+    },
+    {
+      key: "vehicles",
+      icon: <Car className="text-yellow-400" />,
+      title: "Vehicle Management",
+      subItems: [
+        {
+          title: "Vehicle Registry",
+          icon: <CarFront className="h-4 w-4" />,
+          path: "/vehicles/registry",
+        },
+        {
+          title: "Assignment",
+          icon: <ClipboardList className="h-4 w-4" />,
+          path: "/vehicles/assignment",
+        },
+      ],
+    },
+    {
+      key: "rides",
+      icon: <Navigation className="text-purple-400" />,
+      title: "Ride Management",
+      subItems: [
+        {
+          title: "Ride Requests",
+          icon: <ClipboardList className="h-4 w-4" />,
+          path: "/rides/requests",
+        },
+        {
+          title: "Status Tracking",
+          icon: <Gauge className="h-4 w-4" />,
+          path: "/rides/status",
+        },
+      ],
+    },
+    {
+      key: "users",
+      icon: <Users className="text-pink-400" />,
+      title: "User Management",
+      subItems: [
+        {
+          title: "User Profiles",
+          icon: <Users className="h-4 w-4" />,
+          path: "/users/profiles",
+        },
+        {
+          title: "Role Management",
+          icon: <Shield className="h-4 w-4" />,
+          path: "/users/roles",
+        },
+      ],
+    },
+    {
+      key: "security",
+      icon: <Shield className="text-red-400" />,
+      title: "Security",
+      subItems: [
+        {
+          title: "Authentication",
+          icon: <Shield className="h-4 w-4" />,
+          path: "/security/auth",
+        },
+        {
+          title: "Access Control",
+          icon: <UserCog className="h-4 w-4" />,
+          path: "/security/access",
+        },
+      ],
+    },
+    {
+      key: "notifications",
+      icon: <Bell className="text-amber-400" />,
+      title: "Notifications",
+      subItems: [
+        {
+          title: "Management",
+          icon: <Bell className="h-4 w-4" />,
+          path: "/notifications/manage",
+        },
+        {
+          title: "Test Notifications",
+          icon: <MessageCircle className="h-4 w-4" />,
+          path: "/notifications/test",
+        },
+      ],
+    },
+    {
+      key: "support",
+      icon: <MessageCircle className="text-indigo-400" />,
+      title: "Customer Support",
+      subItems: [
+        {
+          title: "Ticket Dashboard",
+          icon: <ClipboardList className="h-4 w-4" />,
+          path: "/support/tickets",
+        },
+        {
+          title: "Live Chat",
+          icon: <MessageSquare className="h-4 w-4" />,
+          path: "/support/chat",
+        },
+        {
+          title: "Support Analytics",
+          icon: <BarChart3 className="h-4 w-4" />,
+          path: "/support/analytics",
+        },
+        {
+          title: "Knowledge Base",
+          icon: <BookOpen className="h-4 w-4" />,
+          path: "/support/knowledge",
+        },
+      ],
+    },
+    {
+      key: "reviews",
+      icon: <Star className="text-yellow-400" />,
+      title: "Reviews",
+      subItems: [
+        {
+          title: "Ride Reviews",
+          icon: <Star className="h-4 w-4" />,
+          path: "/reviews/rides",
+        },
+        {
+          title: "Driver Reviews",
+          icon: <Star className="h-4 w-4" />,
+          path: "/reviews/drivers",
+        },
+      ],
+    },
+    {
+      key: "sms",
+      icon: <MessageSquare className="text-teal-400" />,
+      title: "SMS",
+      subItems: [
+        {
+          title: "Bulk SMS",
+          icon: <MessageSquare className="h-4 w-4" />,
+          path: "/sms/bulk",
+        },
+        {
+          title: "Individual SMS",
+          icon: <MessageCircle className="h-4 w-4" />,
+          path: "/sms/individual",
+        },
+      ],
+    },
   ];
 
   const renderMenuItem = (item: MenuItem) => {
-    const isAnySubItemActive = item.subItems.some(subItem => pathname === subItem.path);
+    const isAnySubItemActive = item.subItems.some(
+      (subItem) => pathname === subItem.path
+    );
 
     if (!isSidebarOpen) {
       return (
@@ -200,7 +324,7 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
                 className: cn(
                   (item.icon as React.ReactElement).props.className,
                   "h-5 w-5 transition-transform group-hover:scale-110"
-                )
+                ),
               })}
               {isAnySubItemActive && (
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-l-full" />
@@ -232,7 +356,7 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
               className: cn(
                 (item.icon as React.ReactElement).props.className,
                 "h-5 w-5 transition-transform group-hover:scale-110"
-              )
+              ),
             })}
             <span className="text-sm font-medium">{item.title}</span>
           </div>
@@ -250,7 +374,7 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
         {expanded[item.key] && (
           <div className="mt-1 space-y-1 animate-slideDown">
             {item.subItems.map((subItem, index) => (
-              <Link key={index} href={subItem.path}>
+              <Link key={`${item.key}-${index}`} href={subItem.path as any}>
                 <Button
                   variant="ghost"
                   className={cn(
@@ -323,9 +447,7 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
 
         {/* Navigation */}
         <ScrollArea className="flex-1 px-2 py-2">
-          <nav className="space-y-1">
-            {menuItems.map(renderMenuItem)}
-          </nav>
+          <nav className="space-y-1">{menuItems.map(renderMenuItem)}</nav>
         </ScrollArea>
 
         {/* User Profile Section */}
@@ -333,12 +455,18 @@ const Sidebar = ({ children, onSidebarChange }: SidebarProps) => {
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
               <AvatarImage src="/avatar-placeholder.png" />
-              <AvatarFallback className="bg-blue-500/20 text-blue-500">AD</AvatarFallback>
+              <AvatarFallback className="bg-blue-500/20 text-blue-500">
+                AD
+              </AvatarFallback>
             </Avatar>
             {isSidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-200 truncate">Admin User</p>
-                <p className="text-xs text-gray-400 truncate">admin@kwikride.com</p>
+                <p className="text-sm font-medium text-gray-200 truncate">
+                  Admin User
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  admin@kwikride.com
+                </p>
               </div>
             )}
           </div>

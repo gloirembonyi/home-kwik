@@ -1,9 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/base/card';
 import { Badge } from '@/components/ui/base/badge';
-import { Progress } from '@/components/ui/base/progress';
 import { TrendingUp, TrendingDown, Minus, Info, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+interface DetailItem {
+  label: string;
+  value: number;
+}
+
+interface MetricData {
+  category: string;
+  score: number;
+  previousScore: number;
+  trend: 'up' | 'down' | 'stable';
+  details: DetailItem[];
+}
 
 const mockData = [
   {
@@ -52,29 +64,30 @@ const mockData = [
   }
 ];
 
-const CustomerSatisfaction = () => {
-  const [selectedMetric, setSelectedMetric] = useState(null);
-  const [hoveredDetail, setHoveredDetail] = useState(null);
-  const cardRef = useRef(null);
+const CustomerSatisfaction: React.FC = () => {
+  const [selectedMetric, setSelectedMetric] = useState<number | null>(null);
+  const [hoveredDetail, setHoveredDetail] = useState<string | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Add a subtle parallax effect on scroll
     const handleScroll = () => {
       if (cardRef.current) {
-        cardRef.current.style.transform = `translateY(${window.pageYOffset * 0.05}px)`;
+        const transform = `translateY(${window.pageYOffset * 0.05}px)`;
+        cardRef.current.style.setProperty('transform', transform);
       }
     };
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const getProgressColor = (score) => {
+  const getProgressColor = (score: number): string => {
     if (score >= 90) return 'bg-green-500';
     if (score >= 80) return 'bg-blue-500';
     return 'bg-yellow-500';
   };
 
-  const getBackgroundGradient = (trend) => {
+  const getBackgroundGradient = (trend: MetricData['trend']): string => {
     switch (trend) {
       case 'up':
         return 'bg-gradient-to-r from-green-50 to-white';
@@ -112,15 +125,15 @@ const CustomerSatisfaction = () => {
         <div className="space-y-8">
           {mockData.map((metric, index) => (
             <motion.div
-              key={index}
-              className={`p-4 rounded-lg transition-all duration-300 transform hover:scale-102 ${getBackgroundGradient(
-                metric.trend
-              )} ${selectedMetric === index ? 'ring-2 ring-blue-400' : ''}`}
-              onClick={() => setSelectedMetric(selectedMetric === index ? null : index)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-            >
+            key={index}
+            className={`p-4 rounded-lg transition-all transform hover:scale-102 ${
+              getBackgroundGradient(metric.trend as "up" | "down" | "stable")
+            } ${selectedMetric === index ? "ring-2 ring-blue-400" : ""}`}
+            onClick={() => setSelectedMetric(selectedMetric === index ? null : index)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+          >
               <div className="flex justify-between items-center mb-4">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
@@ -222,7 +235,7 @@ const CustomerSatisfaction = () => {
               <motion.div
                 className="flex justify-end mt-4 text-gray-500 cursor-pointer"
                 onClick={() => setSelectedMetric(selectedMetric === index ? null : index)}
-                whileHover={{ color: 'gray-800' }}
+                whileHover={{ color: '#1f2937' }}
               >
                 <span className="mr-1">
                   {selectedMetric === index ? 'Hide Details' : 'View Details'}

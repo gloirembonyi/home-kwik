@@ -7,8 +7,45 @@ import {
   ArrowDownRight, Activity, AlertTriangle, CheckCircle 
 } from 'lucide-react';
 
+// Define interfaces for type safety
+interface HourData {
+  hour: number;
+  rides: number;
+  avgWaitTime: number;
+  utilization: number;
+  status: 'high' | 'medium' | 'low';
+  revenue: number;
+  previousRides: number;
+}
+
+interface Stats {
+  totalRides: number;
+  avgWaitTime: number;
+  avgUtilization: number;
+  totalRevenue: number;
+}
+
+interface StatCardProps {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  trend: number;
+  detail?: string;
+  className?: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: HourData }>;
+  label?: string;
+}
+
+interface StatusIndicatorProps {
+  utilization: number;
+}
+
 // Utility functions for data generation and processing
-const generateMockData = (baseDate = new Date()) => {
+const generateMockData = (baseDate = new Date()): HourData[] => {
   const isWeekend = baseDate.getDay() === 0 || baseDate.getDay() === 6;
   
   return Array.from({ length: 24 }, (_, i) => {
@@ -36,7 +73,7 @@ const generateMockData = (baseDate = new Date()) => {
 };
 
 // Enhanced Stat Card with Animation
-const StatCard = ({ icon: Icon, label, value, trend, detail, className = '' }) => {
+const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, trend, detail, className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
   
   return (
@@ -72,7 +109,7 @@ const StatCard = ({ icon: Icon, label, value, trend, detail, className = '' }) =
 };
 
 // Enhanced Tooltip Component
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const ridesDiff = data.rides - data.previousRides;
@@ -82,7 +119,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="bg-white p-4 shadow-xl rounded-lg border border-gray-200">
         <div className="flex items-center justify-between mb-2">
           <p className="font-semibold text-gray-900">
-            {`${String(label).padStart(2, '0')}:00 - ${String(label + 1).padStart(2, '0')}:00`}
+            {`${String(label).padStart(2, '0')}:00 - ${String(Number(label) + 1).padStart(2, '0')}:00`}
           </p>
           <Badge 
             className={
@@ -128,7 +165,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // Status Indicator Component
-const StatusIndicator = ({ utilization }) => {
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({ utilization }) => {
   const status = utilization > 80 ? 'critical' : utilization > 60 ? 'warning' : 'normal';
   
   return (
@@ -152,9 +189,9 @@ const StatusIndicator = ({ utilization }) => {
   );
 };
 
-const PeakHours = () => {
+const PeakHours: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState('today');
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<HourData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -166,7 +203,7 @@ const PeakHours = () => {
     }, 1000);
   }, [timeFilter]);
 
-  const stats = useMemo(() => {
+  const stats = useMemo<Stats | null>(() => {
     if (!data.length) return null;
     
     const totalRides = data.reduce((sum, hour) => sum + hour.rides, 0);

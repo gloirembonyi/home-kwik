@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/base/badge';
 
 
 // Google Maps Script Loader Component
+// Google Maps Script Loader Component
 const useGoogleMaps = (apiKey: string) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -23,9 +24,18 @@ const useGoogleMaps = (apiKey: string) => {
     // Function to load the Google Maps script
     const loadGoogleMapsScript = () => {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey=''}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
       script.async = true;
       script.defer = true;
+
+      // Unique identifier to prevent multiple loads
+      script.id = 'google-maps-script';
+
+      // Remove any existing script to prevent duplicates
+      const existingScript = document.getElementById('google-maps-script');
+      if (existingScript) {
+        existingScript.remove();
+      }
 
       script.onload = () => {
         setIsLoaded(true);
@@ -38,7 +48,9 @@ const useGoogleMaps = (apiKey: string) => {
       document.head.appendChild(script);
 
       return () => {
-        document.head.removeChild(script);
+        if (script.parentNode) {
+          document.head.removeChild(script);
+        }
       };
     };
 
@@ -51,6 +63,10 @@ const useGoogleMaps = (apiKey: string) => {
 
   return { isLoaded, loadError };
 };
+
+
+type DriverStatus = 'available' | 'busy' | 'offline';
+type VehicleType = 'old' | 'new';
 
 interface Location {
   lat: number;
@@ -77,9 +93,10 @@ interface Driver {
   };
 }
 
+
 interface MapFilters {
-  status: ('available' | 'busy' | 'offline')[];
-  vehicleType: ('old' | 'new')[];
+  status: DriverStatus[];
+  vehicleType: VehicleType[];
 }
 
 interface MapStats {
@@ -350,24 +367,26 @@ const LiveMap: React.FC = () => {
     }
   }, [mapCenter]);
 
-  const handleFilterChange = (type: keyof MapFilters, value: string) => {
+  const handleFilterChange = (type: keyof MapFilters, value: DriverStatus | VehicleType) => {
     setFilters(prev => {
       const updated = { ...prev };
-      const index = updated[type].indexOf(value);
-  
-      if (index === -1) {
-        // Add value to array if it doesn't exist
-        updated[type] = [...updated[type], value];
+      if (type === 'status') {
+        const statusValue = value as DriverStatus;
+        const statusArray = prev.status.includes(statusValue)
+          ? prev.status.filter(s => s !== statusValue)
+          : [...prev.status, statusValue];
+        return { ...prev, status: statusArray };
       } else {
-        // Remove value from array if it exists
-        updated[type] = updated[type].filter((v) => v !== value);
+        const vehicleValue = value as VehicleType;
+        const vehicleArray = prev.vehicleType.includes(vehicleValue)
+          ? prev.vehicleType.filter(v => v !== vehicleValue)
+          : [...prev.vehicleType, vehicleValue];
+        return { ...prev, vehicleType: vehicleArray };
       }
-  
-      return updated;
     });
   };
 
-  const getStatusColor = (status: Driver['status']) => {
+  const getStatusColor = (status: DriverStatus): string => {
     switch (status) {
       case 'available': return 'bg-green-500';
       case 'busy': return 'bg-yellow-500';
@@ -482,10 +501,10 @@ const LiveMap: React.FC = () => {
                 <div>
                   <h4 className="font-medium mb-2">Driver Status</h4>
                   <div className="flex gap-2">
-                    {['available', 'busy', 'offline'].map(status => (
+                    {(['available', 'busy', 'offline'] as DriverStatus[]).map(status => (
                       <Button
                         key={status}
-                        variant={filters.status.includes(status as any) ? 'default' : 'outline'}
+                        variant={filters.status.includes(status) ? 'default' : 'outline'}
                         onClick={() => handleFilterChange('status', status)}
                         className="capitalize"
                       >
@@ -497,10 +516,10 @@ const LiveMap: React.FC = () => {
                 <div>
                   <h4 className="font-medium mb-2">Vehicle Type</h4>
                   <div className="flex gap-2">
-                    {['old', 'new'].map(type => (
+                    {(['old', 'new'] as VehicleType[]).map(type => (
                       <Button
                         key={type}
-                        variant={filters.vehicleType.includes(type as any) ? 'default' : 'outline'}
+                        variant={filters.vehicleType.includes(type) ? 'default' : 'outline'}
                         onClick={() => handleFilterChange('vehicleType', type)}
                         className="capitalize"
                       >

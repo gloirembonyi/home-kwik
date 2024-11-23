@@ -11,11 +11,40 @@ import {
 import {
   Card,
   CardContent,
-
 } from "@/components/ui/base/card";
 import { Input } from '../ui/Input';
 
-const SearchAndFilters = ({
+// Define interface for category object
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+}
+
+// Define type for view mode
+type ViewMode = 'grid' | 'list';
+
+// Define interface for component props
+interface SearchAndFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  filterCategory: string;
+  setFilterCategory: (category: string) => void;
+  filterStatus: string;
+  setFilterStatus: (status: string) => void;
+  filterPriority: string;
+  setFilterPriority: (priority: string) => void;
+  viewMode: 'grid' | 'list';  // Define viewMode as literal type union
+  setViewMode: (mode: 'grid' | 'list') => void;
+  setShowModal: (show: boolean) => void;
+  categories: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
+}
+
+const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   searchTerm,
   setSearchTerm,
   filterCategory,
@@ -27,7 +56,7 @@ const SearchAndFilters = ({
   viewMode,
   setViewMode,
   setShowModal,
-  categories
+  categories,
 }) => {
   return (
     <Card className="bg-white mb-8">
@@ -40,7 +69,7 @@ const SearchAndFilters = ({
               className="pl-10 w-full bg-gray-50 border-gray-200"
               placeholder="Search tasks by title or description..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               id="search-input"
             />
           </div>

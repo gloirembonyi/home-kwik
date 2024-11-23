@@ -92,12 +92,13 @@ import CombinedMetricsChart from "@/components/charts/CombinedChart";
 import TaskBoard from "@/components/Task Board/page";
 import Sidebar from "@/components/layout/Sidebar/page";
 import ActivityFeed from "@/components/dashboard/ActivityFeed/page";
-import { RiderHistory, DriverHistory } from "@/components/dashboard/analytics/Ride-Share";
 import UserDashboard from "@/components/dashboard/userdashboard/page";
 import LiveChat from "@/components/support/LiveChat";
 import TicketDashboard from "@/components/support/TicketDashboard";
 import KwikRideAdminDashboard from "@/components/support/AI/page";
 import { AnalyticsService } from "@/services/analytics";
+import DriverHistory from "@/components/dashboard/analytics/driver-history";
+import RiderHistory from "@/components/dashboard/analytics/riderhistory";
 
 
 //Analytics Service
@@ -440,67 +441,6 @@ const Dashboard = () => {
                   <TabsContent value="overview" className="space-y-6">
                     {/* Key Metrics Grid */}
 
-                    <div>
-                      {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                      {[
-                        {
-                          title: "Active Users",
-                          value: metrics.activeUsers,
-                          icon: Users,
-                          change: 12,
-                          color: "text-blue-500",
-                        },
-                        {
-                          title: "Total Revenue",
-                          value: metrics.driverEarnings,
-                          icon: DollarSign,
-                          change: 8,
-                          color: "text-green-500",
-                          prefix: "RWF",
-                        },
-                        {
-                          title: "Completion Rate",
-                          value: metrics.completionRate,
-                          icon: Target,
-                          change: 5,
-                          color: "text-yellow-500",
-                          suffix: "%",
-                        },
-                        {
-                          title: "Growth Rate",
-                          value: metrics.growthRate,
-                          icon: TrendingUp,
-                          change: 3,
-                          color: "text-purple-500",
-                          suffix: "%",
-                        },
-                      ].map((metric, index) => (
-                        <MetricCard
-                          key={index}
-                          title={metric.title}
-                          value={
-                            loading
-                              ? "-"
-                              : `${
-                                  metric.prefix || ""
-                                }${metric.value.toLocaleString()}${
-                                  metric.suffix || ""
-                                }`
-                          }
-                          change={metric.change}
-                          icon={
-                            <metric.icon
-                              className={`h-4 w-4 ${metric.color}`}
-                            />
-                          }
-                          loading={loading}
-                          details={
-                            <UserActivityChart data={metrics.userActivities} />
-                          }
-                        />
-                      ))}
-                    </div> */}
-                    </div>
                     <div>
                       {/* <KwikRideAdminDashboard /> */}
                       <PeakHours />

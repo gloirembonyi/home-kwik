@@ -38,6 +38,66 @@ import { Select } from "@/components/ui/base/select";
 import TaskModal from "./task-model";
 import SearchAndFilters from "./Search-Filters";
 
+type TaskStatus = 'Todo' | 'In Progress' | 'Review' | 'Completed';
+type TaskPriority = 'Low' | 'Medium' | 'High';
+
+interface StatusColors {
+  [key: string]: string;
+  Todo: string;
+  "In Progress": string;
+  Review: string;
+  Completed: string;
+}
+
+interface PriorityColors {
+  [key: string]: string;
+  Low: string;
+  Medium: string;
+  High: string;
+}
+
+interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+interface Task {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  type: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  date: string;
+  category: string;
+  progress: number;
+  team: string[];
+  starred: boolean;
+  tags: string[];
+  subtasks: Subtask[];
+}
+
+interface SearchAndFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  filterCategory: string;
+  setFilterCategory: (category: string) => void;
+  filterStatus: string;
+  setFilterStatus: (status: string) => void;
+  filterPriority: string;
+  setFilterPriority: (priority: string) => void;
+  viewMode: 'grid' | 'list';  // Define viewMode as literal type union
+  setViewMode: (mode: 'grid' | 'list') => void;
+  setShowModal: (show: boolean) => void;
+  categories: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
+}
+
 const TaskBoard = () => {
   const initialCategories = [
     { id: "design", name: "Design", color: "bg-pink-100 text-pink-800" },
@@ -109,16 +169,16 @@ const TaskBoard = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const statusColors = {
+  const statusColors: StatusColors = {
     Todo: "bg-gray-100 text-gray-800",
     "In Progress": "bg-blue-100 text-blue-800",
     Review: "bg-yellow-100 text-yellow-800",
     Completed: "bg-green-100 text-green-800",
   };
 
-  const priorityColors = {
+  const priorityColors: PriorityColors = {
     Low: "bg-gray-100 text-gray-800",
     Medium: "bg-yellow-100 text-yellow-800",
     High: "bg-red-100 text-red-800",
@@ -388,10 +448,10 @@ const TaskBoard = () => {
 
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  <Badge className={statusColors[task.status]}>
+                  <Badge className={statusColors[task.status] || ''}>
                     {task.status}
                   </Badge>
-                  <Badge className={priorityColors[task.priority]}>
+                  <Badge className={priorityColors[task.priority] || ''}>
                     {task.priority}
                   </Badge>
                   {task.tags.map((tag) => (

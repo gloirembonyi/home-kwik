@@ -56,7 +56,8 @@ const mockData = [
 ];
 
 const PopularRoutes = () => {
-  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
 
   return (
     <Card className="bg-gradient-to-br from-white to-blue-50/50 rounded-2xl shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 backdrop-blur-sm">
