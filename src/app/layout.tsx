@@ -1,4 +1,4 @@
-// layout.tsx
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from "@/hooks/useAuth";
 import { TooltipProvider } from "@/components/ui/base/tooltip";
 import type { Metadata } from "next";
@@ -8,7 +8,7 @@ import App from "./_app";
 import "./globals.css";
 import 'leaflet/dist/leaflet.css';
 
-// Configure Geist Sans
+// Your font configurations remain the same
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -17,7 +17,6 @@ const geistSans = localFont({
   fallback: ['system-ui', 'arial'],
 });
 
-// Configure Geist Mono
 const geistMono = localFont({
   src: './fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
@@ -26,7 +25,6 @@ const geistMono = localFont({
   fallback: ['monospace'],
 });
 
-// Configure Inter
 const inter = Inter({
   subsets: ["latin"],
   display: 'swap',
@@ -35,7 +33,6 @@ const inter = Inter({
   fallback: ['system-ui', 'arial'],
 });
 
-// Configure Poppins
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -56,8 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html 
-      lang="en" 
+    <html
+      lang="en"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${poppins.variable}`}
     >
@@ -70,6 +67,7 @@ export default function RootLayout({
             <App>{children}</App>
           </TooltipProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );

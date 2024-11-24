@@ -1,5 +1,4 @@
 import React from 'react';
-import { Search, Filter } from 'lucide-react';
 import { Input } from '../ui/Input';
 
 interface SearchBarProps {
@@ -14,52 +13,43 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="relative group">
-        {/* Background glow effect on focus */}
+        {/* Animated background effect */}
         <div
-          className={`absolute inset-0 rounded-2xl transition-all duration-300 
-            ${searchFocused 
-              ? 'bg-blue-50/50 shadow-lg shadow-blue-100/50' 
-              : 'bg-transparent'
-            }`}
+          className={`absolute -inset-0.5 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl blur-sm transition-opacity duration-300
+            ${searchFocused ? 'opacity-100' : 'opacity-0'}`}
         />
         
         {/* Main search container */}
-        <div className="relative flex items-center">
-          {/* Search icon */}
-          <div className="absolute left-4 transition-colors duration-200">
-            <Search 
-              className={`h-4 w-4 ${
-                searchFocused 
-                  ? 'text-blue-500' 
-                  : 'text-gray-400 group-hover:text-gray-500'
-              }`}
-            />
-          </div>
-
-          {/* Search input */}
+        <div className="relative">
           <Input
-                      placeholder="Search anything..."
-                      className={`w-full h-12 pl-11 pr-12 rounded-2xl border-2 transition-all duration-200
-              ${searchFocused
-                              ? 'border-blue-500/50 bg-white'
-                              : 'border-gray-100 bg-gray-50 group-hover:border-gray-200 group-hover:bg-gray-50/80'}
+            placeholder="Search"
+            className={`w-full h-12 px-6 rounded-xl transition-all duration-300
+              ${
+                searchFocused
+                  ? 'border-blue-400 bg-white shadow-lg shadow-blue-100/50'
+                  : 'border-gray-100 bg-gray-50 hover:border-gray-200 hover:bg-white'
+              }
               placeholder-gray-400 text-gray-600 text-sm
-              focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50
+              focus:outline-none focus:ring-2 focus:ring-blue-400/20 focus:border-blue-400
             `}
-                      onFocus={() => setSearchFocused(true)}
-                      onBlur={() => setSearchFocused(false)} id={''}          />
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            id="search"
+          />
 
-          {/* Filter button */}
-          <div className="absolute right-3">
-            <button 
-              className={`p-1.5 rounded-lg transition-colors duration-200
-                ${searchFocused
-                  ? 'bg-blue-50 text-blue-500 hover:bg-blue-100'
-                  : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+          {/* Search actions */}
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+            {/* Optional filter button - using text instead of icon */}
+            <button
+              className={`px-3 py-1.5 text-sm rounded-lg transition-all duration-200
+                ${
+                  searchFocused
+                    ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                    : 'text-gray-500 hover:bg-gray-100'
                 }
               `}
             >
-              <Filter className="h-4 w-4" />
+              Filter
             </button>
           </div>
         </div>
