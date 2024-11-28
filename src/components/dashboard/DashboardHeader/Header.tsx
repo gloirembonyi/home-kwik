@@ -110,7 +110,7 @@ const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
   <div className="flex items-center space-x-6">
     <div className="flex items-center space-x-3">
       <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-200" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
         <h1 className="relative text-2xl font-bold">
           Hello John!
         </h1>
