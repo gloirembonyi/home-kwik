@@ -33,7 +33,7 @@ const App = ({ children }: { children: React.ReactNode }) => {
   }
 
   // Render authenticated layout for other pages
-  return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
+  return <>{children}</>;
 };
 
 export default App;
