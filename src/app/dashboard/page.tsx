@@ -19,7 +19,6 @@ import OverviewDashboard from "@/components/dashboard/Overview/OverviewDashboard
 import UserManagement from "@/components/dashboard/Overview/users";
 import RidesManagement from "@/components/dashboard/Overview/rides/page";
 import SettingsPage from "@/components/dashboard/Overview/UserSettings";
-import RiderHistory from "@/components/dashboard/analytics/riderhistory";
 import UserDashboard from "@/components/dashboard/userdashboard/page";
 import PeakHours from "@/components/charts/PeakHours";
 import TicketDashboard from "@/components/support/TicketDashboard";
@@ -27,6 +26,7 @@ import ProSidebar from "@/components/dashboard/Overview/sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
 import RideAnalytics from "@/components/dashboard/Overview/rides/fleet";
 import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
+import RiderHistory from "@/components/dashboard/DashboardHeader/analytics/riderhistory";
 
 
 type MenuItem = {
