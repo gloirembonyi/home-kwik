@@ -16,6 +16,17 @@ const config: Config = {
         inter: ['var(--font-inter)', 'system-ui', 'arial'],
         poppins: ['var(--font-poppins)', 'system-ui', 'arial'],
       },
+      theme: {
+        extend: {
+          colors: {
+            gray: {
+              100: "#f9fafb",
+              500: "#6b7280",
+              900: "#111827",
+            },
+          },
+        },
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

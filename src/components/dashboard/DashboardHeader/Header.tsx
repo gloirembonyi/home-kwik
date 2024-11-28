@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Search,
   Calendar,
@@ -114,21 +114,23 @@ const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
         <h1 className="relative text-2xl font-bold">
           Hello John!
         </h1>
-      </div>
-      <div className="hidden lg:flex items-center space-x-2">
-        {/* <Badge
+        <p className="text-slate-500 text-sm">
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+      </div>  
+      
+      {/* <div className="hidden lg:flex items-center space-x-2">
+        <Badge
           variant="secondary"
           className="text-xs font-medium animate-fade-in bg-primary/10 text-primary"
         >
           {TIME_RANGE_LABELS[timeRange]}
         </Badge>
-        <Badge
-          variant="outline"
-          className="text-xs font-medium animate-pulse border-green-500 text-green-500"
-        >
-          Live
-        </Badge> */}
-      </div>
+      </div> */}
     </div>
   </div>
 );
@@ -184,8 +186,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [theme, setTheme] = React.useState<"light" | "dark">("light");
   const [searchFocused, setSearchFocused] = React.useState(false);
   const [notifications] = React.useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <header
@@ -202,12 +208,23 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <BrandingSection timeRange={timeRange} />
 
             <div className="flex items-center space-x-6">
-              <SearchBar
+              {/* <SearchBar
                 searchFocused={searchFocused}
                 setSearchFocused={setSearchFocused}
-              />
+              /> */}
 
-              <Select value={timeRange} onValueChange={setTimeRange}>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search anything..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="pl-10 pr-4 py-2.5 w-72 rounded-xl border-2 border-slate-100 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+              />
+            </div>
+
+              {/* <Select value={timeRange} onValueChange={setTimeRange}>
                 <SelectTrigger className="w-48 bg-gray-50 hover:bg-white dark:bg-gray-800/50 dark:hover:bg-gray-800 transition-all duration-200 rounded-xl border-2 border-gray-200 hover:border-primary/30">
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-2 text-primary" />
@@ -223,11 +240,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     )
                   )}
                 </SelectContent>
-              </Select>
+              </Select> */}
 
 
               <div className="flex items-center space-x-3">
-                <Button
+                {/* <Button
                   variant="outline"
                   size="icon"
                   onClick={refreshData}
@@ -235,7 +252,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
                   <RefreshCcw className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />
-                </Button>
+                </Button> */}
 
                 <Button
                   variant="outline"
