@@ -1,4 +1,4 @@
-// analyticsService.ts
+
 import { ApiResponse, ActiveUsersResponse, RegisteredUsersResponse, RidesResponse, DriverRatingsResponse, RideMetricsResponse, DriverUtilizationResponse, RatioResponse, EarningsResponse, GrowthResponse, PopularRoutesResponse, PeakHoursResponse, CustomerSatisfactionResponse } from '@/types/types';
 import axios, { AxiosResponse } from 'axios';
 
@@ -20,7 +20,7 @@ export class AnalyticsApiService {
   private static instance: AnalyticsApiService;
   
   private constructor() {
-    // Initialize axios interceptors
+    
     axios.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token');
@@ -39,6 +39,7 @@ export class AnalyticsApiService {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
+          
           // Handle unauthorized access
           localStorage.removeItem('token');
           window.location.href = '/login';

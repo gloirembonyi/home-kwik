@@ -21,7 +21,7 @@
 //   private isInitialized = false;
 
 //   private constructor() {
-//     // Initialize Rollbar
+//     // Rollbar
 //     this.rollbar = new Rollbar({
 //       accessToken: process.env.NEXT_PUBLIC_ROLLBAR_TOKEN,
 //       environment: process.env.NODE_ENV,
@@ -37,13 +37,11 @@
 //       }
 //     });
 
-//     // Initialize Mixpanel
 //     mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || 'af9227f551110121e7d949ac7356d942', {
 //       debug: process.env.NODE_ENV === 'development',
 //       persistence: "localStorage"
 //     });
 
-//     // Initialize Hotjar
 //     const HOTJAR_CONFIG = {
 //       hjid: Number(process.env.NEXT_PUBLIC_HOTJAR_ID),
 //       hjsv: 6
@@ -67,14 +65,12 @@
 //   trackError(error: ErrorDetails): void {
 //     if (!this.isInitialized) return;
 
-//     // Rollbar error tracking
 //     this.rollbar.error(error.message, {
 //       ...error.metadata,
 //       severity: error.severity,
 //       stack: error.stack,
 //     });
 
-//     // Mixpanel error tracking for user context
 //     mixpanel.track('Error Occurred', {
 //       error_message: error.message,
 //       severity: error.severity,
@@ -83,33 +79,29 @@
 //     });
 //   }
 
-//   // ** User Feedback Tracking (NPS) **
 //   trackNPSScore(score: number, feedback?: string): void {
 //     if (!this.isInitialized) return;
 
-//     // Track in Mixpanel
 //     mixpanel.track('NPS Feedback', {
 //       score,
 //       feedback,
 //       timestamp: new Date().toISOString(),
 //     });
 
-//     // Log in Rollbar for correlation
 //     this.rollbar.info('NPS Feedback Received', { score, feedback });
 //   }
 
-//   // ** User Session Tracking **
 //   trackUserSession(userId: string, metadata: Record<string, any>): void {
 //     if (!this.isInitialized) return;
 
-//     // Mixpanel user identification and property setting
+
 //     mixpanel.identify(userId);
 //     mixpanel.people.set({
 //       ...metadata,
 //       last_seen: new Date().toISOString(),
 //     });
 
-//     // Set Rollbar person context
+//     // Rollbar person context
 //     this.rollbar.configure({
 //       payload: {
 //         person: {
@@ -120,7 +112,6 @@
 //     });
 //   }
 
-//   // ** Performance Monitoring **
 //   trackPerformance(metrics: {
 //     name: string;
 //     duration: number;
@@ -128,23 +119,19 @@
 //   }): void {
 //     if (!this.isInitialized) return;
 
-//     // Track in Mixpanel
 //     mixpanel.track('Performance Metric', {
 //       ...metrics,
 //       timestamp: new Date().toISOString()
 //     });
 
-//     // Log performance metrics in Rollbar
 //     this.rollbar.log('Performance Metric', {
 //       ...metrics
 //     });
 //   }
 
-//   // ** Feature Usage Tracking **
 //   trackFeatureUsage(feature: string, metadata?: Record<string, any>): void {
 //     if (!this.isInitialized) return;
 
-//     // Track in Mixpanel
 //     mixpanel.track('Feature Usage', {
 //       feature,
 //       ...metadata,
@@ -152,7 +139,6 @@
 //     });
 //   }
 
-//   // ** Error Boundary Handler **
 //   errorBoundaryHandler(error: Error, componentStack: string): void {
 //     this.trackError({
 //       message: error.message,

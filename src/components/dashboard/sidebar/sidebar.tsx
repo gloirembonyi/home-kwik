@@ -16,7 +16,8 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { cn } from '@/lib/utils'; 
+import { signOut } from 'next-auth/react'; // Import signOut function
+import { cn } from "@/components/lib/utils"
 
 interface MenuItem {
   icon?: React.ReactElement;
@@ -43,19 +44,16 @@ const ProSidebar: React.FC<SidebarProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  // Handle sidebar collapse
   const handleCollapse = useCallback(() => {
     const newCollapsedState = !isCollapsed;
     setIsCollapsed(newCollapsedState);
     onCollapseChange?.(newCollapsedState);
   }, [isCollapsed, onCollapseChange]);
 
-  // Toggle dropdown menu
   const toggleDropdown = (label: string) => {
     setOpenDropdown(openDropdown === label ? null : label);
   };
 
-  // Define sidebar menu items
   const menuItems: MenuItem[] = [
     { icon: <LayoutDashboard />, label: 'Dashboard', path: '/dashboard', badge: 3 },
     { icon: <Users />, label: 'Users', path: '/users', badge: 12 },
@@ -76,14 +74,12 @@ const ProSidebar: React.FC<SidebarProps> = ({
     { icon: <Settings />, label: 'Settings', path: '/settings' }
   ];
 
-  // Render a single menu item (handles both dropdown and regular items)
   const renderMenuItem = (item: MenuItem) => {
     const isActive = currentPath === item.path;
     const isDropdownOpen = openDropdown === item.label;
 
     return (
       <div key={item.path || item.label}>
-        {/* Main Menu Item */}
         <div
           onClick={() =>
             item.subItems ? toggleDropdown(item.label) : onNavigate(item.path)
@@ -117,7 +113,6 @@ const ProSidebar: React.FC<SidebarProps> = ({
             </span>
           )}
 
-          {/* Dropdown Indicator */}
           {!isCollapsed && item.subItems && (
             <div className="ml-auto">
               {isDropdownOpen ? (
@@ -129,7 +124,6 @@ const ProSidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* Render Subitems */}
         {isDropdownOpen && item.subItems && !isCollapsed && (
           <div className="ml-8 space-y-1">
             {item.subItems.map((subItem) => (
@@ -160,7 +154,6 @@ const ProSidebar: React.FC<SidebarProps> = ({
       )}
     >
       <div className="flex flex-col h-full">
-        {/* Logo Section */}
         <div
           className={cn(
             'px-6 py-6 border-b flex items-center transition-all duration-300',
@@ -179,12 +172,10 @@ const ProSidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Navigation Section */}
         <nav className="flex-1 px-4 py-4 overflow-y-auto">
           <div className="space-y-2">{menuItems.map(renderMenuItem)}</div>
         </nav>
 
-        {/* Actions Section */}
         <div className="p-4 border-t space-y-2">
           <div
             onClick={() => onNavigate('/help')}
@@ -198,21 +189,18 @@ const ProSidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && <span className="text-sm">Help</span>}
           </div>
 
-          {onLogout && (
-            <div
-              onClick={onLogout}
-              className={cn(
-                'group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
-                isCollapsed ? 'justify-center p-2' : 'px-4 py-3 gap-3',
-                'text-gray-600 hover:bg-red-50 hover:text-red-600'
-              )}
-            >
-              <LogOut size={20} className="text-gray-500 group-hover:text-red-500" />
-              {!isCollapsed && <span className="text-sm">Logout</span>}
-            </div>
-          )}
+          <div
+            onClick={onLogout || (() => signOut())} // Use signOut directly if no custom handler is passed
+            className={cn(
+              'group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
+              isCollapsed ? 'justify-center p-2' : 'px-4 py-3 gap-3',
+              'text-gray-600 hover:bg-red-50 hover:text-red-600'
+            )}
+          >
+            <LogOut size={20} className="text-gray-500 group-hover:text-red-500" />
+            {!isCollapsed && <span className="text-sm">Logout</span>}
+          </div>
 
-          {/* Collapse Button */}
           <button
             onClick={handleCollapse}
             className={cn(

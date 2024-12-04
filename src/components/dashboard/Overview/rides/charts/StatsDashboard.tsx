@@ -258,79 +258,81 @@ const RoleDistributionChart = () => {
 
   return (
     <Card className="rounded-3xl overflow-hidden shadow-xl">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-white p-6">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold text-slate-800">
-            Role Usage
-          </CardTitle>
-          <div className="flex space-x-2">
-            <button className="hover:bg-blue-100 p-2 rounded-full transition-colors">
-              <RefreshCw className="w-5 h-5 text-slate-600" />
-            </button>
-            <button className="hover:bg-blue-100 p-2 rounded-full transition-colors">
-              <Filter className="w-5 h-5 text-slate-600" />
-            </button>
-          </div>
+    <CardHeader className="bg-gradient-to-r from-blue-50 to-white p-6">
+      <div className="flex justify-between items-center">
+        <CardTitle className="text-xl font-bold text-slate-800">
+          Role Usage
+        </CardTitle>
+        <div className="flex space-x-2">
+          <button className="hover:bg-blue-100 p-2 rounded-full transition-colors">
+            <RefreshCw className="w-5 h-5 text-slate-600" />
+          </button>
+          <button className="hover:bg-blue-100 p-2 rounded-full transition-colors">
+            <Filter className="w-5 h-5 text-slate-600" />
+          </button>
         </div>
-      </CardHeader>
-      <CardContent className="relative h-72 p-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={roleData}
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={5}
-              dataKey="value"
-              onMouseEnter={(data) => setActiveSegment(data.name)}
-              onMouseLeave={() => setActiveSegment(null)}
-              label={({ name, value }) => `${name} ${value}%`}
-            >
-              {roleData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color}
-                  opacity={
-                    activeSegment === null || activeSegment === entry.name
-                      ? 1
-                      : 0.5
-                  }
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6">
-          {roleData.map((entry) => (
-            <div
-              key={entry.name}
-              className={`
-                flex items-center gap-2 p-2 rounded-lg 
-                transition-all duration-300 
-                ${activeSegment === entry.name ? "bg-blue-50 shadow-md" : ""}
-              `}
-            >
-              <div
-                className="w-4 h-4 rounded-full shadow-md"
-                style={{ backgroundColor: entry.color }}
+      </div>
+    </CardHeader>
+    <CardContent className="relative h-72 p-4">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={roleData}
+            cx="50%"
+            cy="50%"
+            innerRadius={0}
+            outerRadius={100}
+            paddingAngle={0}
+            dataKey="value"
+            labelLine={false}
+            onMouseEnter={(data) => setActiveSegment(data.name)}
+            onMouseLeave={() => setActiveSegment(null)}
+          >
+            {roleData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.color}
+                opacity={
+                  activeSegment === null || activeSegment === entry.name
+                    ? 1
+                    : 0.5
+                }
               />
-              <div>
-                <span className="text-sm font-semibold text-slate-600">
-                  {entry.name}: {entry.value}%
-                </span>
-                {activeSegment === entry.name && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    {entry.description}
-                  </p>
-                )}
-              </div>
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6">
+        {roleData.map((entry) => (
+          <div
+            key={entry.name}
+            className={`
+              flex items-center gap-2 p-2 rounded-lg 
+              transition-all duration-300 
+              ${activeSegment === entry.name ? "bg-blue-50 shadow-md" : ""}
+            `}
+          >
+            <div
+              className="w-4 h-4 rounded-full shadow-md"
+              style={{ backgroundColor: entry.color }}
+            />
+            <div>
+              <span className="text-sm font-semibold text-slate-600">
+                {entry.name}: {entry.value}%
+              </span>
+              {activeSegment === entry.name && (
+                <p className="text-xs text-slate-500 mt-1">
+                  {entry.description}
+                </p>
+              )}
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
   );
 };
 

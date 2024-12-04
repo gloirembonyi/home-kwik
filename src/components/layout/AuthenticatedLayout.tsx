@@ -1,13 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
-import NewSidebar from "../dashboard/Overview/sidebar";
-
+import NewSidebar from "../dashboard/sidebar/sidebar";
 
 // Define the TimeRange type
 type TimeRange = "day" | "week" | "month" | "quarter";
 const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
-  const [timeRange, setTimeRange] = useState<TimeRange>('day');
+  const [timeRange, setTimeRange] = useState<TimeRange>("day");
 
   const refreshData = () => {
     // Refresh data from API
@@ -16,7 +15,7 @@ const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-       {/* <NewSidebar 
+      {/* <NewSidebar 
         currentPath="/dashboard" onNavigate={function (path: string): void {
           throw new Error("Function not implemented.");
         } }      /> */}

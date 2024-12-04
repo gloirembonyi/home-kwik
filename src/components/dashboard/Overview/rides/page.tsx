@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 
-const Map = dynamic(() => import("..//StarticMap"), { ssr: false });
+const Map = dynamic(() => import("../dashboard/will-used/map/StarticMap"), { ssr: false });
 
 // Define a more comprehensive Ride interface
 interface Ride {

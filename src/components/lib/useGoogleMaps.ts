@@ -12,7 +12,7 @@ const useGoogleMaps = (apiKey: string) => {
       return;
     }
 
-    // Check if script is already in the document
+    // Check if script is already in the doc
     const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
     if (existingScript) {
       existingScript.addEventListener('load', () => setIsLoaded(true));
@@ -20,7 +20,7 @@ const useGoogleMaps = (apiKey: string) => {
       return;
     }
 
-    // Function to load the Google Maps script
+    // load the Google Maps script
     const loadGoogleMapsScript = () => {
       return new Promise<void>((resolve, reject) => {
         const script = document.createElement('script');
@@ -45,7 +45,6 @@ const useGoogleMaps = (apiKey: string) => {
     // Prevent multiple script loads
     loadGoogleMapsScript().catch(console.error);
 
-    // Cleanup function
     return () => {
       const script = document.querySelector(`script[src*="maps.googleapis.com"]`);
       if (script) {

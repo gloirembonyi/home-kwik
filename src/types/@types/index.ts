@@ -38,7 +38,7 @@ export interface IUserData {
 
 }
 
-// Interface for action history
+// action history
 export interface ActionHistoryRecord {
   action: string;
   timestamp: string;

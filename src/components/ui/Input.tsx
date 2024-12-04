@@ -7,7 +7,7 @@ import { BaseInput } from "./base/input";
 import { Label } from "./base/label";
 
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;

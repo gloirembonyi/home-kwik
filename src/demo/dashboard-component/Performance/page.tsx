@@ -1,10 +1,11 @@
 // components/DriverPerformanceChart.tsx
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/base/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/base/card";
+import { Spinner } from "@/components/ui/spinner";
 import mixpanel from "mixpanel-browser";
 import { useEffect, memo } from "react";
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from "recharts";
-import Spinner from "../ui/base/spinner";
+
 
 
 interface AnalyticsData {
@@ -35,7 +36,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = memo(({ data, loading 
           {/* Loading State */}
           {loading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <Spinner /> {/* Assume Spinner is a component for loading */}
+              <Spinner /> {/*component for loading */}
             </div>
           ) : data && data.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -75,7 +76,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = memo(({ data, loading 
                   dataKey="rides"
                   stroke="#8884d8"
                   name="Rides"
-                  dot={false} // Improve performance by removing dots
+                  dot={false}
                 />
                 <Line
                   yAxisId="right"
@@ -83,7 +84,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = memo(({ data, loading 
                   dataKey="revenue"
                   stroke="#82ca9d"
                   name="Revenue ($)"
-                  dot={false} // Improve performance by removing dots
+                  dot={false} 
                 />
               </LineChart>
             </ResponsiveContainer>

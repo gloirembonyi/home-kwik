@@ -1,5 +1,3 @@
-// src/types/dashboard.ts
-// Enhanced Types
 
 export interface DashboardMetrics {
   activeUsers: number;
@@ -73,24 +71,21 @@ export interface SatisfactionStat {
   score: number;
 }
 
-// UserActivityChart.tsx
 export interface UserActivityChartProps {
   data: UserActivity[];
 }
 
-// RideChart.tsx
 export interface RideChartProps {
   data: RideStat[];
 }
 
-// DriverPerformanceChart.tsx
 export interface DriverPerformanceChartProps {
   data: DriverStat[];
 }
 
 
 
-// types/dashboard.ts
+// dashboard
 
 export interface PopularRoute {
   route: string;

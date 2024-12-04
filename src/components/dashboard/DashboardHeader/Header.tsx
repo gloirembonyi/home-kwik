@@ -110,7 +110,7 @@ const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
   <div className="flex items-center space-x-6">
     <div className="flex items-center space-x-3">
       <div className="relative group">
-        <div className="space-y-2 absolute -inset-1 bg-gradient-to-r rounded-lg blur opacity-25" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
         <h1 className="relative text-2xl font-bold">
           Hello John!
         </h1>
@@ -315,7 +315,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       className="relative group px-4 rounded-xl border-2 border-gray-200 hover:border-primary/30"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 ">
                         <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-purple-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-white">
                             JD

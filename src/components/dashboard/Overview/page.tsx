@@ -34,7 +34,7 @@ import DashboardHeader from "../DashboardHeader/Header";
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
-// Enhanced Color Palette
+// Color Palette
 const CHART_COLORS = {
   primary: "#3b82f6",     // Vibrant Blue
   secondary: "#10b981",   // Emerald Green
@@ -385,7 +385,7 @@ const StatsCard = ({ title, value, change, icon, trend }: StatsCardProps) => {
   );
 };
 
-// Helper functions remain the same
+// Helper functions
 const getRidesData = () => [
   { day: "Mon", riders: 60, drivers: 25, pending: 15 },
   { day: "Tue", riders: 58, drivers: 20, pending: 22 },

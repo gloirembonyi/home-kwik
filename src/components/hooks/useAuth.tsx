@@ -1,12 +1,12 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getErrorMessage } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { login } from "./useApi";
 import { RecoilRoot } from "recoil";
+import { getErrorMessage } from "../lib/utils";
 
 interface IUser {
   firstName: string;

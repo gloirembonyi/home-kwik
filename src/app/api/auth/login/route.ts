@@ -1,4 +1,4 @@
-// app/api/auth/login/route.ts
+
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -11,7 +11,6 @@ export async function POST(request: Request) {
     // 2. Generate a JWT token
     // 3. Return the token and user data
 
-    // This is a mock implementation
     if (email === 'test@example.com' && password === 'password') {
       return NextResponse.json({
         token: 'mock-jwt-token',
