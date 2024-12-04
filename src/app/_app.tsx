@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
+import useAuth from "@/components/hooks/useAuth";
+
 
 const App = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();

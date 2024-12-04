@@ -31,7 +31,7 @@ import {
   Star
 } from "lucide-react";
 
-// Enhanced Color Palette with More Depth
+// Color Palette with More Depth
 const CHART_COLORS = {
   primary: {
     main: "#132e6d",  // Deep Blue
@@ -349,7 +349,7 @@ const RidesOverviewChart = () => {
         </div>
       </CardContent>
 
-      {/* Enhanced Performance Summary */}
+      {/* Performance Summary */}
       <div className="px-6 pb-6">
         <div className="grid grid-cols-3 gap-4 bg-blue-50 rounded-2xl p-4 shadow-md">
           <div className="text-center border-r border-blue-100 pr-4">

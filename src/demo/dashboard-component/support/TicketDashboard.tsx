@@ -48,9 +48,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/base/dropdown-menu";
-import { Input } from '../ui/Input';
+import { Input } from '@/components/ui/Input';
 
-// Ticket interface with more detailed types
+// Ticket types
 interface Ticket {
   id: string;
   customer: {

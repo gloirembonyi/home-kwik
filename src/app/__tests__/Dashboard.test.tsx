@@ -1,4 +1,4 @@
-// __tests__/Dashboard.test.tsx
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -7,18 +7,16 @@ import axios from 'axios';
 import Dashboard from '../dashboard/page';
 import { AnalyticsApiService } from '@/services/analyticsService';
 
-// Mock axios
+
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Mock the analytics service
 jest.mock('../services/analyticsService', () => ({
   AnalyticsApiService: {
     getInstance: jest.fn(),
   },
 }));
 
-// Mock third-party analytics services
 jest.mock('rollbar', () => ({
   __esModule: true,
   default: jest.fn().mockImplementation(() => ({
@@ -86,7 +84,6 @@ const mockDashboardData = {
   ],
 };
 
-// Mock API service instance
 const mockAnalyticsService = {
   fetchDashboardData: jest.fn(),
   exportData: jest.fn(),
@@ -102,25 +99,23 @@ describe('Dashboard Component', () => {
   it('renders dashboard and fetches initial data', async () => {
     render(<Dashboard />);
 
-    // Check loading state
     expect(screen.getByText(/Kwik Ride Analytics/i)).toBeInTheDocument();
     expect(screen.getAllByTestId('skeleton')).toBeTruthy();
 
-    // Wait for data to load
     await waitFor(() => {
       expect(mockAnalyticsService.fetchDashboardData).toHaveBeenCalledWith('week');
     });
 
     // Verify key metrics are displayed
-    expect(screen.getByText('1,000')).toBeInTheDocument(); // Active Users
-    expect(screen.getByText('$50,000')).toBeInTheDocument(); // Total Revenue
-    expect(screen.getByText('95%')).toBeInTheDocument(); // Completion Rate
+    expect(screen.getByText('1,000')).toBeInTheDocument(); 
+    expect(screen.getByText('$50,000')).toBeInTheDocument();
+    expect(screen.getByText('95%')).toBeInTheDocument();
   });
 
   it('handles time range changes', async () => {
     render(<Dashboard />);
 
-    // Wait for initial load
+
     await waitFor(() => {
       expect(mockAnalyticsService.fetchDashboardData).toHaveBeenCalledWith('week');
     });

@@ -68,3 +68,30 @@ export interface ApiResponse<T> {
   export interface CustomerSatisfactionResponse {
     metrics: Array<any>;
   }
+
+  // user Type
+
+  export interface User {
+    [key: string]: any;
+    id: number;
+    name: string;
+    userId: string;
+    phoneNumber: string;
+    role: string;
+    gender: string;
+    status: "Active" | "Inactive" | "Pending";
+    email: string;
+    joinDate: string;
+    department?: string;
+  }
+  
+  export interface SortConfig {
+    key: keyof User | null;
+    direction: "ascending" | "descending";
+  }
+  
+  export interface FilterConfig {
+    role?: string;
+    status?: string;
+    gender?: string;
+  }

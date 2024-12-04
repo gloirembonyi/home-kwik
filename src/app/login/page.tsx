@@ -194,7 +194,7 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right Side - Image */}
+      {/*Image */}
       <div className="hidden lg:block w-1/2 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm" />
         <Image

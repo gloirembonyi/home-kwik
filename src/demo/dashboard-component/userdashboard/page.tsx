@@ -13,7 +13,6 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { userToDeleteState, isDeleteModalOpen } from "@/atoms";
-import DeleteUserModal from "@/components/modals/deleteModal";
 import {
   DropdownMenu,
   DropdownMenuContent,

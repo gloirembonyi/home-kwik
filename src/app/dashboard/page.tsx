@@ -1,33 +1,22 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
-import {
-  LayoutDashboard,
-  Users,
-  Navigation,
-  TrendingUp,
-  Star,
-  BarChart2,
-  Truck,
-  DollarSign,
-  Settings
-} from "lucide-react";
-
-// Import your existing components
-
+// component
 import OverviewDashboard from "@/components/dashboard/Overview/OverviewDashboard";
-import UserManagement from "@/components/dashboard/Overview/users";
-import RidesManagement from "@/components/dashboard/Overview/rides/page";
-import SettingsPage from "@/components/dashboard/Overview/UserSettings";
-import UserDashboard from "@/components/dashboard/userdashboard/page";
-import PeakHours from "@/components/charts/PeakHours";
-import TicketDashboard from "@/components/support/TicketDashboard";
-import ProSidebar from "@/components/dashboard/Overview/sidebar";
+import UserManagement from "@/components/dashboard/users/users";
+import SettingsPage from "@/components/dashboard/setting/UserSettings";
+import ProSidebar from "@/components/dashboard/sidebar/sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
-import RideAnalytics from "@/components/dashboard/Overview/rides/fleet";
+import Revenue from "@/components/dashboard/Revenue/Revenue";
+import RatingsAnalytics from "@/components/dashboard/vehicles/vehicles";
+import VehicleFleetAnalytics from "@/components/dashboard/vehicles/vehicles";
+import VehicleManagement from "@/components/dashboard/vehicles/vehicles";
+import PaymentDashboard from "@/components/dashboard/payment/payment";
+import TicketDashboard from "@/demo/dashboard-component/support/TicketDashboard";
+import RideAnalytics from "@/demo/dashboard-component/charts/RideActivity";
 import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
-import RiderHistory from "@/components/dashboard/DashboardHeader/analytics/riderhistory";
-
+import RidesManagement from "@/components/dashboard/Overview/rides/page";
+import PeakHours from "@/demo/dashboard-component/charts/PeakHours";
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -44,55 +33,50 @@ const Dashboard: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
 
- // Handles navigation to a selected path
- const handleNavigation = (path: string) => {
-  setCurrentPath(path);
-};
+  const handleNavigation = (path: string) => {
+    setCurrentPath(path);
+  };
 
-// Handles user logout
-const handleLogout = () => {
-  console.log("Logging out...");
-};
+  const handleLogout = () => {
+    console.log("Logging out...");
+  };
 
-// Refresh logic for data
-const refreshData = () => {
-  console.log("Refreshing data...");
-};
+  const refreshData = () => {
+    console.log("Refreshing data...");
+  };
 
-// Handle sidebar collapse state change
-const handleSidebarCollapse = (collapsed: boolean) => {
-  setIsSidebarCollapsed(collapsed);
-};
+  const handleSidebarCollapse = (collapsed: boolean) => {
+    setIsSidebarCollapsed(collapsed);
+  };
 
-// Render content based on the current path
-const renderContent = () => {
-  switch (currentPath) {
-    case "/dashboard":
-      return <OverviewDashboard />;
-    case "/users":
-      return <UserManagement />;
-    case "/rides":
-      return <RidesManagement />;
-    case "/rides/analytics":
-      return <AnalyticsPageRide />;
-    case "/rides/fleet":
-      return <RideAnalytics />;
-    case "/revenue":
-      return <RiderHistory />;
-    case "/ratings":
-      return <RidesManagement />;
-    case "/performance":
-      return <PeakHours />;
-    case "/vehicles":
-      return <PeakHours />;
-    case "/cost":
-      return <TicketDashboard />;
-    case "/settings":
-      return <SettingsPage />;
-    default:
-      return <OverviewDashboard />;
-  }
-};
+  const renderContent = () => {
+    switch (currentPath) {
+      case "/dashboard":
+        return <OverviewDashboard />;
+      case "/users":
+        return <UserManagement />;
+      case "/rides":
+        return <RidesManagement />;
+      case "/rides/analytics":
+        return <AnalyticsPageRide />;
+      case "/rides/fleet":
+        return <RidesManagement/>;
+      case "/revenue":
+        return <Revenue />;
+      case "/ratings":
+        return <PeakHours />;
+      case "/performance":
+        return <PaymentDashboard />;
+      case "/vehicles":
+        return <VehicleManagement />;
+      case "/cost":
+        return <PaymentDashboard />;
+      case "/settings":
+        return <SettingsPage />;
+      default:
+        return <OverviewDashboard />;
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
@@ -102,7 +86,6 @@ const renderContent = () => {
         onLogout={handleLogout}
         onCollapseChange={handleSidebarCollapse}
       />
-
 
       <div
         className={`
@@ -114,17 +97,14 @@ const renderContent = () => {
           ${isSidebarCollapsed ? "ml-20" : "ml-64"}
         `}
       >
-
-<div className="sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+        <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-md">
           <DashboardHeader
             timeRange={timeRange}
             setTimeRange={setTimeRange}
             refreshData={refreshData}
           />
         </div>
-        <main className="px-4 py-6 space-y-6">
-          {renderContent()}
-        </main>
+        <main className="px-4 py-6 space-y-6">{renderContent()}</main>
       </div>
     </div>
   );

@@ -13,32 +13,8 @@ import {
   Check,
   Menu,
 } from "lucide-react";
+import { FilterConfig, SortConfig, User } from "@/types/types";
 
-// Enhanced TypeScript Types
-interface User {
-  [key: string]: any;
-  id: number;
-  name: string;
-  userId: string;
-  phoneNumber: string;
-  role: string;
-  gender: string;
-  status: "Active" | "Inactive" | "Pending";
-  email: string;
-  joinDate: string;
-  department?: string;
-}
-
-interface SortConfig {
-  key: keyof User | null;
-  direction: "ascending" | "descending";
-}
-
-interface FilterConfig {
-  role?: string;
-  status?: string;
-  gender?: string;
-}
 
 const UserManagement: React.FC = () => {
   // State Management
@@ -52,11 +28,17 @@ const UserManagement: React.FC = () => {
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false);
   const [newUser, setNewUser] = useState<Partial<User>>({});
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
 
   // Extended Mock Users Data
-  const users: User[] = [
+  const [users, setUsers] = useState<User[]>([
     {
       id: 1,
       name: "Darlene Robertson",
@@ -114,7 +96,7 @@ const UserManagement: React.FC = () => {
       joinDate: "2023-09-05",
       department: "Customer Service",
     },
-  ];
+  ]);
 
   const itemsPerPage = 5;
 
@@ -189,30 +171,6 @@ const UserManagement: React.FC = () => {
     }
   }, [selectedUsers, paginatedUsers]);
 
-  const handleAddUser = useCallback(() => {
-    // Basic validation
-    if (newUser.name && newUser.email && newUser.role) {
-      const newUserId = users.length + 1;
-      const completeUser: User = {
-        id: newUserId,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        userId: `USER-${newUserId}`,
-        phoneNumber: newUser.phoneNumber || "",
-        gender: newUser.gender || "Not Specified",
-        status: "Pending",
-        joinDate: new Date().toISOString().split("T")[0],
-      };
-
-      // In a real app, this would be an API call
-      users.push(completeUser);
-
-      // Reset modal and form
-      setNewUser({});
-      setIsAddUserModalOpen(false);
-    }
-  }, [newUser, users]);
 
   // Utility Functions
   const getStatusColor = (status: User['status']): string => {
@@ -234,6 +192,103 @@ const UserManagement: React.FC = () => {
   };
 
   const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
+
+  // View User Handler
+  const handleViewUser = useCallback((user: User) => {
+    setCurrentUser(user);
+    setIsViewUserModalOpen(true);
+  }, []);
+
+  // Edit User Handler
+  const handleEditUser = useCallback((user: User) => {
+    setCurrentUser(user);
+    setIsEditUserModalOpen(true);
+    setNewUser({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phoneNumber: user.phoneNumber,
+      gender: user.gender,
+    });
+  }, []);
+
+  const handleUpdateUser = useCallback(() => {
+    if (currentUser && newUser.name && newUser.email && newUser.role) {
+      setUsers((prevUsers: User[]) =>
+        prevUsers.map((user) =>
+          user.id === currentUser.id
+            ? {
+                ...user,
+                name: newUser.name || user.name, 
+                email: newUser.email || user.email, 
+                role: newUser.role || user.role, 
+                phoneNumber: newUser.phoneNumber || user.phoneNumber, 
+                gender: newUser.gender || user.gender, 
+              }
+            : user
+        )
+      );
+      setIsEditUserModalOpen(false);
+      setNewUser({});
+      setCurrentUser(null);
+    }
+  }, [currentUser, newUser]);
+  
+
+  const handleAddUser = useCallback(() => {
+    // Validate all required fields
+    if (!newUser.name || !newUser.email || !newUser.role || 
+        !newUser.phoneNumber || !newUser.gender) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    const newUserId = users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1;
+    const completeUser: User = {
+      id: newUserId,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      userId: `USER-${newUserId}`,
+      phoneNumber: newUser.phoneNumber,
+      gender: newUser.gender,
+      status: "Pending", // Default status
+      joinDate: new Date().toISOString().split("T")[0],
+    };
+
+    setUsers((prevUsers: User[]) => [...prevUsers, completeUser]);
+    setNewUser({});
+    setIsAddUserModalOpen(false);
+  }, [newUser, users]);
+
+  // Enhanced Delete User with Confirmation
+  const confirmDeleteUser = useCallback((user: User) => {
+    setUserToDelete(user);
+    setIsDeleteConfirmModalOpen(true);
+  }, []);
+
+  const handleDeleteUser = useCallback(() => {
+    if (userToDelete) {
+      setUsers((prevUsers: User[]) => 
+        prevUsers.filter((user) => user.id !== userToDelete.id)
+      );
+      setIsDeleteConfirmModalOpen(false);
+      setUserToDelete(null);
+    }
+  }, [userToDelete]);
+
+  const handleCancelAddUser = useCallback(() => {
+    setNewUser({});
+    setIsAddUserModalOpen(false);
+  }, []);
+
+  // Bulk Delete Handler
+  const handleBulkDelete = useCallback(() => {
+    setUsers(prevUsers => 
+      prevUsers.filter(user => !selectedUsers.includes(user.id))
+    );
+    setSelectedUsers([]);
+  }, [selectedUsers]);
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
@@ -263,15 +318,16 @@ const UserManagement: React.FC = () => {
               />
               <Search className="absolute left-4 top-4 text-gray-400" />
             </div>
-            <button
-              onClick={() => setIsAddUserModalOpen(true)}
-              className="bg-blue-900 text-white px-6 py-3 rounded-lg 
-                  flex items-center space-x-3 hover:bg-blue-700 transition 
-                  shadow-md hover:shadow-lg"
-            >
-              <PlusCircle className="w-6 h-6" />
-              <span className="font-semibold">Add New User</span>
-            </button>
+             {/* Add New User Button */}
+        <button
+          onClick={() => setIsAddUserModalOpen(true)}
+          className="bg-blue-900 text-white px-6 py-3 rounded-lg 
+            flex items-center space-x-3 hover:bg-blue-700 transition 
+            shadow-md hover:shadow-lg"
+        >
+          <PlusCircle className="w-6 h-6" />
+          <span className="font-semibold">Add New User</span>
+        </button>
 
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -331,6 +387,8 @@ const UserManagement: React.FC = () => {
             </div>
           )}
         </div>
+
+
 
         {/* User Table */}
         <div className="bg-white shadow-md rounded-lg overflow-x-auto">
@@ -445,17 +503,27 @@ const UserManagement: React.FC = () => {
                       {user.status}
                     </span>
                   </td>
-                  <td className="p-4 space-x-2">
-                    <button className="text-blue-600 hover:text-blue-800">
-                      <Eye className="w-5 h-5" />
-                    </button>
-                    <button className="text-green-600 hover:text-green-800">
-                      <Edit2 className="w-5 h-5" />
-                    </button>
-                    <button className="text-red-600 hover:text-red-800">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </td>
+                   {/* Action Buttons in User Rows */}
+        <td className="p-4 space-x-2">
+          <button 
+            onClick={() => handleViewUser(user)}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            <Eye className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={() => handleEditUser(user)}
+            className="text-green-600 hover:text-green-800"
+          >
+            <Edit2 className="w-5 h-5" />
+          </button>
+          <button 
+        onClick={() => confirmDeleteUser(user)}
+        className="text-red-600 hover:text-red-800"
+      >
+        <Trash2 className="w-5 h-5" />
+      </button>                                                                                                                                                                                                                      
+        </td>
                 </tr>
               ))}
             </tbody>
@@ -560,7 +628,8 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Add User Modal */}
+      
+      {/* Add User Modal - Enhanced */}
       {isAddUserModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-8 rounded-xl shadow-2xl w-full md:w-1/2">
@@ -568,32 +637,58 @@ const UserManagement: React.FC = () => {
             <div className="space-y-4">
               <input
                 type="text"
-                placeholder="Full Name"
+                placeholder="Full Name *"
                 value={newUser.name || ""}
                 onChange={(e) =>
                   setNewUser((prev) => ({ ...prev, name: e.target.value }))
                 }
                 className="w-full p-3 border rounded"
+                required
               />
               <input
                 type="email"
-                placeholder="Email Address"
+                placeholder="Email Address *"
                 value={newUser.email || ""}
                 onChange={(e) =>
                   setNewUser((prev) => ({ ...prev, email: e.target.value }))
                 }
                 className="w-full p-3 border rounded"
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number *"
+                value={newUser.phoneNumber || ""}
+                onChange={(e) =>
+                  setNewUser((prev) => ({ ...prev, phoneNumber: e.target.value }))
+                }
+                className="w-full p-3 border rounded"
+                required
               />
               <select
                 value={newUser.role || ""}
                 onChange={(e) =>
-                  setNewUser((prev) => ({ ...prev, role: e.target.value as "Driver" | "Rider" }))
+                  setNewUser((prev) => ({ ...prev, role: e.target.value }))
                 }
                 className="w-full p-3 border rounded"
+                required
               >
-                <option value="">Select Role</option>
+                <option value="">Select Role *</option>
                 <option value="Driver">Driver</option>
                 <option value="Rider">Rider</option>
+              </select>
+              <select
+                value={newUser.gender || ""}
+                onChange={(e) =>
+                  setNewUser((prev) => ({ ...prev, gender: e.target.value }))
+                }
+                className="w-full p-3 border rounded"
+                required
+              >
+                <option value="">Select Gender *</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Not Specified">Not Specified</option>
               </select>
               <div className="flex justify-end space-x-4">
                 <button
@@ -613,6 +708,151 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmModalOpen && userToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-2xl w-full md:w-1/2">
+            <h2 className="text-2xl font-bold mb-6 text-red-600">Confirm Delete</h2>
+            <div className="mb-4">
+              <p>Are you sure you want to delete the following user?</p>
+              <div className="mt-4 bg-gray-100 p-4 rounded">
+                <p><strong>Name:</strong> {userToDelete.name}</p>
+                <p><strong>Email:</strong> {userToDelete.email}</p>
+                <p><strong>User ID:</strong> {userToDelete.userId}</p>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setIsDeleteConfirmModalOpen(false)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 flex items-center"
+              >
+                <X className="mr-2" /> Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center"
+              >
+                <Trash2 className="mr-2" /> Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+       {/* View User Modal */}
+       {isViewUserModalOpen && currentUser && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-xl shadow-2xl w-full md:w-1/2">
+              <h2 className="text-2xl font-bold mb-6">User Details</h2>
+              <div className="space-y-4">
+                <div><strong>Name:</strong> {currentUser.name}</div>
+                <div><strong>Email:</strong> {currentUser.email}</div>
+                <div><strong>User ID:</strong> {currentUser.userId}</div>
+                <div><strong>Role:</strong> {currentUser.role}</div>
+                <div><strong>Phone:</strong> {currentUser.phoneNumber}</div>
+                <div><strong>Gender:</strong> {currentUser.gender}</div>
+                <div><strong>Status:</strong> {currentUser.status}</div>
+                <div><strong>Join Date:</strong> {currentUser.joinDate}</div>
+                {currentUser.department && (
+                  <div><strong>Department:</strong> {currentUser.department}</div>
+                )}
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setIsViewUserModalOpen(false)}
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 flex items-center"
+                  >
+                    <X className="mr-2" /> Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+       {/* Edit User Modal */}
+       {isEditUserModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-xl shadow-2xl w-full md:w-1/2">
+              <h2 className="text-2xl font-bold mb-6">Edit User</h2>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={newUser.name || ""}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  className="w-full p-3 border rounded"
+                />
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={newUser.email || ""}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                  className="w-full p-3 border rounded"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={newUser.phoneNumber || ""}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, phoneNumber: e.target.value }))
+                  }
+                  className="w-full p-3 border rounded"
+                />
+                <select
+                  value={newUser.role || ""}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, role: e.target.value }))
+                  }
+                  className="w-full p-3 border rounded"
+                >
+                  <option value="">Select Role</option>
+                  <option value="Driver">Driver</option>
+                  <option value="Rider">Rider</option>
+                </select>
+                <select
+                  value={newUser.gender || ""}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, gender: e.target.value }))
+                  }
+                  className="w-full p-3 border rounded"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Not Specified">Not Specified</option>
+                </select>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setIsEditUserModalOpen(false)}
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 flex items-center"
+                  >
+                    <X className="mr-2" /> Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateUser}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
+                  >
+                    <Check className="mr-2" /> Update User
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+       {/* Optional: Bulk Delete Button */}
+       {selectedUsers.length > 0 && (
+          <button
+            onClick={handleBulkDelete}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center"
+          >
+            <Trash2 className="mr-2" /> Delete {selectedUsers.length} Users
+          </button>
+        )}
     </div>
   );
 };

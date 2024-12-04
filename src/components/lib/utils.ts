@@ -24,7 +24,6 @@ export const getObjValue = (key: string | number, obj: any) => {
 };
 
 export function getErrorMessage(error: any) {
-  // check if it as axios error and handle accordingly else just return the message
   if (error.response) {
     if (error.response.data) {
       const msg = error.response.data.message;

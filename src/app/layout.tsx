@@ -1,5 +1,4 @@
 import { Analytics } from '@vercel/analytics/react';
-import { AuthProvider } from "@/hooks/useAuth";
 import { TooltipProvider } from "@/components/ui/base/tooltip";
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
@@ -7,6 +6,9 @@ import localFont from "next/font/local";
 import App from "./_app";
 import "./globals.css";
 import 'leaflet/dist/leaflet.css';
+import { Toaster } from "sonner";
+import { AuthProvider } from '@/components/hooks/useAuth';
+
 
 // Your font configurations remain the same
 const geistSans = localFont({
@@ -67,6 +69,7 @@ export default function RootLayout({
             <App>{children}</App>
           </TooltipProvider>
         </AuthProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>
