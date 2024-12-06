@@ -38,17 +38,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(true);
 
-  const authenticateUser = async (email: string, password: string) => {
+  const authenticateUser = async (email: string, loginCodeMFA: string) => {
     setLoading(true);
     try {
-      const { data: response } = await login(email, password);
+      const { data: response } = await login(email, loginCodeMFA);
       console.log(process.env.DEV && response);
       Cookies.set("token", response.data.access);
-      localStorage.setItem("kabstore_user", JSON.stringify(response.data.user));
-      setUser(response.data.user);
+      localStorage.setItem("token", JSON.stringify(response.data.token));
+      setUser(response.data.token);
       setIsAuthenticated(true);
       toast.success("Login successful");
-      window.location.href = "/";
+      window.location.href = "/dashboard";
     } catch (error: any) {
       console.log(process.env.DEV && error);
       toast.error(getErrorMessage(error));
@@ -58,14 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   const logout = () => {
     Cookies.remove("token");
-    localStorage.removeItem("kabstore_user");
+    localStorage.removeItem("token");
     setUser(null);
     setIsAuthenticated(false);
-    window.location.href = "/auth/login";
+    window.location.href = "/login";
   };
 
   useEffect(() => {
-    const user = localStorage.getItem("kabstore_user");
+    const user = localStorage.getItem("token");
     if (user) {
       try {
         setUser(JSON.parse(user));

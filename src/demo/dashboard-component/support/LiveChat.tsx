@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Badge } from "@/components/ui/base/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/base/popover";
-import { Input } from '../ui/Input';
+import { Input } from '@/components/ui/Input';
 
 // Enhanced interfaces with more detailed typing
 interface Message {

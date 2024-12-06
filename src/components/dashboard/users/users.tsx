@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   ChevronDown,
   Search,
@@ -14,6 +14,9 @@ import {
   Menu,
 } from "lucide-react";
 import { FilterConfig, SortConfig, User } from "@/types/types";
+import { FaToggleOn } from "react-icons/fa";
+import axios from "axios";
+import { useAnalytics } from "@/components/contexts/AppContext";
 
 
 const UserManagement: React.FC = () => {
@@ -35,69 +38,45 @@ const UserManagement: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  const activeUsers= useAnalytics().dashboardData?.activeUsers
 
   // Extended Mock Users Data
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: "Darlene Robertson",
-      userId: "345321231",
-      phoneNumber: "07820 242 525",
-      role: "Driver",
-      gender: "Female",
-      status: "Active",
-      email: "darlene.robertson@example.com",
-      joinDate: "2023-05-15",
-      department: "Logistics",
-    },
-    {
-      id: 2,
-      name: "Floyd Miles",
-      userId: "987890345",
-      phoneNumber: "07820 242 526",
-      role: "Rider",
-      gender: "Male",
-      status: "Inactive",
-      email: "floyd.miles@example.com",
-      joinDate: "2023-02-20",
-    },
-    {
-      id: 3,
-      name: "Eleanor Pena",
-      userId: "123456789",
-      phoneNumber: "07820 242 527",
-      role: "Rider",
-      gender: "Female",
-      status: "Active",
-      email: "eleanor.pena@example.com",
-      joinDate: "2023-08-10",
-    },
-    {
-      id: 4,
-      name: "Brooklyn Simmons",
-      userId: "456789123",
-      phoneNumber: "07820 242 528",
-      role: "Driver",
-      gender: "Female",
-      status: "Pending",
-      email: "brooklyn.simmons@example.com",
-      joinDate: "2023-06-25",
-    },
-    {
-      id: 5,
-      name: "Michael Chen",
-      userId: "654321987",
-      phoneNumber: "07820 242 529",
-      role: "Driver",
-      gender: "Male",
-      status: "Active",
-      email: "michael.chen@example.com",
-      joinDate: "2023-09-05",
-      department: "Customer Service",
-    },
-  ]);
+  const [users, setUsers] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+        if (!token) {
+          throw new Error('Authorization token is missing.');
+        }
 
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/all?page=0&limit=5`, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json',
+          },
+        });
+
+        setUsers(response.data.data.users); 
+      } catch (error) {
+        console.error('Fetching error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+
+    // Cleanup function (optional)
+    return () => {
+      // Clean up if necessary
+    };
+  }, []); // 
+  
+console.log(users)
   const itemsPerPage = 5;
 
   // Advanced Filtering
@@ -291,12 +270,12 @@ const UserManagement: React.FC = () => {
   }, [selectedUsers]);
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div className="bg-gradient-to-br bg-white min-h-screen">
       <div className="container mx-auto">
         {/* Header */}
 
         {/* Search and Filters */}
-        <div className="bg-white shadow-lg rounded-xl p-4 md:p-6 mb-6">
+        <div className=" border rounded-xl p-4 md:p-6 mb-6">
           {/* Mobile Menu Toggle */}
           <div className="md:hidden flex justify-end mb-4">
             <button 
@@ -313,7 +292,7 @@ const UserManagement: React.FC = () => {
                 placeholder="Search users by name, email, ID, or gender"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg 
+                className="w-full bg-transparent pl-12 pr-4 py-3 border border-gray-300 rounded-lg 
                     focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
               <Search className="absolute left-4 top-4 text-gray-400" />
@@ -326,7 +305,7 @@ const UserManagement: React.FC = () => {
             shadow-md hover:shadow-lg"
         >
           <PlusCircle className="w-6 h-6" />
-          <span className="font-semibold">Add New User</span>
+          <span className="font-semibold text-sm">Add New User</span>
         </button>
 
             <button
@@ -391,9 +370,9 @@ const UserManagement: React.FC = () => {
 
 
         {/* User Table */}
-        <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-        <table className="w-full hidden md:table">
-            <thead className="bg-gradient-to-r from-blue-50 to-blue-100 border-b-2 border-blue-200 shadow-sm">
+        <div className=" shadow-md rounded-lg overflow-x-auto">
+        <table className="w-full hidden md:table bg-transparent">
+            <thead className="bg-gradient-to-r border-b-2 shadow-sm text-sm">
               <tr className="transition-all duration-300">
                 <th className="p-4 text-left w-12">
                   <input
@@ -405,19 +384,19 @@ const UserManagement: React.FC = () => {
                 </th>
                 <th
                   onClick={() => handleSort("name")}
-                  className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                  className="p-4 text-left cursor-pointer group hover:bg-blue-100  transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                    <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
                       User Name
                     </span>
                     <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
                   </div>
                 </th>
-                <th className="p-4 text-left font-medium text-gray-600">
+                <th className="p-4 text-left font-medium text-gray-500">
                   User ID
                 </th>
-                <th className="p-4 text-left font-medium text-gray-600">
+                <th className="p-4 text-left font-medium text-gray-500">
                   Phone Number
                 </th>
                 <th
@@ -425,10 +404,10 @@ const UserManagement: React.FC = () => {
                   className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                    <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
                       Role
                     </span>
-                    <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ChevronDown className="ml-2 w-4 h-4 text-gray-500 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
                   </div>
                 </th>
                 <th
@@ -436,10 +415,10 @@ const UserManagement: React.FC = () => {
                   className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                    <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
                       Gender
                     </span>
-                    <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ChevronDown className="ml-2 w-4 h-4 text-gray-500 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
                   </div>
                 </th>
                 <th
@@ -447,23 +426,23 @@ const UserManagement: React.FC = () => {
                   className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                    <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
                       Status
                     </span>
-                    <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                    <ChevronDown className="ml-2 w-4 h-4 text-gray-500 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
                   </div>
                 </th>
-                <th className="p-4 text-left font-medium text-gray-600">
+                <th className="p-4 text-left font-medium text-gray-500">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-sm">
               {paginatedUsers.map((user, index) => (
                 <tr
                   key={user.id}
-                  className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} 
-                  hover:bg-blue-50 transition`}
+                  className={`bg-white
+                  hover:bg-blue-50/50 transition`}
                 >
                   <td className="p-4">
                     <input
@@ -547,7 +526,7 @@ const UserManagement: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="text-blue-600 hover:text-blue-800">
+                    <button  className="text-blue-600 hover:text-blue-800">
                       <Eye className="w-5 h-5" />
                     </button>
                     <button className="text-green-600 hover:text-green-800">
@@ -742,20 +721,68 @@ const UserManagement: React.FC = () => {
        {/* View User Modal */}
        {isViewUserModalOpen && currentUser && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-xl shadow-2xl w-full md:w-1/2">
-              <h2 className="text-2xl font-bold mb-6">User Details</h2>
-              <div className="space-y-4">
-                <div><strong>Name:</strong> {currentUser.name}</div>
-                <div><strong>Email:</strong> {currentUser.email}</div>
-                <div><strong>User ID:</strong> {currentUser.userId}</div>
-                <div><strong>Role:</strong> {currentUser.role}</div>
-                <div><strong>Phone:</strong> {currentUser.phoneNumber}</div>
-                <div><strong>Gender:</strong> {currentUser.gender}</div>
-                <div><strong>Status:</strong> {currentUser.status}</div>
-                <div><strong>Join Date:</strong> {currentUser.joinDate}</div>
-                {currentUser.department && (
-                  <div><strong>Department:</strong> {currentUser.department}</div>
-                )}
+            
+            <div className="bg-white p-6 rounded-xl shadow-2xl w-full md:w-1/2">
+                <div className="p-4 flex items-center">
+                    <div
+                      className="w-10 h-10 rounded-full bg-blue-200 
+                      flex items-center justify-center mr-3 text-blue-800"
+                    >
+                      {currentUser.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-semibold">{currentUser.name}</div>
+                      <div className="text-sm text-gray-500 mt-2">user_id: <span className="rounded-sm bg-gray-200 text-sm p-1 ">{currentUser.userId}</span> </div>
+                    </div>
+                </div>
+                <h2 className="font-bold mb-4">Edit Details</h2>
+
+              <div className=" grid grid-cols-2 gap-4 w-full">
+                <div>
+                  <label htmlFor="" className="text-sm font-bold ">Name</label>
+                  <input type="text" className="bg-transparent p-4 outline-none w-full rounded-lg indent-2  text-sm border " value={currentUser.name} disabled />
+                </div>
+                
+                <div>
+                  <label htmlFor="" className="text-sm font-bold ">Email address</label>
+                  <input type="text" className="bg-transparent p-4 outline-none w-full rounded-lg indent-2  text-sm border " value={currentUser.email} disabled />
+                </div>
+
+                <div>
+                  <label htmlFor="" className="text-sm font-bold ">country</label>
+                  <input type="text" className="bg-transparent p-4 outline-none w-full rounded-lg indent-2  text-sm border " value={"Rwanda"} disabled />
+                </div>
+
+                <div>
+                  <label htmlFor="" className="text-sm font-bold ">Phone number</label>
+                  <input type="text" className="bg-transparent p-4 outline-none w-full rounded-lg indent-2  text-sm border " value={currentUser.phoneNumber} disabled />
+                </div>
+
+                <div>
+                  <label htmlFor="" className="text-sm font-bold ">gender</label>
+                  <input type="text" className="bg-transparent p-4 outline-none w-full rounded-lg indent-2  text-sm border " value={currentUser.gender} disabled />
+                </div>
+
+              </div>
+              <div>
+                <h2 className="mt-4 text-sm font-bold">Role Switching</h2>
+                <div className="text-gray-400 flex justify-between mt-2">
+                  <p className="text-sm">Toggling this will let this user know that they can switch being a driver and a rider account</p>
+                  <FaToggleOn className="text-xl"/>
+                </div>
+
+                <div className="flex gap-2 mt-2">
+                  <button
+                      className="bg-blue-900 text-white text-sm px-4 py-2 rounded-lg 
+                        flex items-center space-x-3 hover:bg-blue-700 transition 
+                        shadow-md hover:shadow-lg"
+                    >update</button>
+                    <button
+                      className="bg-gray-200 text-black text-sm px-4 py-2 rounded-lg 
+                        flex items-center space-x-3 hover:bg-gray-300 transition 
+                        shadow-md hover:shadow-lg"
+                    >cancel</button>
+                </div>
                 <div className="flex justify-end">
                   <button
                     onClick={() => setIsViewUserModalOpen(false)}
@@ -764,7 +791,10 @@ const UserManagement: React.FC = () => {
                     <X className="mr-2" /> Close
                   </button>
                 </div>
+
+                
               </div>
+             
             </div>
           </div>
         )}

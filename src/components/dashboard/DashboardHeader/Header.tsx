@@ -311,10 +311,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
-                      className="relative group px-4 rounded-xl border-2 border-gray-200 hover:border-primary/30"
+                      variant="ghost"
+                      className="relative p-4  "
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
+                      {/* <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10  transition-opacity duration-200" /> */}
                       <div className="flex items-center space-x-3 ">
                         <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-purple-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-white">

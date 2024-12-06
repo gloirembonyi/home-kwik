@@ -18,13 +18,13 @@ api.interceptors.response.use(
       toast.error(
         "You are not authorized to perform this action. Try logging in again."
       );
-      window.location.href = "/auth/login";
+      window.location.href = "/login";
       // Optionally, you can also perform other actions like redirecting to a login page
     }
     return Promise.reject(error);
   }
 );
 
-export const login = async (email: string, password: string) => {
-  return api.post("/auth/login", { email, password });
+export const login = async (email: string, loginCodeMFA: string) => {
+  return axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-login`, { email, loginCodeMFA });
 };

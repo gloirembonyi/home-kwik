@@ -5,6 +5,7 @@ import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import useAuth from "@/components/hooks/useAuth";
 
 
+
 const App = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
@@ -14,15 +15,17 @@ const App = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const pathname = window.location.pathname;
     setIsLoginPage(pathname === "/login");
-
-    if (!isAuthenticated && pathname !== "/login") {
+    const token=localStorage.getItem('token')
+    console.log(token)
+    if ( !isAuthenticated   ) {
       // Redirect unauthenticated users to login
       router.push("/login");
     } else {
       // Allow authenticated users or login page to load
+      // router.push('/dashboard')
       setIsLoading(false);
     }
-  }, [isAuthenticated, router]);
+  }, []);
 
   if (isLoading) {
     return null; // Show nothing while loading

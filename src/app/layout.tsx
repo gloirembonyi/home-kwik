@@ -8,6 +8,7 @@ import "./globals.css";
 import 'leaflet/dist/leaflet.css';
 import { Toaster } from "sonner";
 import { AuthProvider } from '@/components/hooks/useAuth';
+import { AnalyticsProvider } from '@/components/contexts/AppContext';
 
 
 // Your font configurations remain the same
@@ -64,6 +65,7 @@ export default function RootLayout({
         className="antialiased font-sans"
         suppressHydrationWarning
       >
+        <AnalyticsProvider>
         <AuthProvider>
           <TooltipProvider>
             <App>{children}</App>
@@ -71,6 +73,8 @@ export default function RootLayout({
         </AuthProvider>
         <Toaster />
         <Analytics />
+        </AnalyticsProvider>
+       
       </body>
     </html>
   );

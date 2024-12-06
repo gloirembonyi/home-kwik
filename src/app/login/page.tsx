@@ -7,19 +7,42 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn } from 'next-auth/react';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
+import Modal from '@/components/ui/base/modal/Modal';
+import { login } from '@/components/hooks/useApi';
 
 const Login = () => {
   const router = useRouter();
+  const [modalOpen,setModalOpen]= useState(false)
+  const [error,setError]= useState('')
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginCodeMFA, setLoginCodeMFA] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showLoginCodeMFA, setShowLoginCodeMFA] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
-      await signIn('google', { callbackUrl: '/dashboard' });
+
+      // Initialize Google Identity Services
+      const { google } = window;
+      const auth2 = google.accounts.oauth2.initTokenClient({
+        client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+        scope: 'profile email',
+        callback: (response) => {
+          if (response.error) {
+            throw new Error('Login failed');
+          }
+          console.log('Access Token:', response.access_token);
+          // Use the access token to fetch user info or navigate to dashboard
+          window.location.href = '/dashboard'; // Navigate to dashboard
+        },
+      });
+
+      auth2.requestAccessToken();
     } catch (error) {
       console.error('Google sign in error:', error);
     } finally {
@@ -27,19 +50,67 @@ const Login = () => {
     }
   };
 
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault(); 
     setLoading(true);
 
     try {
         
-        await new Promise(resolve => setTimeout(resolve, 800));
-        router.push('/dashboard'); 
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,{email,password});
+      if (response?.data) {
+        
+        
+        setLoading(false);
+        setModalOpen(true)
+        // router.push('/dashboard');
+       
+      } else {
+        setLoading(false);
+        setError( 'Error occurred while logging in');
+      }
+       
     } catch (error) {
         console.error('Login error:', error);
+        setError( 'Error occurred while logging in');
+        
     } finally {
         setLoading(false);
+        // setTimeout(() => {
+        //   setError('')
+        // }, 7000);
     }
+};
+
+const handleVerification = async (e: React.FormEvent) => {
+  e.preventDefault(); 
+  setLoading(true);
+
+  try {
+      
+    const action = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-login`,{email,loginCodeMFA});
+    if (action.data.data.token) {
+      localStorage.setItem('token', action.data.data.token);
+      console.log(action.data.data.token)
+      setLoading(false);
+      login(email,loginCodeMFA)
+      router.push('/dashboard');
+     
+    } else {
+      setLoading(false);
+      setError(action?.statusText || 'Error occurred while Verifying');
+    }
+     
+  } catch (error) {
+      console.error('Verification error:', error);
+      setError( 'Error occurred while Verifying');
+  } finally {
+      setLoading(false);
+      // setTimeout(() => {
+      //   setError('')
+      // }, 7000);
+     
+  }
 };
 
 
@@ -58,12 +129,69 @@ const Login = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full mt-8">
+          <Modal isOpen={modalOpen} onRequestClose={()=>setModalOpen(!modalOpen)}>
+            <div>
+              <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-gray-900">Your Security is Key !</h1>
+              <p className="text-gray-500">
+                Please enter the verification code sent to your email.
+              </p>
+              <form onSubmit={handleVerification}>
+              <div className="relative my-10">
+                <label htmlFor="Code" className="block text-sm font-medium text-gray-700 mb-1">
+                  Code
+                </label>
+                <div className="relative ">
+                  <Input
+                    id="loginCodeMFA"
+                    value={loginCodeMFA}
+                    onChange={(e) => setLoginCodeMFA(e.target.value)}
+                    placeholder="••••••••"
+                    type={showLoginCodeMFA ? "text" : "password"}
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300
+                             focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                             transition-all duration-200 pr-10"
+                  />
+                  
+                </div>
+                {error &&
+                  <p className='text-sm my-2 text-red-500 '>{error}</p>
+                
+
+                }
+                <Button
+                type="submit"
+                disabled={!email || !loginCodeMFA || loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg
+                         transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+                         transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2 ">
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Verifying...
+                  </div>
+                ) : (
+                  'Verify'
+                )}
+              </Button>
+              
+                </div>
+              </form>
+          </div>
+            </div>
+          </Modal>
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-gray-900">Welcome back</h1>
             <p className="text-gray-500">
               Please enter your details to sign in
             </p>
+           
           </div>
 
           {/* Form */}
@@ -127,6 +255,12 @@ const Login = () => {
                 Forgot password?
               </button>
             </div>
+            {error 
+            && 
+                  <p className='text-sm my-2 text-red-500 '>{error}</p>
+                
+
+              }
 
             <div className="space-y-4">
               <Button
