@@ -8,15 +8,18 @@ import SettingsPage from "@/components/dashboard/setting/UserSettings";
 import ProSidebar from "@/components/dashboard/sidebar/sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
 import Revenue from "@/components/dashboard/Revenue/Revenue";
-import RatingsAnalytics from "@/components/dashboard/vehicles/vehicles";
-import VehicleFleetAnalytics from "@/components/dashboard/vehicles/vehicles";
 import VehicleManagement from "@/components/dashboard/vehicles/vehicles";
 import PaymentDashboard from "@/components/dashboard/payment/payment";
 import TicketDashboard from "@/demo/dashboard-component/support/TicketDashboard";
 import RideAnalytics from "@/demo/dashboard-component/charts/RideActivity";
-import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
 import RidesManagement from "@/components/dashboard/Overview/rides/page";
 import PeakHours from "@/demo/dashboard-component/charts/PeakHours";
+import Payments from "@/components/dashboard/payment/payment-v";
+import RiderHistory from "@/demo/dashboard-component/analytics/riderhistory";
+import DriverHistory from "@/demo/dashboard-component/analytics/driver-history";
+import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
+import TransactionsPage from "@/components/dashboard/transactions/page";
+
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -59,14 +62,16 @@ const Dashboard: React.FC = () => {
         return <RidesManagement />;
       case "/rides/analytics":
         return <AnalyticsPageRide />;
+      case "/rides/history":
+        return <DriverHistory />;
       case "/rides/fleet":
-        return <RidesManagement/>;
+        return <RidesManagement />;
       case "/revenue":
         return <Revenue />;
       case "/ratings":
-        return <PeakHours />;
+        return <TransactionsPage />;
       case "/performance":
-        return <PaymentDashboard />;
+        return <VehicleManagement />;
       case "/vehicles":
         return <VehicleManagement />;
       case "/cost":

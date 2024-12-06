@@ -100,9 +100,10 @@ const SettingsPage: React.FC = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'privacy'>('profile');
   const [passwordStrength, setPasswordStrength] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = React.useState<'profile' | 'security' | 'privacy'>('profile');
+
 
   // Compute available states based on selected country
   const availableStates = useMemo(() => {
@@ -258,16 +259,11 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="container -mt-6 -mr-6">
       <Card className="shadow-lg">
-        {/* <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
-          <CardTitle className="flex items-center">
-            <User className="mr-2" /> User Profile Settings
-          </CardTitle>
-          <CardDescription>
-            Manage your personal information, security, and privacy settings
-          </CardDescription>
-        </CardHeader> */}
         
-        <Tabs value={activeTab} onValueChange={(val: 'profile' | 'security' | 'privacy') => setActiveTab(val)}>
+      <Tabs
+  value={activeTab}
+  onValueChange={(val) => setActiveTab((val as unknown as { value: 'profile' | 'security' | 'privacy' }).value)}
+>
           <TabsList className="grid w-full grid-cols-3 my-4 px-4">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>

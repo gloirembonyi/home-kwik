@@ -30,7 +30,7 @@ import {
 import NewSidebar from "@/components/dashboard/sidebar/sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
 import ProSidebar from "@/components/dashboard/sidebar/sidebar";
-import RidesOverviewChart from "./rides/charts/RidesOverview";
+import RidesOverviewChart from "./RidesOverview";
 import StatsDashboard from "./rides/charts/StatsDashboard";
 
 // Enhanced Color Palette

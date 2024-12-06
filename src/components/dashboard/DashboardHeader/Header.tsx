@@ -33,8 +33,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/base/dropdown-menu";
 import { ScrollArea } from "@/components/ui/base/scroll-area";
-import { Input } from "@/components/ui/Input";
-import SearchBar from "@/components/search-bar/page";
 
 // Types
 type TimeRange = "day" | "week" | "month" | "quarter";

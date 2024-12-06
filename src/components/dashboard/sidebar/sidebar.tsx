@@ -63,14 +63,15 @@ const ProSidebar: React.FC<SidebarProps> = ({
       path: '/rides',
       subItems: [
         { label: 'Ride Analytics', path: '/rides/analytics' },
+        { label: 'Ride History', path: '/rides/history' },
         { label: 'Fleet', path: '/rides/fleet' }
       ]
     },
     { icon: <TrendingUp />, label: 'Revenue', path: '/revenue', badge: 2 },
-    { icon: <Star />, label: 'Ratings', path: '/ratings' },
+    { icon: <Star />, label: 'Transactions', path: '/ratings' },
     { icon: <BarChart2 />, label: 'Performance', path: '/performance' },
-    { icon: <Truck />, label: 'Vehicles', path: '/vehicles' },
-    { icon: <DollarSign />, label: 'Cost', path: '/cost' },
+    // { icon: <Truck />, label: 'Vehicles', path: '/vehicles' },
+    { icon: <DollarSign />, label: 'Payment', path: '/cost' },
     { icon: <Settings />, label: 'Settings', path: '/settings' }
   ];
 

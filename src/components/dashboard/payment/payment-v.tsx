@@ -17,7 +17,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Area,
+  CartesianGrid,
 } from "recharts";
 import { ChartLineIcon, FilterIcon } from "lucide-react";
 import Dropdown from "./dropdown";
@@ -139,23 +139,23 @@ const recentTransactions = [
   },
 ];
 
-const PaymentDashboard: React.FC = () => {
+const Payments: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState("This Month");
   const filters = ["This Week", "This Month", "This Quarter", "This Year"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 p-8">
       {/* Top Statistics Cards */}
       <section className="grid grid-cols-4 gap-6 mb-8">
         {topStatistics.map((stat, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4 hover:bg-gray-100 transition-colors"
+            className="bg-gray-800 rounded-lg shadow-lg p-6 flex items-center space-x-4 hover:bg-gray-700 transition-colors border border-gray-700"
           >
-            <stat.icon className="h-8 w-8 text-blue-500" />
+            <stat.icon className="h-8 w-8 text-blue-400" />
             <div>
-              <p className="text-gray-500 text-sm">{stat.title}</p>
-              <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-gray-400 text-sm">{stat.title}</p>
+              <p className="text-xl font-bold text-white">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -164,11 +164,11 @@ const PaymentDashboard: React.FC = () => {
       {/* Main Dashboard Content */}
       <div className="grid grid-cols-3 gap-8">
         {/*Overview Graph */}
-        <div className="col-span-2 bg-white rounded-2xl shadow-lg p-6">
+        <div className="col-span-2 bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
-              <h2 className="text-xl font-bold">Today's Stats</h2>
-              <span className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs ml-4">
+              <h2 className="text-xl font-bold text-white">Today's Stats</h2>
+              <span className="bg-green-800 text-green-300 px-2 py-1 rounded-full text-xs ml-4">
                 On Track
               </span>
             </div>
@@ -184,54 +184,46 @@ const PaymentDashboard: React.FC = () => {
             {topCardGraph.map((stat, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4 hover:bg-gray-100 transition-colors"
+                className="bg-gray-700 rounded-lg shadow-md p-6 flex items-center space-x-4 hover:bg-gray-600 transition-colors border border-gray-600"
               >
-                <stat.icon className="h-8 w-8 text-blue-500" />
+                <stat.icon className="h-8 w-8 text-blue-400" />
                 <div>
-                  <p className="text-gray-500 text-sm">{stat.title}</p>
-                  <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+                  <p className="text-gray-400 text-sm">{stat.title}</p>
+                  <p className="text-xl font-bold text-white">{stat.value}</p>
                 </div>
-                <button className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs ml-4">{stat.change}</button>
+                <button className="bg-green-800 text-green-300 px-2 py-1 rounded-full text-xs ml-4">{stat.change}</button>
               </div>
             ))}
           </div>
 
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={graphData}>
-              <defs>
-                <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="name" axisLine={false} tickLine={false} />
-              <YAxis axisLine={false} tickLine={false} />
+            <LineChart data={graphData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="rgba(255,255,255,0.1)" 
+                vertical={false}
+              />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: 'white', fontSize: 12 }}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: 'white', fontSize: 12 }}
+              />
               <Tooltip
                 contentStyle={{
-                  background: "white",
+                  background: "#1F2937",
                   borderRadius: "12px",
-                  border: "none",
-                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  border: "1px solid #374151",
+                  color: "white",
                 }}
+                itemStyle={{ color: "white" }}
+                labelStyle={{ color: "white" }}
               />
-              {/* Gradient Area */}
-              <Area
-                type="monotone"
-                dataKey="income"
-                stroke="none"
-                fill="url(#incomeGradient)"
-              />
-              <Area
-                type="monotone"
-                dataKey="expense"
-                stroke="none"
-                fill="url(#expenseGradient)"
-              />
-              {/* Lines */}
               <Line
                 type="monotone"
                 dataKey="income"
@@ -248,45 +240,44 @@ const PaymentDashboard: React.FC = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-
         </div>
         {/* Recent Transactions */}
-        <section className="bg-white rounded-2xl shadow-lg p-6">
+        <section className="bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-white">
               Top Earnings Users
             </h2>
-            <button className="text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
+            <button className="text-blue-400 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors">
               View All
             </button>
           </div>
 
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-700">
             {recentTransactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between py-4 hover:bg-gray-50 transition-colors rounded-xl px-4"
+                className="flex items-center justify-between py-4 hover:bg-gray-700 transition-colors rounded-xl px-4"
               >
                 <div className="flex items-center space-x-4">
                   <transaction.avatar className="h-10 w-10 text-gray-400" />
                   <div>
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-semibold text-white">
                       {transaction.name}
                     </p>
-                    <p className="text-sm text-gray-500">{transaction.date}</p>
+                    <p className="text-sm text-gray-400">{transaction.date}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <p
                     className={`font-bold ${
                       transaction.amount.startsWith("+")
-                        ? "text-green-500"
-                        : "text-red-500"
+                        ? "text-green-400"
+                        : "text-red-400"
                     }`}
                   >
                     {transaction.amount}
                   </p>
-                  <EllipsisVerticalIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:bg-gray-100 rounded-full" />
+                  <EllipsisVerticalIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:bg-gray-600 rounded-full" />
                 </div>
               </div>
             ))}
@@ -300,4 +291,4 @@ const PaymentDashboard: React.FC = () => {
   );
 };
 
-export default PaymentDashboard;
+export default Payments;
