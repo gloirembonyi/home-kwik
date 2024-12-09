@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex h-screen overflow-hidden ">
       <ProSidebar
         currentPath={currentPath}
         onNavigate={handleNavigation}

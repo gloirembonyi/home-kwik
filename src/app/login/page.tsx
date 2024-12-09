@@ -10,6 +10,8 @@ import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import Modal from '@/components/ui/base/modal/Modal';
 import { login } from '@/components/hooks/useApi';
+import {  GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {auth} from '../../../firebaseConfig'
 
 const Login = () => {
   const router = useRouter();
@@ -23,30 +25,53 @@ const Login = () => {
   const [showLoginCodeMFA, setShowLoginCodeMFA] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleGoogleSignIn = async () => {
+
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     // Initialize Google Identity Services
+  //     const { google } = window;
+  //     const auth2 = google.accounts.oauth2.initTokenClient({
+  //       client_id: '689134666959-3ib6ihtalmdmivi4hmatoefba50a5duk.apps.googleusercontent.com',
+  //       scope: 'profile email',
+  //       callback: (response) => {
+  //         if (response.error) {
+  //           throw new Error('Login failed');
+  //         }
+  //         console.log('Access Token:', response.access_token);
+  //         // Use the access token to fetch user info or navigate to dashboard
+  //         window.location.href = '/dashboard'; // Navigate to dashboard
+  //       },
+  //     });
+
+  //     auth2.requestAccessToken();
+  //   } catch (error) {
+  //     console.error('Google sign in error:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const handleGoogleLogin = async () => {
+    
+    const provider = new GoogleAuthProvider();
+  
     try {
-      setLoading(true);
+      const result = await signInWithPopup(auth, provider);
+      const credential= GoogleAuthProvider.credentialFromResult(result);
+      if(credential){
+        const token = credential?.accessToken;
+        const user = result?.user;
 
-      // Initialize Google Identity Services
-      const { google } = window;
-      const auth2 = google.accounts.oauth2.initTokenClient({
-        client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
-        scope: 'profile email',
-        callback: (response) => {
-          if (response.error) {
-            throw new Error('Login failed');
-          }
-          console.log('Access Token:', response.access_token);
-          // Use the access token to fetch user info or navigate to dashboard
-          window.location.href = '/dashboard'; // Navigate to dashboard
-        },
-      });
-
-      auth2.requestAccessToken();
+        localStorage.setItem('token', token as string)
+        localStorage.setItem('user', user as any)
+        console.log('User Info:', user);
+        console.log('Access Token:', token);
+        window.location.href = '/dashboard'
+      }
     } catch (error) {
-      console.error('Google sign in error:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error during Google sign-in:', error);
     }
   };
 

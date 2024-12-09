@@ -270,12 +270,12 @@ console.log(users)
   }, [selectedUsers]);
 
   return (
-    <div className="bg-gradient-to-br bg-white min-h-screen">
+    <div className=" bg-white h-fit border rounded-xl">
       <div className="container mx-auto">
         {/* Header */}
 
         {/* Search and Filters */}
-        <div className=" border rounded-xl p-4 md:p-6 mb-6">
+        <div className="  p-4 md:p-6 mb-6">
           {/* Mobile Menu Toggle */}
           <div className="md:hidden flex justify-end mb-4">
             <button 
@@ -372,7 +372,7 @@ console.log(users)
         {/* User Table */}
         <div className=" shadow-md rounded-lg overflow-x-auto">
         <table className="w-full hidden md:table bg-transparent">
-            <thead className="bg-gradient-to-r border-b-2 shadow-sm text-sm">
+            <thead className="bg-gradient-to-r border-b  text-sm">
               <tr className="transition-all duration-300">
                 <th className="p-4 text-left w-12">
                   <input
@@ -401,7 +401,7 @@ console.log(users)
                 </th>
                 <th
                   onClick={() => handleSort("role")}
-                  className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                  className="p-4 text-left cursor-pointer group hover:bg-blue-100 transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
@@ -412,7 +412,7 @@ console.log(users)
                 </th>
                 <th
                   onClick={() => handleSort("gender")}
-                  className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                  className="p-4 text-left cursor-pointer group hover:bg-blue-100  transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
@@ -423,7 +423,7 @@ console.log(users)
                 </th>
                 <th
                   onClick={() => handleSort("status")}
-                  className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                  className="p-4 text-left cursor-pointer group hover:bg-blue-100 transition-all duration-300 ease-in-out"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-gray-500 group-hover:text-blue-800 transition-colors">
@@ -442,7 +442,7 @@ console.log(users)
                 <tr
                   key={user.id}
                   className={`bg-white
-                  hover:bg-blue-50/50 transition`}
+                  hover:bg-blue-50/50 transition border-b`}
                 >
                   <td className="p-4">
                     <input
@@ -466,7 +466,7 @@ console.log(users)
                   </td>
                   <td className="p-4">{user.userId}</td>
                   <td className="p-4">{user.phoneNumber}</td>
-                  <td className="p-4">{user.role}</td>
+                  <td className="p-4">{user.roleId === 1 ? 'rider': 'driver'}</td>
                   <td className="p-4">
                     <span className="flex items-center">
                       <span className="mr-2">{getGenderIcon(user.gender)}</span>
@@ -475,11 +475,9 @@ console.log(users)
                   </td>
                   <td className="p-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm ${getStatusColor(
-                        user.status
-                      )}`}
+                      className={`px-3 py-1 rounded-full text-sm bg-green-100 text-green-700`}
                     >
-                      {user.status}
+                      {'active'}
                     </span>
                   </td>
                    {/* Action Buttons in User Rows */}
@@ -562,7 +560,7 @@ console.log(users)
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-between items-center p-4 bg-gray-100">
+          <div className="flex justify-between items-center p-4 ">
             <span className="text-sm text-gray-600">
               Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
               {Math.min(currentPage * itemsPerPage, sortedUsers.length)} of{" "}
