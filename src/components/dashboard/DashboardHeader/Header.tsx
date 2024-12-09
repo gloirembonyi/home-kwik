@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Calendar,
@@ -34,6 +34,9 @@ import {
 } from "@/components/ui/base/dropdown-menu";
 import { ScrollArea } from "@/components/ui/base/scroll-area";
 import { Input } from "@/components/ui/Input";
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import axios from "axios";
+import { any } from "prop-types";
 // import SearchBar from "@/components/search-bar/page";
 
 // Types
@@ -70,6 +73,9 @@ interface DashboardHeaderProps {
 }
 
 
+
+
+
 // Constants
 const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   day: "24h",
@@ -77,6 +83,11 @@ const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   month: "30d",
   quarter: "3m",
 };
+
+//get user by decomposing the token 
+const token= localStorage.getItem('token')
+const payload = jwt.decode(token, { complete: true });
+
 
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
@@ -106,34 +117,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
 ];
 
 // Subcomponents
-const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
-  <div className="flex items-center space-x-6">
-    <div className="flex items-center space-x-3">
-      <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
-        <h1 className="relative text-2xl font-bold">
-          Hello John!
-        </h1>
-        <p className="text-slate-500 text-sm">
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-      </div>  
-      
-      {/* <div className="hidden lg:flex items-center space-x-2">
-        <Badge
-          variant="secondary"
-          className="text-xs font-medium animate-fade-in bg-primary/10 text-primary"
-        >
-          {TIME_RANGE_LABELS[timeRange]}
-        </Badge>
-      </div> */}
-    </div>
-  </div>
-);
+
 
 
 
@@ -187,11 +171,77 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [searchFocused, setSearchFocused] = React.useState(false);
   const [notifications] = React.useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [searchQuery, setSearchQuery] = useState("");
+  const [user,setUser] = useState<any>()
+
+
+  useEffect(() => {
+
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+        if (!token) {
+          throw new Error('Authorization token is missing.');
+        }
+    
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/${payload.payload.userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json',
+          },
+         
+        },);
+        console.log(response.data)
+        setUser(response.data.data.user); 
+      } catch (error) {
+        console.error('Fetching error:', error);
+      } 
+    };
+    
+    
+  
+    fetchUser();
+  
+    // Cleanup function (optional)
+    return () => {
+      // Clean up if necessary
+    };
+  }, [token]); // 
+ 
+  console.log(user)
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
+
+  const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
+    <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-3">
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
+          <h1 className="relative text-2xl font-bold">
+            Hello {user?.name.split(' ')[0] as string}
+          </h1>
+          <p className="text-slate-500 text-sm">
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+        </div>  
+        
+        {/* <div className="hidden lg:flex items-center space-x-2">
+          <Badge
+            variant="secondary"
+            className="text-xs font-medium animate-fade-in bg-primary/10 text-primary"
+          >
+            {TIME_RANGE_LABELS[timeRange]}
+          </Badge>
+        </div> */}
+      </div>
+    </div>
+  );
 
   return (
     <header
@@ -318,12 +368,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                       <div className="flex items-center space-x-3 ">
                         <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-purple-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-white">
-                            JD
+                            {user?.name.split(' ')[0].split('')[0] + user?.name.split(' ')[1].split('')[0]}
                           </span>
                         </div>
                         <div className="hidden md:block text-left">
-                          <p className="text-sm font-medium">John Doe</p>
-                          <p className="text-xs text-gray-500">Admin</p>
+                          <p className="text-sm font-medium">{user?.name}</p>
+                          <p className="text-xs text-gray-500">{user?.currentRole?.name}</p>
                         </div>
                         <ChevronDown className="h-4 w-4 text-gray-500" />
                       </div>
@@ -334,10 +384,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     className="w-64 p-4 rounded-xl border-2"
                   >
                     <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-purple-600/10">
-                      <p className="font-medium">John Doe</p>
-                      <p className="text-sm text-gray-500">john@kwikride.com</p>
+                      <p className="font-medium">{user?.name}</p>
+                      <p className="text-sm text-gray-500">{user?.email}</p>
                       <Badge className="mt-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0">
-                        Admin Account
+                        {user?.currentRole?.name} Account
                       </Badge>
                     </div>
                     <div className="space-y-1">

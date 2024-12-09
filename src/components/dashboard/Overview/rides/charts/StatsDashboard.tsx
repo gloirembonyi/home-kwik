@@ -175,10 +175,10 @@ const StatsCard: React.FC<StatsCardProps> = ({
         relative overflow-hidden rounded-3xl 
         transition-all duration-300 
         hover:shadow-2xl hover:scale-105
-        bg-gradient-to-br ${color.gradient}
+        
       `}
     >
-      <CardHeader className="relative p-6 pb-2">
+      <CardHeader className="relative p-6 ">
         <div className="absolute top-4 right-4 flex space-x-2">
           <button
             onClick={() => setShowDetails(!showDetails)}
@@ -273,7 +273,7 @@ const RoleDistributionChart = () => {
         </div>
       </div>
     </CardHeader>
-    <CardContent className="relative h-72 p-4">
+    <CardContent className="relative h-80">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

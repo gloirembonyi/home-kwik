@@ -3,7 +3,7 @@ import { ApiResponse, ActiveUsersResponse, RegisteredUsersResponse, RidesRespons
 import axios, { AxiosResponse } from 'axios';
 
 
-const BASE_URL = '';
+
 
 // Request configuration
 const createAxiosConfig = () => {
@@ -142,61 +142,61 @@ export class AnalyticsApiService {
 
   // API methods
   private async getActiveUsers(timeRange: string): Promise<AxiosResponse<ApiResponse<ActiveUsersResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/active-users?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/active-users?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getRegisteredUsers(timeRange: string): Promise<AxiosResponse<ApiResponse<RegisteredUsersResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/registered-users?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/registered-users?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getRides(timeRange: string): Promise<AxiosResponse<ApiResponse<RidesResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/rides?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/rides?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getDriverRatings(timeRange: string): Promise<AxiosResponse<ApiResponse<DriverRatingsResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/driver/ratings?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/driver/ratings?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getAverageRideDistance(timeRange: string): Promise<AxiosResponse<ApiResponse<RideMetricsResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/average-ride-distance?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/average-ride-distance?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getAverageRideDuration(timeRange: string): Promise<AxiosResponse<ApiResponse<RideMetricsResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/average-ride-duration?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/average-ride-duration?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getDriverUtilizationRate(timeRange: string): Promise<AxiosResponse<ApiResponse<DriverUtilizationResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/driver-utilization-rate?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/driver-utilization-rate?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getRiderToDriverRatio(timeRange: string): Promise<AxiosResponse<ApiResponse<RatioResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/rider-to-driver-ratio?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/rider-to-driver-ratio?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getDriverEarnings(timeRange: string): Promise<AxiosResponse<ApiResponse<EarningsResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/driver/earnings?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/driver/earnings?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getGrowthRate(timeRange: string): Promise<AxiosResponse<ApiResponse<GrowthResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/growth-rate?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/growth-rate?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getPopularRoutes(timeRange: string): Promise<AxiosResponse<ApiResponse<PopularRoutesResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/popular-routes?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/popular-routes?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getPeakHours(timeRange: string): Promise<AxiosResponse<ApiResponse<PeakHoursResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/peak-hours?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/peak-hours?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   private async getCustomerSatisfaction(timeRange: string): Promise<AxiosResponse<ApiResponse<CustomerSatisfactionResponse>>> {
-    return axios.get(`${BASE_URL}/analytics/customer-satisfaction?timeRange=${timeRange}`, createAxiosConfig());
+    return axios.get(`${process.env.API_BASE_URL}/analytics/customer-satisfaction?timeRange=${timeRange}`, createAxiosConfig());
   }
 
   async exportData(format: 'csv' | 'pdf', timeRange: string): Promise<Blob> {
     try {
       const response = await axios.get(
-        `${BASE_URL}/analytics/export?format=${format}&timeRange=${timeRange}`,
+        `${process.env.API_BASE_URL}/analytics/export?format=${format}&timeRange=${timeRange}`,
         {
           ...createAxiosConfig(),
           responseType: 'blob'
