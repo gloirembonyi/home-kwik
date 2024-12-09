@@ -76,20 +76,20 @@ const RidesOverviewChart = () => {
     const baseData = [
       { 
         day: "Mon", 
-        riders: 60, 
+        riders: 10, 
         drivers: 25, 
         pending: 15, 
-        totalRides: 100,
+        totalRides: 50,
         averageRating: 4.5,
         peakHours: [7, 18],
         topRoutes: ["Downtown", "Airport"]
       },
       { 
         day: "Tue", 
-        riders: 58, 
+        riders: 38, 
         drivers: 20, 
         pending: 22, 
-        totalRides: 100,
+        totalRides: 80,
         averageRating: 4.3,
         peakHours: [8, 17],
         topRoutes: ["University", "Business District"]
@@ -98,28 +98,28 @@ const RidesOverviewChart = () => {
         day: "Wed", 
         riders: 45, 
         drivers: 25, 
-        pending: 30, 
-        totalRides: 100,
+        pending: 20, 
+        totalRides: 90,
         averageRating: 4.2,
         peakHours: [6, 19],
         topRoutes: ["Shopping Mall", "Suburbs"]
       },
       { 
         day: "Thu", 
-        riders: 60, 
+        riders: 30, 
         drivers: 30, 
         pending: 10, 
-        totalRides: 100,
+        totalRides: 70,
         averageRating: 4.6,
         peakHours: [7, 20],
         topRoutes: ["Tech Park", "Residential Area"]
       },
       { 
         day: "Fri", 
-        riders: 75, 
+        riders: 35, 
         drivers: 20, 
         pending: 5, 
-        totalRides: 100,
+        totalRides: 60,
         averageRating: 4.7,
         peakHours: [5, 22],
         topRoutes: ["Night Out Areas", "Entertainment District"]
@@ -297,6 +297,7 @@ const RidesOverviewChart = () => {
               />
               <XAxis 
                 dataKey="day" 
+                
                 axisLine={false} 
                 tickLine={false}
                 className="text-sm"
@@ -312,22 +313,22 @@ const RidesOverviewChart = () => {
                 dataKey="riders"
                 fill={CHART_COLORS.primary.main}
                 stackId="stack"
-                radius={[10, 10, 0, 0]}
-                barSize={40}
+                radius={[10, 10, 10, 10]}
+                barSize={10}
               />
               <Bar
                 dataKey="drivers"
                 fill={CHART_COLORS.secondary.main}
                 stackId="stack"
-                radius={[10, 10, 0, 0]}
-                barSize={40}
+                radius={[10, 10, 10, 10]}
+                barSize={10}
               />
               <Bar
                 dataKey="pending"
                 fill={CHART_COLORS.tertiary.main}
                 stackId="stack"
-                radius={[10, 10, 0, 0]}
-                barSize={40}
+                radius={[10, 10, 10, 10]}
+                barSize={10}
               />
               {/* Trend Line */}
               <Line
