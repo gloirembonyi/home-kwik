@@ -4,12 +4,10 @@ import {
   Download, 
   Filter, 
   Eye, 
-  Edit, 
-  Trash2, 
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';
-import TransactionDetails from './transaction-detail';
+import TransactionDetailsPage from './transaction-detail';
 
 // Mock data generator
 const generateMockTransactions = () => {
@@ -18,13 +16,15 @@ const generateMockTransactions = () => {
   const payees = ['Darlene Robertson', 'Alice Cooper', 'Bob Martin', 'Sarah Connor', 'Tom Hardy'];
 
   return Array.from({ length: 60 }, (_, index) => ({
+    id: `TXN-${String(index + 1).padStart(6, '0')}`,
     transactionId: `TXN-${String(index + 1).padStart(6, '0')}`,
     phoneNumber: `078${Math.floor(10000000 + Math.random() * 90000000)}`,
     payeeName: payees[Math.floor(Math.random() * payees.length)],
     driverName: drivers[Math.floor(Math.random() * drivers.length)],
     date: new Date(2024, 0, Math.floor(Math.random() * 30) + 1).toLocaleDateString('en-GB'),
     status: statuses[Math.floor(Math.random() * statuses.length)],
-    amount: (Math.random() * 1000).toFixed(2)
+    amount: (Math.random() * 1000).toFixed(2),
+    description: 'Payment for ride services'
   }));
 };
 
@@ -33,8 +33,17 @@ const TransactionsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [transactions] = useState(generateMockTransactions());
-  const [selectedTransaction, setSelectedTransaction] = useState<any>(null); 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500); // Simulates a 1.5-second loading time
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(transaction =>
@@ -62,16 +71,102 @@ const TransactionsPage: React.FC = () => {
 
   const handleView = (transaction: any) => {
     setSelectedTransaction(transaction);
-    setIsModalOpen(true);
   };
 
-  const handleEdit = (transaction: any) => {
-    console.log('Edit transaction:', transaction);
+  const handleBack = () => {
+    setSelectedTransaction(null);
   };
 
-  const handleDelete = (transaction: any) => {
-    console.log('Delete transaction:', transaction);
+  const handleExport = () => {
+    // Convert transactions to CSV
+    const csvContent = [
+      ['Transaction ID', 'Phone Number', 'Payee Name', 'Driver Name', 'Date', 'Amount', 'Status'],
+      ...transactions.map(t => [
+        t.transactionId, 
+        t.phoneNumber, 
+        t.payeeName, 
+        t.driverName, 
+        t.date, 
+        `£${t.amount}`, 
+        t.status
+      ])
+    ].map(e => e.join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "transactions_export.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
+
+  // If a transaction is selected, show its details
+  if (selectedTransaction) {
+    return (
+      <TransactionDetailsPage 
+        transaction={selectedTransaction} 
+        onBack={handleBack} 
+      />
+    );
+  }
+
+  // Skeleton Placeholder
+  if (isLoading) {
+    return (
+      <div className="bg-gray-50 min-h-screen p-6">
+
+        <div className="animate-pulse">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="h-10 bg-gray-200 rounded w-1/2 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
+
+          {/* Toolbar Skeleton */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="relative w-1/3 h-10 bg-gray-200 rounded"></div>
+            <div className="h-10 w-24 bg-gray-200 rounded"></div>
+          </div>
+
+          {/* Table Skeleton */}
+          <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+            <div className="bg-gray-100 border-b h-14"></div>
+            <div className="divide-y divide-gray-200">
+              {Array(10).fill(null).map((_, index) => (
+                <div key={index} className="flex items-center p-6">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((col) => (
+                    <div 
+                      key={col} 
+                      className="flex-1 h-4 bg-gray-200 rounded mr-4"
+                      style={{ width: `${Math.random() * 50 + 50}%` }}
+                    ></div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pagination Skeleton */}
+          <div className="flex justify-between items-center mt-6">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="flex space-x-2">
+              {Array(5).fill(null).map((_, index) => (
+                <div 
+                  key={index} 
+                  className="w-8 h-8 bg-gray-200 rounded"
+                ></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -86,23 +181,21 @@ const TransactionsPage: React.FC = () => {
             type="text"
             placeholder="Search transactions..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reset to first page on new search
+            }}
             className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         </div>
         <div className="flex items-center space-x-4">
           <button 
+            onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md"
           >
             <Download className="h-5 w-5" />
             Export
-          </button>
-          <button 
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-          >
-            <Filter className="h-5 w-5" />
-            Filter
           </button>
         </div>
       </div>
@@ -142,18 +235,6 @@ const TransactionsPage: React.FC = () => {
                   >
                     <Eye className="h-5 w-5" />
                   </button>
-                  <button 
-                    className="text-green-500 hover:text-green-700"
-                    onClick={() => handleEdit(transaction)}
-                  >
-                    <Edit className="h-5 w-5" />
-                  </button>
-                  <button 
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleDelete(transaction)}
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
                 </td>
               </tr>
             ))}
@@ -165,7 +246,7 @@ const TransactionsPage: React.FC = () => {
       </div>
 
       <div className="flex justify-between items-center mt-6">
-        <p>
+        <p className="text-gray-600">
           Showing {((currentPage - 1) * itemsPerPage) + 1} to{' '}
           {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} 
           of {filteredTransactions.length} records
@@ -198,14 +279,6 @@ const TransactionsPage: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Transaction Details Modal */}
-      {isModalOpen && selectedTransaction && (
-        <TransactionDetails 
-          transaction={selectedTransaction} 
-          onClose={() => setIsModalOpen(false)} 
-        />
-      )}
     </div>
   );
 };

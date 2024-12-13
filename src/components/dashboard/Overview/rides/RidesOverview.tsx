@@ -78,7 +78,7 @@ const RidesOverviewChart = () => {
         day: "Mon", 
         riders: 60, 
         drivers: 25, 
-        pending: 15, 
+        cancelled: 15, 
         totalRides: 100,
         averageRating: 4.5,
         peakHours: [7, 18],
@@ -88,7 +88,7 @@ const RidesOverviewChart = () => {
         day: "Tue", 
         riders: 58, 
         drivers: 20, 
-        pending: 22, 
+        cancelled: 22, 
         totalRides: 100,
         averageRating: 4.3,
         peakHours: [8, 17],
@@ -98,7 +98,7 @@ const RidesOverviewChart = () => {
         day: "Wed", 
         riders: 45, 
         drivers: 25, 
-        pending: 30, 
+        cancelled: 30, 
         totalRides: 100,
         averageRating: 4.2,
         peakHours: [6, 19],
@@ -108,7 +108,7 @@ const RidesOverviewChart = () => {
         day: "Thu", 
         riders: 60, 
         drivers: 30, 
-        pending: 10, 
+        cancelled: 10, 
         totalRides: 100,
         averageRating: 4.6,
         peakHours: [7, 20],
@@ -118,7 +118,7 @@ const RidesOverviewChart = () => {
         day: "Fri", 
         riders: 75, 
         drivers: 20, 
-        pending: 5, 
+        cancelled: 5, 
         totalRides: 100,
         averageRating: 4.7,
         peakHours: [5, 22],
@@ -128,7 +128,7 @@ const RidesOverviewChart = () => {
         day: "Sat", 
         riders: 45, 
         drivers: 35, 
-        pending: 20, 
+        cancelled: 20, 
         totalRides: 100,
         averageRating: 4.4,
         peakHours: [10, 23],
@@ -138,7 +138,7 @@ const RidesOverviewChart = () => {
         day: "Sun", 
         riders: 48, 
         drivers: 32, 
-        pending: 20, 
+        cancelled: 20, 
         totalRides: 100,
         averageRating: 4.1,
         peakHours: [11, 20],
@@ -206,7 +206,7 @@ const RidesOverviewChart = () => {
             </div>
             <div className="flex items-center">
               <Clock className="w-5 h-5 mr-2 text-red-500" />
-              <span>Pending: {data.pending}</span>
+              <span>Cancelled: {data.cancelled}</span>
             </div>
             <div className="flex items-center">
               <Star className="w-5 h-5 mr-2 text-yellow-500" />
@@ -312,21 +312,21 @@ const RidesOverviewChart = () => {
                 dataKey="riders"
                 fill={CHART_COLORS.primary.main}
                 stackId="stack"
-                radius={[10, 10, 0, 0]}
+                radius={[18, 18, 18, 18]}
                 barSize={40}
               />
               <Bar
                 dataKey="drivers"
                 fill={CHART_COLORS.secondary.main}
                 stackId="stack"
-                radius={[10, 10, 0, 0]}
+                radius={[18, 18, 18, 18]}
                 barSize={40}
               />
               <Bar
-                dataKey="pending"
+                dataKey="cancelled"
                 fill={CHART_COLORS.tertiary.main}
                 stackId="stack"
-                radius={[10, 10, 0, 0]}
+                radius={[18, 18, 18, 18]}
                 barSize={40}
               />
               {/* Trend Line */}

@@ -220,7 +220,7 @@ const VehicleManagement = () => {
   
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50">
+    <div className=" space-y-6 bg-gray-50">
       {/* Statistics Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {mockData.stats.map((stat) => (
