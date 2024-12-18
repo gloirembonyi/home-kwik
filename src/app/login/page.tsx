@@ -88,7 +88,7 @@ const Login = () => {
         
         setLoading(false);
         setModalOpen(true)
-        // router.push('/dashboard');
+       
        
       } else {
         setLoading(false);
@@ -141,7 +141,7 @@ const handleVerification = async (e: React.FormEvent) => {
 
   return (
     <div className="h-screen bg-white flex overflow-hidden">
-      {/* Left Side - Login Form */}
+      {/* Left Side - Login Form we can log in any user if we want kubera we wanteed to say that am sorry and that i have been seing some unrelented  */}
       <div className="w-full lg:w-1/2 flex flex-col p-6 lg:p-12">
         {/* Back Button */}
         <button 

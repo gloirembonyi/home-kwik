@@ -25,75 +25,75 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/base/card';
 
 // Enhanced data generation function
-const generateChartData = (period: string) => {
-  const baseData = {
-    'Today': { 
-      lineData: [
-        { name: '6am', rides: 5, revenue: 3.5 },
-        { name: '9am', rides: 12, revenue: 8.4 },
-        { name: '12pm', rides: 8, revenue: 5.6 },
-        { name: '3pm', rides: 15, revenue: 10.5 },
-        { name: '6pm', rides: 10, revenue: 7 },
-        { name: '9pm', rides: 18, revenue: 12.6 }
-      ],
-      barData: [
-        { name: 'Rides', value: 50 },
-        { name: 'Profit', value: 35 }
-      ]
-    },
-    'This Week': { 
-      lineData: [
-        { name: 'Mon', rides: 20, revenue: 14 },
-        { name: 'Tue', rides: 25, revenue: 17.5 },
-        { name: 'Wed', rides: 22, revenue: 15.4 },
-        { name: 'Thu', rides: 30, revenue: 21 },
-        { name: 'Fri', rides: 28, revenue: 19.6 },
-        { name: 'Sat', rides: 35, revenue: 24.5 },
-        { name: 'Sun', rides: 32, revenue: 22.4 }
-      ],
-      barData: [
-        { name: 'Gross', value: 150 },
-        { name: 'Net', value: 105 }
-      ]
-    },
-    'This Month': { 
-      lineData: [
-        { name: 'Jan', rides: 20, revenue: 14 },
-        { name: 'Feb', rides: 40, revenue: 28 },
-        { name: 'Mar', rides: 30, revenue: 21 },
-        { name: 'Apr', rides: 60, revenue: 42 },
-        { name: 'May', rides: 80, revenue: 56 },
-        { name: 'Jun', rides: 28, revenue: 19.6 },
-        { name: 'Jul', rides: 40, revenue: 28 },
-        { name: 'Aug', rides: 60, revenue: 42 },
-        { name: 'Sep', rides: 40, revenue: 28 },
-        { name: 'Oct', rides: 80, revenue: 56 },
-        { name: 'Nov', rides: 60, revenue: 42 },
-        { name: 'Dec', rides: 50, revenue: 35 }
-      ],
-      barData: [
-        { name: 'Rides', value: 500 },
-        { name: 'Profit', value: 350 }
-      ]
-    },
-    'This Year': { 
-      lineData: [
-        { name: 'Q1', rides: 100, revenue: 70 },
-        { name: 'Q2', rides: 120, revenue: 84 },
-        { name: 'Q3', rides: 110, revenue: 77 },
-        { name: 'Q4', rides: 150, revenue: 105 },
-        { name: 'Q5', rides: 200, revenue: 140 },
-        { name: 'Q6', rides: 180, revenue: 126 }
-      ],
-      barData: [
-        { name: 'Annual Rides', value: 1500 },
-        { name: 'Annual Profit', value: 1050 }
-      ]
-    }
-  };
+// const generateChartData = (period: string) => {
+//   const baseData = {
+//     'Today': { 
+//       lineData: [
+//         { name: '6am', rides: 5, revenue: 3.5 },
+//         { name: '9am', rides: 12, revenue: 8.4 },
+//         { name: '12pm', rides: 8, revenue: 5.6 },
+//         { name: '3pm', rides: 15, revenue: 10.5 },
+//         { name: '6pm', rides: 10, revenue: 7 },
+//         { name: '9pm', rides: 18, revenue: 12.6 }
+//       ],
+//       barData: [
+//         { name: 'Rides', value: 50 },
+//         { name: 'Profit', value: 35 }
+//       ]
+//     },
+//     'This Week': { 
+//       lineData: [
+//         { name: 'Mon', rides: 20, revenue: 14 },
+//         { name: 'Tue', rides: 25, revenue: 17.5 },
+//         { name: 'Wed', rides: 22, revenue: 15.4 },
+//         { name: 'Thu', rides: 30, revenue: 21 },
+//         { name: 'Fri', rides: 28, revenue: 19.6 },
+//         { name: 'Sat', rides: 35, revenue: 24.5 },
+//         { name: 'Sun', rides: 32, revenue: 22.4 }
+//       ],
+//       barData: [
+//         { name: 'Gross', value: 150 },
+//         { name: 'Net', value: 105 }
+//       ]
+//     },
+//     'This Month': { 
+//       lineData: [
+//         { name: 'Jan', rides: 20, revenue: 14 },
+//         { name: 'Feb', rides: 40, revenue: 28 },
+//         { name: 'Mar', rides: 30, revenue: 21 },
+//         { name: 'Apr', rides: 60, revenue: 42 },
+//         { name: 'May', rides: 80, revenue: 56 },
+//         { name: 'Jun', rides: 28, revenue: 19.6 },
+//         { name: 'Jul', rides: 40, revenue: 28 },
+//         { name: 'Aug', rides: 60, revenue: 42 },
+//         { name: 'Sep', rides: 40, revenue: 28 },
+//         { name: 'Oct', rides: 80, revenue: 56 },
+//         { name: 'Nov', rides: 60, revenue: 42 },
+//         { name: 'Dec', rides: 50, revenue: 35 }
+//       ],
+//       barData: [
+//         { name: 'Rides', value: 500 },
+//         { name: 'Profit', value: 350 }
+//       ]
+//     },
+//     'This Year': { 
+//       lineData: [
+//         { name: 'Q1', rides: 100, revenue: 70 },
+//         { name: 'Q2', rides: 120, revenue: 84 },
+//         { name: 'Q3', rides: 110, revenue: 77 },
+//         { name: 'Q4', rides: 150, revenue: 105 },
+//         { name: 'Q5', rides: 200, revenue: 140 },
+//         { name: 'Q6', rides: 180, revenue: 126 }
+//       ],
+//       barData: [
+//         { name: 'Annual Rides', value: 1500 },
+//         { name: 'Annual Profit', value: 1050 }
+//       ]
+//     }
+//   };
 
-  return baseData[period as keyof typeof baseData] || baseData['This Month'];
-};
+//   return baseData[period as keyof typeof baseData] || baseData['This Month'];
+// };
 
 // Stat Card Component with Enhanced Design
 const StatCard = ({ 
@@ -135,11 +135,7 @@ const StatCard = ({
 export const AnalyticsPageRide = () => {
   const [timePeriod, setTimePeriod] = useState<string>("This Month");
   
-  // Memoized chart data to prevent unnecessary re-renders
-  const { lineData, barData } = useMemo(() => 
-    generateChartData(timePeriod), 
-    [timePeriod]
-  );
+  
 
   return (
     <div className="bg-gray-50 min-h-screen p-8 space-y-8">
@@ -148,26 +144,26 @@ export const AnalyticsPageRide = () => {
         <StatCard 
           icon={CreditCard}
           title="Total Revenue"
-          value="152 RWF"
-          trend={{ percentage: 25.3, direction: 'up' }}
+          value="0 RWF"
+          trend={{ percentage: 0, direction: 'up' }}
         />
         <StatCard 
           icon={TrendingUp}
           title="Total Rides"
-          value="100"
-          trend={{ percentage: 15.2, direction: 'up' }}
+          value="0"
+          trend={{ percentage: 0, direction: 'up' }}
         />
         <StatCard 
           icon={Users}
           title="Active Drivers"
           value="321"
-          trend={{ percentage: 10.5, direction: 'up' }}
+          trend={{ percentage: 0, direction: 'up' }}
         />
         <StatCard 
           icon={Star}
           title="Avg. Satisfaction"
-          value="32.1"
-          trend={{ percentage: 5.1, direction: 'down' }}
+          value="0"
+          trend={{ percentage: 0, direction: 'down' }}
         />
       </div>
 

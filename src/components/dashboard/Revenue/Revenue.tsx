@@ -15,68 +15,68 @@ import { Calendar, Clock, DollarSign, Truck, Briefcase, MapPin, TrendingUp, Refr
 
 const Revenue = () => {
   // Sample data
-  const [totalRevenue, setTotalRevenue] = useState(152000);
-  const [driverEarnings, setDriverEarnings] = useState(99700);
-  const [platformCommission, setPlatformCommission] = useState(32100);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [driverEarnings, setDriverEarnings] = useState(0);
+  const [platformCommission, setPlatformCommission] = useState(0);
 
   // Sample data for sales revenue chart
   const [dashboardState, setDashboardState] = useState({
-    totalRevenue: 152000,
-    driverEarnings: 99700,
-    platformCommission: 32100,
+    totalRevenue: 0,
+    driverEarnings: 0,
+    platformCommission: 0,
     lastUpdated: new Date()
   });
 
   // Sample data for sales revenue chart with more granular details
   const [salesRevenueData, setSalesRevenueData] = useState([
-    { month: "Jan", revenue: 10000, cost: 7000, profit: 3000 },
-    { month: "Feb", revenue: 12000, cost: 8000, profit: 4000 },
-    { month: "Mar", revenue: 11000, cost: 7500, profit: 3500 },
-    { month: "Apr", revenue: 15000, cost: 9000, profit: 6000 },
-    { month: "May", revenue: 13000, cost: 8500, profit: 4500 },
-    { month: "Jun", revenue: 14000, cost: 9000, profit: 5000 },
-    { month: "Jul", revenue: 12000, cost: 8000, profit: 4000 },
-    { month: "Aug", revenue: 11000, cost: 7500, profit: 3500 },
-    { month: "Sep", revenue: 13000, cost: 8500, profit: 4500 },
-    { month: "Oct", revenue: 14000, cost: 9000, profit: 5000 },
-    { month: "Nov", revenue: 15000, cost: 9500, profit: 5500 },
-    { month: "Dec", revenue: 16000, cost: 10000, profit: 6000 }
+    { month: "Jan", revenue: 0, cost: 0, profit: 0 },
+    { month: "Feb", revenue: 0, cost: 0, profit: 0 },
+    { month: "Mar", revenue: 0, cost: 0, profit: 0 },
+    { month: "Apr", revenue: 0, cost: 0, profit: 0 },
+    { month: "May", revenue: 0, cost: 0, profit: 0 },
+    { month: "Jun", revenue: 0, cost: 0, profit: 0 },
+    { month: "Jul", revenue: 0, cost: 0, profit: 0 },
+    { month: "Aug", revenue: 0, cost: 0, profit: 0 },
+    { month: "Sep", revenue: 0, cost: 0, profit: 0 },
+    { month: "Oct", revenue: 0, cost: 0, profit: 0 },
+    { month: "Nov", revenue: 0, cost: 0, profit: 0 },
+    { month: "Dec", revenue: 0, cost: 0, profit: 0 }
   ]);
 
   // Enhanced location data with more context
   const [revenueByLocation, setRevenueByLocation] = useState([
     { 
       location: "Kigali", 
-      percentage: 60, 
-      value: 91200, 
+      percentage: 0, 
+      value: 0, 
       coordinates: [-1.9403, 30.0610],
       color: "#3B82F6"
     },
     { 
       location: "Eastern Province", 
-      percentage: 20, 
-      value: 30400, 
+      percentage: 0, 
+      value: 0, 
       coordinates: [-1.6077, 30.4916],
       color: "#10B981"
     },
     { 
       location: "Western Province", 
-      percentage: 10, 
-      value: 15200, 
+      percentage: 0, 
+      value: 0, 
       coordinates: [-1.9706, 29.2275],
       color: "#F43F5E"
     },
     { 
       location: "Northern Province", 
-      percentage: 5, 
-      value: 7600, 
+      percentage: 0, 
+      value: 0, 
       coordinates: [-1.6368, 29.8698],
       color: "#F97316"
     },
     { 
       location: "Southern Province", 
-      percentage: 5, 
-      value: 7600, 
+      percentage: 0, 
+      value: 0, 
       coordinates: [-2.3054, 29.3713],
       color: "#8B5CF6"
     }
@@ -84,49 +84,22 @@ const Revenue = () => {
 
   // Enhanced payment method data
   const [paymentMethodBreakdown, setPaymentMethodBreakdown] = useState([
-    { method: "Cash", value: 14859, icon: "💵" },
-    { method: "Kwik-Wallet", value: 35690, icon: "📱" },
-    { method: "Mobile Money", value: 45120, icon: "💳" },
-    { method: "Credit Card", value: 25486, icon: "💳" }
+    { method: "Cash", value: 0, icon: "💵" },
+    { method: "Kwik-Wallet", value: 0, icon: "📱" },
+    { method: "Mobile Money", value: 0, icon: "💳" },
+    { method: "Credit Card", value: 0, icon: "💳" }
   ]);
 
   // Enhanced driver earnings with more details
   const [driverEarningsData, setDriverEarningsData] = useState([
     { 
       name: "Aime KARAKE", 
-      rating: 5.0, 
-      amount: 99.7, 
-      trips: 145, 
+      rating: 0, 
+      amount: 0, 
+      trips: 0, 
       avatar: "https://randomuser.me/api/portraits/men/1.jpg" 
     },
-    { 
-      name: "Jean-Claude MBABAZI", 
-      rating: 4.8, 
-      amount: 92.5, 
-      trips: 132, 
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg" 
-    },
-    { 
-      name: "Marie UWASE", 
-      rating: 4.7, 
-      amount: 87.2, 
-      trips: 118, 
-      avatar: "https://randomuser.me/api/portraits/women/1.jpg" 
-    },
-    { 
-      name: "Pierre NIYONZIMA", 
-      rating: 4.6, 
-      amount: 83.4, 
-      trips: 105, 
-      avatar: "https://randomuser.me/api/portraits/men/3.jpg" 
-    },
-    { 
-      name: "Clarisse UWIRINGIYIMANA", 
-      rating: 4.5, 
-      amount: 79.8, 
-      trips: 92, 
-      avatar: "https://randomuser.me/api/portraits/women/2.jpg" 
-    }
+   
   ]);
 
   // Memoized calculations for performance

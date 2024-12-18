@@ -173,54 +173,13 @@ interface StatsCardProps {
 
 const getFrequentUsers = () => [
   {
-    name: "Leasie Watson",
-    role: "Driver",
-    gender: "Female",
-    rides: 200,
-    status: "Active",
-  },
-  {
-    name: "Darlene Robertson",
+    name: "Andres Brandon",
     role: "Driver",
     gender: "Male",
-    rides: 200,
-    status: "Active",
+    rides: 0,
+    status: "",
   },
-  {
-    name: "Jacob Jones",
-    role: "Rider",
-    gender: "Male",
-    rides: 200,
-    status: "Active",
-  },
-  {
-    name: "Kathryn Murphy",
-    role: "Rider",
-    gender: "Male",
-    rides: 200,
-    status: "Active",
-  },
-  {
-    name: "Leslie Alexander",
-    role: "Driver",
-    gender: "Female",
-    rides: 200,
-    status: "Active",
-  },
-  {
-    name: "Ronald Richards",
-    role: "Rider",
-    gender: "Male",
-    rides: 200,
-    status: "Active",
-  },
-  {
-    name: "Jenny Wilson",
-    role: "Driver",
-    gender: "Female",
-    rides: 200,
-    status: "Active",
-  },
+  
 ];
 
 export default OverviewDashboard;
