@@ -222,24 +222,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               />
             </div>
 
-              {/* <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-48 bg-gray-50 hover:bg-white dark:bg-gray-800/50 dark:hover:bg-gray-800 transition-all duration-200 rounded-xl border-2 border-gray-200 hover:border-primary/30">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-primary" />
-                    <SelectValue placeholder="Select time range" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-2 border-gray-200">
-                  {(Object.keys(TIME_RANGE_LABELS) as TimeRange[]).map(
-                    (range) => (
-                      <SelectItem key={range} value={range}>
-                        Last {TIME_RANGE_LABELS[range]}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select> */}
-
 
               <div className="flex items-center space-x-3">
                 {/* <Button
@@ -259,7 +241,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="relative group rounded-xl border-2 border-gray-200 hover:border-primary/30"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
-                  {theme === "light" ? (
+                  {theme === "dark" ? (
                     <Moon className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />
                   ) : (
                     <Sun className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -16,14 +16,27 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { cn } from "@/components/lib/utils"
+import { cn } from "@/components/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNotifications } from './notification/hooks';
+import { NotificationService } from './notification/notifications-service';
+
+
+
+interface NotificationCount {
+  count: number;
+  severity: 'low' | 'medium' | 'high';
+  lastUpdated: number;
+  isRead?: boolean;
+}
+
+type NotificationsState = Record<string, NotificationCount>;
 
 interface MenuItem {
   icon?: React.ReactElement;
   label: string;
   path: string;
-  badge?: number;
+  notifications?: NotificationCount;
   comingSoon?: boolean;
   subItems?: MenuItem[];
 }
@@ -33,16 +46,20 @@ interface SidebarProps {
   onNavigate: (path: string) => void;
   onLogout?: () => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
+  notificationUpdateInterval?: number;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   currentPath,
   onNavigate,
   onLogout,
-  onCollapseChange
+  onCollapseChange,
+  notificationUpdateInterval = 30000
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const notificationService = useMemo(() => NotificationService.getInstance(), []);
+  const notifications = useNotifications();
 
   const handleCollapse = useCallback(() => {
     const newCollapsedState = !isCollapsed;
@@ -50,22 +67,40 @@ const Sidebar: React.FC<SidebarProps> = ({
     onCollapseChange?.(newCollapsedState);
   }, [isCollapsed, onCollapseChange]);
 
-  const toggleDropdown = (label: string) => {
-    setOpenDropdown(openDropdown === label ? null : label);
-  };
+  const toggleDropdown = useCallback((label: string) => {
+    setOpenDropdown(prev => prev === label ? null : label);
+  }, []);
 
-  const menuItems: MenuItem[] = [
-    { icon: <LayoutDashboard />, label: 'Dashboard', path: '/dashboard', badge: 3 },
+  const menuItems: MenuItem[] = useMemo(() => [
+    { 
+      icon: <LayoutDashboard />, 
+      label: 'Dashboard', 
+      path: '/dashboard',
+      notifications: notifications['dashboard']
+    },
     { 
       icon: <Users />, 
       label: 'Users', 
-      path: '/all', 
-      badge: 12, 
+      path: '/all',
+      notifications: notifications['users'],
       subItems: [
         { label: 'All Users', path: '/users' },
-        { label: 'Requests', path: '/requests' },
+        { 
+          label: 'Requests', 
+          path: '/requests',
+          notifications: notifications['requests']
+        },
         { label: 'Suspension', path: '/suspension' },
-        { label: 'Logs', path: '/logs' },
+        { 
+          label: 'Logs', 
+          path: '/logs', 
+          notifications: notifications['logs']
+        },
+        { 
+          label: 'Refunds', 
+          path: '/refunds',
+          notifications: notifications['refunds']
+        },
       ]
     },
     {
@@ -79,6 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       ]
     },
     { icon: <TrendingUp />, label: 'Revenue', path: '/revenue', badge: 2 },
+    { icon: <TrendingUp />, label: 'Test', path: '/dash', badge: 2 },
     { 
       icon: <Star />,
       label: 'Transactions',
@@ -91,30 +127,81 @@ const Sidebar: React.FC<SidebarProps> = ({
     { icon: <BarChart2 />, label: 'Performance', path: '/performance' },
     { icon: <DollarSign />, label: 'Payment', path: '/cost' },
     { icon: <Settings />, label: 'Settings', path: '/settings' }
-  ];
+  ], [notifications]);
 
-  const renderBadge = (count?: number) => {
-    if (!count) return null;
-    return (
-      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-        {count}
-      </span>
-    );
+
+   // Notification badge component with severity colors
+   const NotificationBadge = React.memo(({ notification }: { notification?: NotificationCount }) => {
+  if (!notification?.count) return null;
+
+  const severityColorMap = {
+    high: {
+      base: 'bg-red-500',
+      elevated: 'bg-red-600'
+    },
+    medium: {
+      base: 'bg-yellow-500',
+      elevated: 'bg-yellow-600'
+    },
+    low: {
+      base: 'bg-blue-500',
+      elevated: 'bg-blue-600'
+
+
+      
+    }
   };
 
-  const renderMenuItem = (item: MenuItem) => {
-    const isActive = currentPath === item.path;
-    const isDropdownOpen = openDropdown === item.label;
+  const { base, elevated } = severityColorMap[notification.severity];
+  const color = notification.count > 5 ? elevated : base;
 
+  return (
+    <span className={cn(
+      'ml-auto text-white text-xs font-bold rounded-full px-2 py-0.5',
+      color,
+      'animate-pulse'
+    )}>
+      {notification.count}
+    </span>
+  );
+});
+
+ 
+const handleNavigation = useCallback((path: string) => {
+  console.log('Navigating to:', path); // Debug log
+  onNavigate(path);
+  
+  // Check if there's a notification for this path
+  const notification = notifications[path];
+  if (notification && !notification.isRead) {
+    console.log('Found unread notification for:', path); // Debug log
+    notificationService.markAsRead(path);
+  }
+}, [notifications, onNavigate, notificationService]);
+
+const renderMenuItem = useCallback((item: MenuItem) => {
+  const isActive = currentPath === item.path;
+  const isDropdownOpen = openDropdown === item.label;
+
+  const handleItemClick = () => {
+    if (item.subItems) {
+      toggleDropdown(item.label);
+    } else {
+      handleNavigation(item.path);
+    }
+  };
+
+  const handleSubItemClick = (subItem: MenuItem) => {
+    handleNavigation(subItem.path);
+  };
+  
     return (
       <div key={item.path || item.label} className="relative">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={() =>
-            item.subItems ? toggleDropdown(item.label) : onNavigate(item.path)
-          }
+          onClick={handleItemClick}
           className={cn(
             'group relative flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
             isCollapsed ? 'justify-center p-2' : 'px-4 py-3 gap-3',
@@ -125,43 +212,26 @@ const Sidebar: React.FC<SidebarProps> = ({
           )}
           title={isCollapsed ? item.label : undefined}
         >
-          <div
-            className={cn(
-              'transition-colors duration-200 relative flex items-center',
-              isActive ? 'text-blue-800' : 'text-gray-500 group-hover:text-gray-700'
-            )}
-          >
-            {item.icon &&
-              React.cloneElement(item.icon, {
-                size: 20,
-                strokeWidth: isActive ? 2.5 : 1.5
-              })}
-          </div>
-
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.div 
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                className="flex items-center gap-2"
-              >
-                <span className="font-medium whitespace-nowrap text-sm">
-                  {item.label}
-                </span>
-                {renderBadge(item.badge)}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {item.icon && (
+            <span className="text-gray-600 group-hover:text-blue-700">
+              {item.icon}
+            </span>
+          )}
+          
+          {!isCollapsed && (
+            <span className="text-sm font-medium">
+              {item.label}
+            </span>
+          )}
 
           {!isCollapsed && item.subItems && (
-            <div className="ml-auto">
-              {isDropdownOpen ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
-            </div>
+            <span className="ml-auto">
+              {isDropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
+          )}
+
+          {!isCollapsed && item.notifications && !item.notifications.isRead && (
+            <NotificationBadge notification={item.notifications} />
           )}
         </motion.div>
 
@@ -176,7 +246,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {item.subItems.map((subItem) => (
                 <div
                   key={subItem.path}
-                  onClick={() => onNavigate(subItem.path)}
+                  onClick={() => handleSubItemClick(subItem)}
                   className={cn(
                     'flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out px-4 py-2 gap-3 text-sm',
                     currentPath === subItem.path
@@ -185,6 +255,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                   )}
                 >
                   {subItem.label}
+                  {subItem.notifications && !subItem.notifications.isRead && (
+                    <NotificationBadge notification={subItem.notifications} />
+                  )}
                 </div>
               ))}
             </motion.div>
@@ -192,7 +265,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         </AnimatePresence>
       </div>
     );
-  };
+  }, [currentPath, isCollapsed, openDropdown, toggleDropdown, handleNavigation]);
+
+  
 
   return (
     <motion.aside
@@ -311,3 +386,4 @@ const Sidebar: React.FC<SidebarProps> = ({
 };
 
 export default Sidebar;
+

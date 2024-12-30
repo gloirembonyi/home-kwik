@@ -22,6 +22,7 @@ import {
 import { ChartLineIcon, FilterIcon } from "lucide-react";
 import Dropdown from "./dropdown";
 import PaymentMethod from "./PaymentMethod";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 // Mock Data with more realistic structure
 const topStatistics = [
@@ -146,7 +147,7 @@ const PaymentDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Top Statistics Cards */}
-      <section className="grid grid-cols-4 gap-6 mb-8">
+      <section className="grid grid-cols-4 gap-6 mb-6">
         {topStatistics.map((stat, index) => (
           <div
             key={index}
@@ -162,7 +163,7 @@ const PaymentDashboard: React.FC = () => {
       </section>
 
       {/* Main Dashboard Content */}
-      <div className="grid grid-cols-3 gap-8">
+      <div className="grid grid-cols-3 gap-6">
         {/*Overview Graph */}
         <div className="col-span-2 bg-white rounded-2xl shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
@@ -256,9 +257,6 @@ const PaymentDashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800">
               Top Earnings Users
             </h2>
-            <button className="text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
-              View All
-            </button>
           </div>
 
           <div className="divide-y divide-gray-100">
@@ -291,6 +289,11 @@ const PaymentDashboard: React.FC = () => {
               </div>
             ))}
           </div>
+            <div className="flex items-center flex-1 p-8 m-6 ">
+              <button className=" flex items-center text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
+                View All <ArrowRightIcon className="h-4 w-4 ml-2" />
+              </button>
+            </div>
         </section>
       </div>
 
