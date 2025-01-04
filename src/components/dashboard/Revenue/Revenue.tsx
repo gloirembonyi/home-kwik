@@ -186,7 +186,7 @@ const Revenue = () => {
             ].map((stat, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 flex justify-between items-center border-l-4 border-blue-500"
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 flex justify-between items-center border-l-4 "
               >
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">{stat.title}</h3>
@@ -205,7 +205,7 @@ const Revenue = () => {
           </div>
 
           {/* Sales Revenue Chart */}
-          <div className="bg-white rounded-xl shadow-lg mb-6 p-6 border-t-4 border-blue-500">
+          <div className="bg-white rounded-xl shadow-lg mb-6 p-6 border-t-4 ">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-800 flex items-center">
                 <TrendingUp className="mr-3 text-blue-500" size={24} />
@@ -254,7 +254,7 @@ const Revenue = () => {
         <div className="col-span-2">
 
           {/* Driver Earnings */}
-          <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6 border-t-4 border-indigo-500">
+          <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6 border-t-4 ">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-800 flex items-center">
                 <Truck className="mr-3 text-indigo-500" size={24} />
@@ -293,7 +293,7 @@ const Revenue = () => {
       <div className="grid grid-cols-8 gap-6">
         
         {/* Revenue by Location */}
-        <div className="bg-white rounded-xl shadow-lg col-span-6 grid p-6 border-t-4 border-green-500">
+        <div className="bg-white rounded-xl shadow-lg col-span-6 grid p-6 border-t-4 ">
           <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
             <MapPin className="mr-3 text-green-500" size={24} />
             Revenue by Location
@@ -342,7 +342,7 @@ const Revenue = () => {
         </div>
 
         {/* Payment Method*/}
-        <div className="bg-white rounded-xl col-span-2 shadow-lg p-6 border-t-4 border-purple-500">
+        <div className="bg-white rounded-xl col-span-2 shadow-lg p-6 border-t-4 ">
           <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
             <DollarSign className="mr-3 text-purple-500" size={24} />
             Rides per Payment Method
@@ -386,7 +386,6 @@ const Revenue = () => {
         </div>
       </div>
 
-      
     </div>
   );
 };

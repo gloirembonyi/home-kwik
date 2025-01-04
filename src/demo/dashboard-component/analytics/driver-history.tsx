@@ -195,7 +195,7 @@ const DriverHistory: React.FC = () => {
       </CardHeader>
 
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-4 md:grid-cols-5 gap-4 mb-6">
           <StatsCard 
             icon={Car}
             label="Total Rides"

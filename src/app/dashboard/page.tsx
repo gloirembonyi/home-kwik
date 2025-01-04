@@ -3,21 +3,28 @@
 import React, { useState } from "react";
 // component
 import OverviewDashboard from "@/components/dashboard/Overview/OverviewDashboard";
-import UserManagement from "@/components/dashboard/users/users";
-import SettingsPage from "@/components/dashboard/setting/UserSettings";
-import ProSidebar from "@/components/dashboard/sidebar/sidebar";
+import Sidebar from "@/components/dashboard/sidebar/sidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
 import Revenue from "@/components/dashboard/Revenue/Revenue";
-import RatingsAnalytics from "@/components/dashboard/vehicles/vehicles";
-import VehicleFleetAnalytics from "@/components/dashboard/vehicles/vehicles";
 import VehicleManagement from "@/components/dashboard/vehicles/vehicles";
 import PaymentDashboard from "@/components/dashboard/payment/payment";
 import TicketDashboard from "@/demo/dashboard-component/support/TicketDashboard";
 import RideAnalytics from "@/demo/dashboard-component/charts/RideActivity";
-import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
 import RidesManagement from "@/components/dashboard/Overview/rides/page";
 import PeakHours from "@/demo/dashboard-component/charts/PeakHours";
-import HistoryPageRide from "@/components/dashboard/Overview/rides/HistoryPageRide";
+import Payments from "@/components/dashboard/payment/payment-v";
+import RiderHistory from "@/demo/dashboard-component/analytics/riderhistory";
+import DriverHistory from "@/demo/dashboard-component/analytics/driver-history";
+import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
+import TransactionsPage from "@/components/dashboard/transactions/page";
+import SettingsPage from "@/components/dashboard/settings/UserSettings";
+import UserDetail from "@/components/dashboard/users/user-code-not-used/user-detail";
+import TablePage from "@/components/dashboard/users/all-drivers/driver-request";
+import FlaggedIssuesPage from "@/components/dashboard/transactions/flagged-isues";
+import UserManagement from "@/components/dashboard/users/all-users-page/all-users";
+import RideHistory from "@/components/dashboard/Overview/rides/ride-history/page";
+import SuspensionHistoryPage from "@/components/dashboard/users/suspension/suspension";
+import AuditLogs from "@/components/dashboard/users/audit-logs/audit-logs";
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -53,37 +60,55 @@ const Dashboard: React.FC = () => {
   const renderContent = () => {
     switch (currentPath) {
       case "/dashboard":
-        return <OverviewDashboard />;
+        return (
+          <OverviewDashboard
+            currentPath={currentPath}
+            onNavigate={handleNavigation}
+          />
+        );
       case "/users":
         return <UserManagement />;
+      case "/requests":
+        return <TablePage />;
       case "/rides":
         return <RidesManagement />;
       case "/rides/analytics":
         return <AnalyticsPageRide />;
       case "/rides/history":
-        return <HistoryPageRide />;
+        return <RideHistory />;
+      case "/suspension":
+        return <SuspensionHistoryPage />;
+      case "/logs":
+        return <AuditLogs />;
       case "/rides/fleet":
-        return <RidesManagement/>;
+        return <RidesManagement />;
       case "/revenue":
         return <Revenue />;
-      case "/ratings":
-        return <PeakHours />;
+      case "/transactions":
+        return <TransactionsPage />;
+      case "/issues":
+        return <FlaggedIssuesPage />;
       case "/performance":
-        return <PaymentDashboard />;
-      case "/vehicles":
         return <VehicleManagement />;
+      case "/vehicles":
+        return <FlaggedIssuesPage />;
       case "/cost":
         return <PaymentDashboard />;
       case "/settings":
         return <SettingsPage />;
       default:
-        return <OverviewDashboard />;
+        return (
+          <OverviewDashboard
+            currentPath={currentPath}
+            onNavigate={handleNavigation}
+          />
+        );
     }
   };
 
   return (
-    <div className="flex h-screen overflow-hidden ">
-      <ProSidebar
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+      <Sidebar
         currentPath={currentPath}
         onNavigate={handleNavigation}
         onLogout={handleLogout}

@@ -76,72 +76,72 @@ const RidesOverviewChart = () => {
     const baseData = [
       { 
         day: "Mon", 
-        riders: 0, 
-        drivers: 0, 
-        pending: 0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 60, 
+        drivers: 25, 
+        cancelled: 15, 
+        totalRides: 100,
+        averageRating: 4.5,
+        peakHours: [7, 18],
         topRoutes: ["Downtown", "Airport"]
       },
       { 
         day: "Tue", 
-        riders: 0, 
-        drivers: 0, 
-        pending: 0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 58, 
+        drivers: 20, 
+        cancelled: 22, 
+        totalRides: 100,
+        averageRating: 4.3,
+        peakHours: [8, 17],
         topRoutes: ["University", "Business District"]
       },
       { 
         day: "Wed", 
-        riders: 0, 
-        drivers: 0, 
-        pending: 0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 45, 
+        drivers: 25, 
+        cancelled: 30, 
+        totalRides: 100,
+        averageRating: 4.2,
+        peakHours: [6, 19],
         topRoutes: ["Shopping Mall", "Suburbs"]
       },
       { 
         day: "Thu", 
-        riders: 0, 
-        drivers: 0, 
-        pending: 0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 60, 
+        drivers: 30, 
+        cancelled: 10, 
+        totalRides: 100,
+        averageRating: 4.6,
+        peakHours: [7, 20],
         topRoutes: ["Tech Park", "Residential Area"]
       },
       { 
         day: "Fri", 
-        riders: 0, 
-        drivers: 0, 
-        pending:0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 75, 
+        drivers: 20, 
+        cancelled: 5, 
+        totalRides: 100,
+        averageRating: 4.7,
+        peakHours: [5, 22],
         topRoutes: ["Night Out Areas", "Entertainment District"]
       },
       { 
         day: "Sat", 
-        riders: 0, 
-        drivers: 0, 
-        pending: 0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 45, 
+        drivers: 35, 
+        cancelled: 20, 
+        totalRides: 100,
+        averageRating: 4.4,
+        peakHours: [10, 23],
         topRoutes: ["Tourist Spots", "Shopping Centers"]
       },
       { 
         day: "Sun", 
-        riders: 0, 
-        drivers: 0, 
-        pending: 0, 
-        totalRides: 0,
-        averageRating: 0,
-        peakHours: [0, 0],
+        riders: 48, 
+        drivers: 32, 
+        cancelled: 20, 
+        totalRides: 100,
+        averageRating: 4.1,
+        peakHours: [11, 20],
         topRoutes: ["Leisure Areas", "Restaurants"]
       },
     ];
@@ -206,7 +206,7 @@ const RidesOverviewChart = () => {
             </div>
             <div className="flex items-center">
               <Clock className="w-5 h-5 mr-2 text-red-500" />
-              <span>Pending: {data.pending}</span>
+              <span>Cancelled: {data.cancelled}</span>
             </div>
             <div className="flex items-center">
               <Star className="w-5 h-5 mr-2 text-yellow-500" />
@@ -297,7 +297,6 @@ const RidesOverviewChart = () => {
               />
               <XAxis 
                 dataKey="day" 
-                
                 axisLine={false} 
                 tickLine={false}
                 className="text-sm"
@@ -313,22 +312,22 @@ const RidesOverviewChart = () => {
                 dataKey="riders"
                 fill={CHART_COLORS.primary.main}
                 stackId="stack"
-                radius={[10, 10, 10, 10]}
-                barSize={10}
+                radius={[18, 18, 18, 18]}
+                barSize={40}
               />
               <Bar
                 dataKey="drivers"
                 fill={CHART_COLORS.secondary.main}
                 stackId="stack"
-                radius={[10, 10, 10, 10]}
-                barSize={10}
+                radius={[18, 18, 18, 18]}
+                barSize={40}
               />
               <Bar
-                dataKey="pending"
+                dataKey="cancelled"
                 fill={CHART_COLORS.tertiary.main}
                 stackId="stack"
-                radius={[10, 10, 10, 10]}
-                barSize={10}
+                radius={[18, 18, 18, 18]}
+                barSize={40}
               />
               {/* Trend Line */}
               <Line

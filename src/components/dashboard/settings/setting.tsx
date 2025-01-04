@@ -225,7 +225,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <Card>
+      <div>
         <CardHeader>
           <CardTitle>Profile Settings</CardTitle>
           <CardDescription>Manage your account details</CardDescription>
@@ -358,7 +358,7 @@ const SettingsPage: React.FC = () => {
             )}
           </div>
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 };
