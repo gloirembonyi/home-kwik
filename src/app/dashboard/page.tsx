@@ -17,6 +17,7 @@ import RideAnalytics from "@/demo/dashboard-component/charts/RideActivity";
 import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
 import RidesManagement from "@/components/dashboard/Overview/rides/page";
 import PeakHours from "@/demo/dashboard-component/charts/PeakHours";
+import HistoryPageRide from "@/components/dashboard/Overview/rides/HistoryPageRide";
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -59,6 +60,8 @@ const Dashboard: React.FC = () => {
         return <RidesManagement />;
       case "/rides/analytics":
         return <AnalyticsPageRide />;
+      case "/rides/history":
+        return <HistoryPageRide />;
       case "/rides/fleet":
         return <RidesManagement/>;
       case "/revenue":

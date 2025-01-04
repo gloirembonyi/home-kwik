@@ -63,6 +63,7 @@ const ProSidebar: React.FC<SidebarProps> = ({
       path: '/rides',
       subItems: [
         { label: 'Ride Analytics', path: '/rides/analytics' },
+        { label: 'Ride History', path: '/rides/history' },
         { label: 'Fleet', path: '/rides/fleet' }
       ]
     },

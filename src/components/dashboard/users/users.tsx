@@ -76,7 +76,7 @@ const UserManagement: React.FC = () => {
     };
   }, []); // 
   
-console.log(users)
+
   const itemsPerPage = 5;
 
   // Advanced Filtering

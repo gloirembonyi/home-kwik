@@ -7,8 +7,8 @@ export interface DashboardData {
   registeredUsers: number;
   totalRides: number;
   averageRating: number;
-  rideStats: any[]; // Example improvement
-  driverStats: any[] // Example improvement
+  rideStats: any[];   
+  driverStats: any[] 
   userActivities: Array<{ hour: number; active: number }>;
   revenueData: Array<{ date: string; amount: number; type: string }>;
   completionRate: number;
@@ -20,9 +20,9 @@ export interface DashboardData {
   driverEarnings: number;
   growthRate: number;
   peakHours: string[];
-  popularRoutes: any[]; // Example improvement
+  popularRoutes: any[]; 
   userGrowth: Array<{ date: string; users: number; drivers: number }>;
-  customerSatisfaction: any[]; // Example improvement
+  customerSatisfaction: any[]; 
 }
 
 export interface AnalyticsContextType {

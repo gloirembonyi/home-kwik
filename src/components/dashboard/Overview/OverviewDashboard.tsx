@@ -53,6 +53,7 @@ const OverviewDashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentPath, setCurrentPath] = useState("/dashboard");
+  const [users, setUsers] = useState<any[]>([]);
 
   return (
     <div className="flex">
@@ -107,7 +108,7 @@ const OverviewDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {getFrequentUsers().map((user, index) => (
+                    {users?.map((user, index) => (
                       <tr
                         key={index}
                         className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors"
@@ -171,15 +172,35 @@ interface StatsCardProps {
 
 // Helper functions
 
-const getFrequentUsers = () => [
-  {
-    name: "Andres Brandon",
-    role: "Driver",
-    gender: "Male",
-    rides: 0,
-    status: "",
-  },
+
   
-];
+   
+  
+  
+      const getFrequentUsers = async() => {
+        try {
+          const token = localStorage.getItem('token'); 
+          if (!token) {
+            throw new Error('Authorization token is missing.');
+          }
+  
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/all?page=0&limit=5`, {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+              'Content-Type': 'application/json',
+            },
+          });
+  
+          setUsers(response.data.data.users); 
+        } catch (error) {
+          console.error('Fetching error:', error);
+        } finally {
+          console.log('Fetching users completed.');
+        }
+
+      };
+  
+     
+
 
 export default OverviewDashboard;

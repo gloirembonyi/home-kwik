@@ -83,10 +83,10 @@ const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   month: "30d",
   quarter: "3m",
 };
-
-//get user by decomposing the token 
+//get user by decomposing the token
 const token= localStorage.getItem('token')
 const payload = jwt.decode(token, { complete: true });
+
 
 
 const MOCK_NOTIFICATIONS: Notification[] = [
@@ -115,8 +115,6 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     type: "warning",
   },
 ];
-
-// Subcomponents
 
 
 
