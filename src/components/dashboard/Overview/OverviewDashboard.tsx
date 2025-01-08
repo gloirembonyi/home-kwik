@@ -7,61 +7,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/base/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-import {
-  Users,
-  CreditCard,
-  Car,
-  Zap,
-  ArrowUpRight,
-  ArrowDownRight,
-} from "lucide-react";
-import NewSidebar from "@/components/dashboard/sidebar/sidebar";
-import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
-import ProSidebar from "@/components/dashboard/sidebar/sidebar";
-import RidesOverviewChart from "./rides/charts/RidesOverview";
+import RidesOverviewChart from "./rides/RidesOverview";
 import StatsDashboard from "./rides/charts/StatsDashboard";
-
-// Enhanced Color Palette
-const CHART_COLORS = {
-  primary: "#122d6c",
-  secondary: "#f2ba6a",
-  tertiary: "#e1646c",
-  background: "#f8fafc",
-  text: {
-    heading: "#0f172a",
-    subheading: "#64748b",
-    muted: "#94a3b8",
-  },
-};
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
-const OverviewDashboard: React.FC = () => {
+interface OverviewDashboardProps {
+  currentPath: string;
+  onNavigate: (path: string) => void;
+}
+
+const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
+  currentPath,
+  onNavigate,
+}) => {
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [currentPath, setCurrentPath] = useState("/dashboard");
 
   return (
     <div className="flex">
-      <div
-        className=" flex-1 
-        transition-all 
-        duration-300 
-        ease-in-out "
-      >
+      <div className="flex-1 transition-all duration-300 ease-in-out">
         <main className="space-y-6">
           {/* Stats card on dashboard */}
           <StatsDashboard />
@@ -80,7 +45,11 @@ const OverviewDashboard: React.FC = () => {
                   Users with highest ride counts
                 </p>
               </div>
-              <button className="text-blue-600 text-sm hover:underline font-semibold">
+              {/* Navigation handled via onNavigate */}
+              <button
+                className="text-blue-600 text-sm hover:underline font-semibold"
+                onClick={() => onNavigate("/users")}
+              >
                 View All Users
               </button>
             </CardHeader>
@@ -136,8 +105,7 @@ const OverviewDashboard: React.FC = () => {
                         </td>
                         <td className="py-4 px-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium
-                            ${
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
                               user.status === "Active"
                                 ? "bg-green-100 text-green-600"
                                 : "bg-yellow-100 text-yellow-600"
@@ -158,7 +126,6 @@ const OverviewDashboard: React.FC = () => {
     </div>
   );
 };
-
 // StatsCard Component
 interface StatsCardProps {
   title: string;

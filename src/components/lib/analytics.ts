@@ -19,7 +19,7 @@ export class Analytics {
   static init() {
     if (this.isInitialized) return;
     
-    mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || 'af9227f551110121e7d949ac7356d942', {
+    mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || '', {
       debug: process.env.NODE_ENV === 'development',
       persistence: "localStorage"
     });

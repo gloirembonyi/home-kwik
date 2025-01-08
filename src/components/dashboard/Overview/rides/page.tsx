@@ -78,7 +78,7 @@ export default function RidesManagement() {
         <header className="flex justify-between items-center pb-6 border-b border-gray-200">
           <h1 className="text-3xl font-extrabold text-gray-800">Rides Management</h1>
           
-          {/* Enhanced Search Input */}
+          {/* Search Input */}
           <div className="relative">
             <input
               type="search"
@@ -94,7 +94,7 @@ export default function RidesManagement() {
         </header>
 
         <div className="flex mt-6 space-x-6">
-          {/* Enhanced Fleet List */}
+          {/* Fleet List */}
           <div className="w-1/3 bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-800">Active Fleet</h2>
@@ -173,7 +173,6 @@ export default function RidesManagement() {
           <Map 
               apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} 
               onLocationSelect={(location) => {
-                // Optional: Add any additional logic when a location is selected
                 console.log('Selected Location:', location);
               }} 
             />

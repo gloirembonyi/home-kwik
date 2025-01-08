@@ -1,36 +1,88 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import React, { useState } from "react";
-// component
-import OverviewDashboard from "@/components/dashboard/Overview/OverviewDashboard";
-import UserManagement from "@/components/dashboard/users/users";
-import SettingsPage from "@/components/dashboard/setting/UserSettings";
-import ProSidebar from "@/components/dashboard/sidebar/sidebar";
-import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
-import Revenue from "@/components/dashboard/Revenue/Revenue";
-import RatingsAnalytics from "@/components/dashboard/vehicles/vehicles";
-import VehicleFleetAnalytics from "@/components/dashboard/vehicles/vehicles";
-import VehicleManagement from "@/components/dashboard/vehicles/vehicles";
-import PaymentDashboard from "@/components/dashboard/payment/payment";
-import TicketDashboard from "@/demo/dashboard-component/support/TicketDashboard";
-import RideAnalytics from "@/demo/dashboard-component/charts/RideActivity";
-import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
-import RidesManagement from "@/components/dashboard/Overview/rides/page";
-import PeakHours from "@/demo/dashboard-component/charts/PeakHours";
-
-type MenuItem = {
-  icon: React.ReactNode;
-  label: string;
-  path: string;
-  badge?: number;
-};
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
-// Main Dashboard
-const Dashboard: React.FC = () => {
-  const [currentPath, setCurrentPath] = useState("/dashboard");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+// Dynamically import components with ssr: false
+const OverviewDashboard = dynamic(
+  () => import("@/components/dashboard/Overview/OverviewDashboard"),
+  { ssr: false }
+);
+const Sidebar = dynamic(
+  () => import("@/components/dashboard/sidebar/sidebar"),
+  {
+    ssr: false,
+  }
+);
+const DashboardHeader = dynamic(
+  () => import("@/components/dashboard/DashboardHeader/Header"),
+  { ssr: false }
+);
+const Revenue = dynamic(
+  () => import("@/components/dashboard/Revenue/Revenue"),
+  {
+    ssr: false,
+  }
+);
+const VehicleManagement = dynamic(
+  () => import("@/components/dashboard/vehicles/vehicles"),
+  { ssr: false }
+);
+const PaymentDashboard = dynamic(
+  () => import("@/components/dashboard/payment/payment"),
+  { ssr: false }
+);
+const RidesManagement = dynamic(
+  () => import("@/components/dashboard/Overview/rides/page"),
+  { ssr: false }
+);
+const AnalyticsPageRide = dynamic(
+  () => import("@/components/dashboard/Overview/rides/RideAnalitics"),
+  { ssr: false }
+);
+const TransactionsPage = dynamic(
+  () => import("@/components/dashboard/transactions/page"),
+  { ssr: false }
+);
+const TablePage = dynamic(
+  () => import("@/components/dashboard/users/all-drivers/driver-request"),
+  { ssr: false }
+);
+const FlaggedIssuesPage = dynamic(
+  () => import("@/components/dashboard/transactions/flagged-isues"),
+  { ssr: false }
+);
+const UserManagement = dynamic(
+  () => import("@/components/dashboard/users/all-users-page/all-users"),
+  { ssr: false }
+);
+const RideHistory = dynamic(
+  () => import("@/components/dashboard/Overview/rides/ride-history/page"),
+  { ssr: false }
+);
+const SuspensionHistoryPage = dynamic(
+  () => import("@/components/dashboard/users/suspension/suspension"),
+  { ssr: false }
+);
+const AuditLogs = dynamic(
+  () => import("@/components/dashboard/users/audit-logs/audit-logs"),
+  { ssr: false }
+);
+const RefundRequestsPage = dynamic(
+  () => import("@/components/dashboard/users/refund-requests/page"),
+  { ssr: false }
+);
+const SettingSystem = dynamic(
+  () => import("@/components/dashboard/settings/settings-system"),
+  { ssr: false }
+);
+
+// Main Dashboard Component
+const Dashboard = () => {
+  const [currentPath, setCurrentPath] = React.useState("/dashboard");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
 
   const handleNavigation = (path: string) => {
@@ -52,39 +104,64 @@ const Dashboard: React.FC = () => {
   const renderContent = () => {
     switch (currentPath) {
       case "/dashboard":
-        return <OverviewDashboard />;
+        return (
+          <OverviewDashboard
+            currentPath={currentPath}
+            onNavigate={handleNavigation}
+          />
+        );
       case "/users":
         return <UserManagement />;
+      case "/requests":
+        return <TablePage />;
       case "/rides":
         return <RidesManagement />;
       case "/rides/analytics":
         return <AnalyticsPageRide />;
+      case "/rides/history":
+        return <RideHistory />;
+      case "/suspension":
+        return <SuspensionHistoryPage />;
+      case "/logs":
+        return <AuditLogs />;
+      case "/refunds":
+        return <RefundRequestsPage />;
       case "/rides/fleet":
-        return <RidesManagement/>;
+        return <RidesManagement />;
       case "/revenue":
         return <Revenue />;
-      case "/ratings":
-        return <PeakHours />;
+      case "/dash":
+        return <SettingSystem />;
+      case "/transactions":
+        return <TransactionsPage />;
+      case "/issues":
+        return <FlaggedIssuesPage />;
       case "/performance":
-        return <PaymentDashboard />;
-      case "/vehicles":
         return <VehicleManagement />;
+      case "/vehicles":
+        return <RefundRequestsPage />;
       case "/cost":
         return <PaymentDashboard />;
       case "/settings":
-        return <SettingsPage />;
+        return <SettingSystem />;
       default:
-        return <OverviewDashboard />;
+        return (
+          <OverviewDashboard
+            currentPath={currentPath}
+            onNavigate={handleNavigation}
+          />
+        );
     }
   };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-      <ProSidebar
+      <Sidebar
         currentPath={currentPath}
         onNavigate={handleNavigation}
         onLogout={handleLogout}
         onCollapseChange={handleSidebarCollapse}
+        notificationUpdateInterval={15000}
       />
 
       <div

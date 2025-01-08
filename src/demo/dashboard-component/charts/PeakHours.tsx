@@ -67,12 +67,12 @@ const generateMockData = (baseDate = new Date()): HourData[] => {
       utilization,
       status: utilization > 80 ? 'high' : utilization > 60 ? 'medium' : 'low',
       revenue: rides * (15 + Math.random() * 10), // Average fare between $15-25
-      previousRides: Math.floor(rides * (0.9 + Math.random() * 0.2)), // Previous week data
+      previousRides: Math.floor(rides * (0.9 + Math.random() * 0.2)), 
     };
   });
 };
 
-// Enhanced Stat Card with Animation
+// Stat Card with Animation
 const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, trend, detail, className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
   

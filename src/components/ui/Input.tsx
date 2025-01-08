@@ -34,9 +34,9 @@ export function Input({
   textColor,
   Component,
   className,
-  onFocus, // Added onFocus prop here
-  onBlur, // Added onBlur prop here
-  ...rest // Spread other input props
+  onFocus, 
+  onBlur, 
+  ...rest
 }: InputProps) {
   const [internalValue, setInternalValue] = useState(value || "");
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
