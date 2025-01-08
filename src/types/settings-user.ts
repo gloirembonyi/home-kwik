@@ -148,3 +148,23 @@ export interface UserData {
       severity: 'low' | 'medium' | 'high';
     }
 
+    export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+      email: {
+        security: true,
+        updates: true,
+        marketing: false,
+        newsletter: false,
+      },
+      push: {
+        security: true,
+        updates: false,
+        reminders: true,
+        messages: true,
+      },
+      frequency: "immediate",
+      quiet_hours: {
+        enabled: false,
+        start: "22:00",
+        end: "07:00",
+      },
+    };

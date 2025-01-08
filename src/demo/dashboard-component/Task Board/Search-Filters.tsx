@@ -12,7 +12,8 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/base/card";
-import { Input } from '../ui/Input';
+import { Input } from '@/components/ui/Input';
+
 
 // Define interface for category object
 interface Category {

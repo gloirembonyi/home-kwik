@@ -21,7 +21,6 @@ import RefundRequestsPage from "@/components/dashboard/users/refund-requests/pag
 import DashboardTest from "@/components/dashboard/example/dashboard";
 import { useNotifications } from "@/components/dashboard/sidebar/notification/hooks";
 import NotificationModal from "@/components/dashboard/settings/notification-model";
-import SettingsPage from "@/components/dashboard/settings/sub-tab/setting";
 import SettingSystem from "@/components/dashboard/settings/settings-system";
 
 type MenuItem = {

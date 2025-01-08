@@ -1,39 +1,56 @@
-import React, { useState } from 'react';
-import { X, Upload } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/base/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/base/tabs";
+import React, { useState } from "react";
+import { X, Upload } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/base/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/base/tabs";
 import { Button } from "@/components/ui/base/button";
 import { Textarea } from "@/components/ui/base/textarea";
-import { Input } from '@/components/ui/Input';
+import { Input } from "@/components/ui/Input";
+import { User } from "./all-users";
 
-const SMSDialog = ({ isOpen, onClose, users }) => {
-  const [selectedUser, setSelectedUser] = useState('');
-  const [message, setMessage] = useState('');
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [activeTab, setActiveTab] = useState('single');
+interface SMSDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  users: User[];
+}
+
+const SMSDialog: React.FC<SMSDialogProps> = ({ isOpen, onClose, users }) => {
+  const [selectedUser, setSelectedUser] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [activeTab, setActiveTab] = useState<"single" | "bulk">("single");
 
   const handleSendSingle = async () => {
     if (!selectedUser || !message) {
-      alert('Please select a user and write a message');
+      alert("Please select a user and write a message");
       return;
     }
     // TODO: Implement SMS sending logic here
-    console.log('Sending SMS to:', selectedUser, 'Message:', message);
+    console.log("Sending SMS to:", selectedUser, "Message:", message);
     onClose();
   };
 
   const handleSendBulk = async () => {
     if (!uploadedFile || !message) {
-      alert('Please upload a file and write a message');
+      alert("Please upload a file and write a message");
       return;
     }
     // TODO: Implement bulk SMS sending logic here
-    console.log('Sending bulk SMS, File:', uploadedFile, 'Message:', message);
+    console.log("Sending bulk SMS, File:", uploadedFile, "Message:", message);
     onClose();
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
     setUploadedFile(file);
   };
 
@@ -42,10 +59,16 @@ const SMSDialog = ({ isOpen, onClose, users }) => {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Send SMS</DialogTitle>
-         
         </DialogHeader>
 
-        <Tabs defaultValue="single" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="single"
+          className="w-full"
+          value={activeTab}
+          onValueChange={(value: string) =>
+            setActiveTab(value as "single" | "bulk")
+          }
+        >
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="single">Send to a User</TabsTrigger>
             <TabsTrigger value="bulk">Send to Many Users</TabsTrigger>
@@ -83,7 +106,7 @@ const SMSDialog = ({ isOpen, onClose, users }) => {
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={handleSendSingle}
                 className="w-full bg-blue-900 text-white hover:bg-blue-800"
               >
@@ -108,11 +131,14 @@ const SMSDialog = ({ isOpen, onClose, users }) => {
                           type="file"
                           className="sr-only"
                           onChange={handleFileUpload}
+                          id=""
                           accept=".csv,.xlsx,.xls"
                         />
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500">CSV, XLSX up to 10MB</p>
+                    <p className="text-xs text-gray-500">
+                      CSV, XLSX up to 10MB
+                    </p>
                   </div>
                 </div>
                 {uploadedFile && (
@@ -134,7 +160,7 @@ const SMSDialog = ({ isOpen, onClose, users }) => {
                 />
               </div>
 
-              <Button 
+              <Button
                 onClick={handleSendBulk}
                 className="w-full bg-blue-900 text-white hover:bg-blue-800"
               >

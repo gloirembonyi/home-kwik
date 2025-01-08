@@ -41,8 +41,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/base/tooltip";
 import ProfileTab from './profile';
-import { AuditLog, Device, SystemResource, UserData } from '@/types/settings-user';
-import { DEFAULT_NOTIFICATION_SETTINGS } from './sub-tab/setting';
+import { AuditLog, DEFAULT_NOTIFICATION_SETTINGS, Device, SystemResource, UserData } from '@/types/settings-user';
+
 
 
 

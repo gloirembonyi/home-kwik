@@ -20,6 +20,7 @@ import { Separator } from "@/components/ui/base/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/base/avatar";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '../lib/utils';
 
 interface SubItem {
   title: string;
