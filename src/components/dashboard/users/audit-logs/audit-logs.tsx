@@ -184,7 +184,7 @@ const toggleSelectAll = useCallback(() => {
    };
  
    return (
-     <div className=" space-y-6 bg-gray-50 min-h-screen">
+     <div className=" space-y-6 bg-gray-50 min-h-screen p-6 -m-4 -mt-8">
        {/* Header with Search and Actions */}
        <div className="flex justify-between items-center">
          <h1 className="text-2xl font-semibold text-gray-800">Audit Logs</h1>
@@ -289,7 +289,7 @@ const toggleSelectAll = useCallback(() => {
            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)} of {filteredData.length} records
          </span>
          <Pagination
-           total={filteredData.length}
+           total={Number(filteredData.length)}
            perPage={ITEMS_PER_PAGE}
            currentPage={currentPage}
            onPageChange={setCurrentPage}

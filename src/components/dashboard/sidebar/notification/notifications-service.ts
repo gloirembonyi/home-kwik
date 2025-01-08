@@ -1,24 +1,19 @@
-import { NotificationsState } from "../../../../pages/api/notifications";
+import { NotificationsState } from "@/types/notification-types";
 
-type Notification = {
-  count: number;
-  severity: 'low' | 'medium' | 'high';
-  lastUpdated: number;
-  isRead: boolean;
-};
 
+// notifications-service.ts
 export class NotificationService {
   private static instance: NotificationService;
   private listeners: ((notifications: NotificationsState) => void)[] = [];
   private currentNotifications: NotificationsState = {};
   private polling: boolean = false;
   private pollInterval: number = 30000;
+  private lastFetchTime: number = 0;
+  private readonly FETCH_COOLDOWN = 5000;
+  private activePaths: Set<string> = new Set();
 
   private constructor() {
-    const savedNotifications = localStorage.getItem('currentNotifications');
-    if (savedNotifications) {
-      this.currentNotifications = JSON.parse(savedNotifications);
-    }
+    this.loadFromStorage();
   }
 
   static getInstance(): NotificationService {
@@ -28,34 +23,106 @@ export class NotificationService {
     return NotificationService.instance;
   }
 
-  async fetchNotifications(): Promise<NotificationsState> {
+  private loadFromStorage() {
     try {
-      const response = await fetch('api/notifications');
-      const newNotifications: Record<string, Notification> = await response.json();
+      const savedNotifications = localStorage.getItem('currentNotifications');
+      if (savedNotifications) {
+        this.currentNotifications = JSON.parse(savedNotifications);
+        this.cleanupOldNotifications();
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      this.currentNotifications = {};
+    }
+  }
 
-      // Merge new notifications with existing ones
-      const mergedNotifications = { ...this.currentNotifications };
+  private cleanupOldNotifications() {
+    const now = Date.now();
+    Object.entries(this.currentNotifications).forEach(([path, notification]) => {
+      if (now - notification.lastUpdated > 24 * 60 * 60 * 1000) {
+        delete this.currentNotifications[path];
+      }
+    });
+    this.saveToStorage();
+  }
 
+  private saveToStorage() {
+    try {
+      localStorage.setItem('currentNotifications', JSON.stringify(this.currentNotifications));
+    } catch (error) {
+      console.error('Error saving notifications:', error);
+    }
+  }
+
+  calculateSeverity(count: number): 'low' | 'medium' | 'high' {
+    if (count >= 10) return 'high';
+    if (count >= 5) return 'medium';
+    return 'low';
+  }
+
+  formatNotificationCount(count: number): string {
+    return count > 99 ? '99+' : count.toString();
+  }
+
+  setActivePath(path: string) {
+    this.activePaths.add(path);
+    if (this.currentNotifications[path]) {
+      this.markAsRead(path);
+    }
+  }
+
+  clearActivePath(path: string) {
+    this.activePaths.delete(path);
+  }
+
+  async fetchNotifications(): Promise<NotificationsState> {
+    const now = Date.now();
+    if (now - this.lastFetchTime < this.FETCH_COOLDOWN) {
+      return this.currentNotifications;
+    }
+
+    try {
+      const response = await fetch('/api/notifications');
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      
+      const newNotifications: NotificationsState = await response.json();
+      this.lastFetchTime = now;
+
+      // Merge with existing notifications
       Object.entries(newNotifications).forEach(([path, notification]) => {
-        if (!mergedNotifications[path] || mergedNotifications[path].isRead) {
-          // If no existing notification or it was read, create new
-          mergedNotifications[path] = {
-            ...notification,
-            isRead: false
-          };
+        const isPathActive = this.activePaths.has(path);
+        const existing = this.currentNotifications[path];
+
+        if (isPathActive) {
+          // For active paths, only update if newer
+          if (!existing || notification.lastUpdated > existing.lastUpdated) {
+            this.currentNotifications[path] = {
+              ...notification,
+              isRead: false,
+              lastUpdated: now
+            };
+          }
         } else {
-          // If existing unread notification, accumulate count
-          mergedNotifications[path] = {
-            ...mergedNotifications[path],
-            count: mergedNotifications[path].count + notification.count,
-            severity: this.calculateSeverity(mergedNotifications[path].count + notification.count),
-            lastUpdated: Date.now()
-          };
+          // For inactive paths, accumulate notifications
+          if (!existing || existing.isRead) {
+            this.currentNotifications[path] = {
+              ...notification,
+              isRead: false,
+              lastUpdated: now
+            };
+          } else {
+            const newCount = existing.count + notification.count;
+            this.currentNotifications[path] = {
+              ...existing,
+              count: Math.min(newCount, 999),
+              severity: this.calculateSeverity(newCount),
+              lastUpdated: now
+            };
+          }
         }
       });
 
-      this.currentNotifications = mergedNotifications;
-      localStorage.setItem('currentNotifications', JSON.stringify(this.currentNotifications));
+      this.saveToStorage();
       this.notifyListeners();
       return this.currentNotifications;
     } catch (error) {
@@ -64,65 +131,56 @@ export class NotificationService {
     }
   }
 
-  private calculateSeverity(count: number): 'low' | 'medium' | 'high' {
-    if (count > 10) return 'high';
-    if (count > 5) return 'medium';
-    return 'low';
-  }
-
   markAsRead(path: string) {
-    console.log('Marking as read:', path); // Debug log
     if (this.currentNotifications[path]) {
-      this.currentNotifications[path].isRead = true;
-      this.currentNotifications[path].count = 0;
-      localStorage.setItem('currentNotifications', JSON.stringify(this.currentNotifications));
+      this.currentNotifications[path] = {
+        ...this.currentNotifications[path],
+        isRead: true,
+        count: 0,
+        lastUpdated: Date.now()
+      };
+      this.saveToStorage();
       this.notifyListeners();
-      console.log('Updated notifications:', this.currentNotifications); // Debug log
     }
   }
 
   clearNotification(path: string) {
-    console.log('Clearing notification:', path); // Debug log
     if (this.currentNotifications[path]) {
       delete this.currentNotifications[path];
-      localStorage.setItem('currentNotifications', JSON.stringify(this.currentNotifications));
+      this.saveToStorage();
       this.notifyListeners();
-      console.log('Notifications after clear:', this.currentNotifications); // Debug log
     }
   }
 
-  getCurrentNotifications(): NotificationsState {
-    return this.currentNotifications;
-  }
-
-  subscribe(listener: (notifications: NotificationsState) => void) {
+  subscribe(listener: (notifications: NotificationsState) => void): () => void {
     this.listeners.push(listener);
     return () => {
       this.listeners = this.listeners.filter(l => l !== listener);
     };
   }
 
-  private notifyListeners() {
-    this.listeners.forEach(listener => listener({ ...this.currentNotifications }));
-  }
-
-  startPolling(interval: number = this.pollInterval) {
+  startPolling() {
     if (this.polling) return;
     this.polling = true;
-    this.pollInterval = interval;
-    
-    const poll = async () => {
-      if (!this.polling) return;
-      await this.fetchNotifications();
-      setTimeout(poll, this.pollInterval);
-    };
-    poll();
+    this.poll();
   }
 
   stopPolling() {
     this.polling = false;
   }
 
+  private async poll() {
+    while (this.polling) {
+      await this.fetchNotifications();
+      await new Promise(resolve => setTimeout(resolve, this.pollInterval));
+    }
+  }
+
+  private notifyListeners() {
+    this.listeners.forEach(listener => listener(this.currentNotifications));
+  }
+
+  // For testing purposes
   setNotifications(notifications: NotificationsState) {
     this.currentNotifications = notifications;
     this.notifyListeners();

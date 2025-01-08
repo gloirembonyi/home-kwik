@@ -8,7 +8,7 @@ import {
   ChevronDown, Menu, Gauge, UserCog, CarFront,
   ClipboardList, LogOut, Settings, Home
 } from 'lucide-react';
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/base/button";
 import {
   Tooltip,

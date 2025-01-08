@@ -1,5 +1,7 @@
+// notifications.test.ts
+import { NotificationsState } from '@/types/notification-types';
 import { NotificationService } from './notifications-service';
-import { NotificationsState } from '../../../../pages/api/notifications';
+
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -41,11 +43,11 @@ describe('NotificationService', () => {
 
     service.setNotifications(mockNotifications);
     service.clearNotification('dashboard');
-    
+
     const listener = (notifications: NotificationsState) => {
       expect(notifications.dashboard.count).toBe(0);
     };
-    
+
     service.subscribe(listener);
   });
 });

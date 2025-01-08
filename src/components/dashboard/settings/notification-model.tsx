@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Switch } from "@headlessui/react";
-import { BellIcon, UserCircleIcon } from "@heroicons/react/outline";
+import { BellIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+
 
 const NotificationModal = () => {
   const [accountActivity, setAccountActivity] = useState(false);

@@ -1,15 +1,6 @@
 // notifications.ts
+import { NotificationCount, NotificationsState } from '@/types/notification-types';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-// Types
-export interface NotificationCount {
-  count: number;
-  severity: 'low' | 'medium' | 'high';
-  lastUpdated: number;
-  isRead?: boolean;
-}
-
-export type NotificationsState = Record<string, NotificationCount>;
 
 // Helper function to generate random severity
 const getRandomSeverity = (): 'low' | 'medium' | 'high' => {

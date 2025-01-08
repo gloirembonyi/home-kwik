@@ -11,7 +11,6 @@ import PaymentDashboard from "@/components/dashboard/payment/payment";
 import RidesManagement from "@/components/dashboard/Overview/rides/page";
 import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
 import TransactionsPage from "@/components/dashboard/transactions/page";
-import SettingsPage from "@/components/dashboard/settings/UserSettings";
 import TablePage from "@/components/dashboard/users/all-drivers/driver-request";
 import FlaggedIssuesPage from "@/components/dashboard/transactions/flagged-isues";
 import UserManagement from "@/components/dashboard/users/all-users-page/all-users";
@@ -21,6 +20,9 @@ import AuditLogs from "@/components/dashboard/users/audit-logs/audit-logs";
 import RefundRequestsPage from "@/components/dashboard/users/refund-requests/page";
 import DashboardTest from "@/components/dashboard/example/dashboard";
 import { useNotifications } from "@/components/dashboard/sidebar/notification/hooks";
+import NotificationModal from "@/components/dashboard/settings/notification-model";
+import SettingsPage from "@/components/dashboard/settings/sub-tab/setting";
+import SettingSystem from "@/components/dashboard/settings/settings-system";
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -37,6 +39,8 @@ const Dashboard: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
   useNotifications();
+
+  const notifications = useNotifications(currentPath);
 
   const handleNavigation = (path: string) => {
     setCurrentPath(path);
@@ -83,8 +87,8 @@ const Dashboard: React.FC = () => {
         return <RidesManagement />;
       case "/revenue":
         return <Revenue />;
-        case "/dash":
-        return <DashboardTest />;
+      case "/dash":
+        return <SettingSystem />;
       case "/transactions":
         return <TransactionsPage />;
       case "/issues":
@@ -96,14 +100,14 @@ const Dashboard: React.FC = () => {
       case "/cost":
         return <PaymentDashboard />;
       case "/settings":
-        return <SettingsPage />;
+        return <SettingSystem />;
       default:
         return (
           <OverviewDashboard
             currentPath={currentPath}
             onNavigate={handleNavigation}
           />
-        ); 
+        );
     }
   };
 

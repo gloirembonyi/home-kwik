@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/Input";
-import { Download, FilterIcon, CheckIcon, XIcon } from "lucide-react";
+import {
+  Download,
+  FilterIcon,
+  CheckIcon,
+  XIcon,
+  SearchIcon,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/base/table";
-import { Pagination } from "@/components/ui/base/pagination";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/base/pagination";
 import { Button } from "@/components/ui/base/button";
 import {
   Dialog,
@@ -16,9 +22,10 @@ import {
   DialogTitle,
 } from "@/components/ui/base/dialog";
 import { Calendar } from "@/components/ui/base/calendar";
+import ExportFilterModal from "./ExportFilterModal";
 
 // Define types
-interface RefundRequest {
+export interface RefundRequest {
   id: string;
   rideId: string;
   reason: string;
@@ -30,31 +37,30 @@ interface RefundRequest {
 }
 
 // Define status as a union type
-type RefundStatus = "Pending" | "Approved" | "Denied";
+export type RefundStatus = "Pending" | "Approved" | "Denied";
 
-interface FilterState {
+export interface FilterState {
   status: "All" | RefundStatus;
   dateRange: DateRange;
 }
 
-interface DateRange {
+export interface DateRange {
   from: Date | null;
   to: Date | null;
 }
 
-interface PaginationProps {
+export interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
 
-interface CalendarProps {
+export interface CalendarProps {
   mode: "range";
   selected: DateRange;
   onSelect: (range: DateRange | undefined) => void;
   className?: string;
 }
-
 
 // Mock data service (replace with actual API call in production)
 const fetchRefundRequests = async () => {
@@ -131,6 +137,7 @@ const RefundRequestsPage: React.FC = () => {
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     status: "All",
     dateRange: {
@@ -138,7 +145,6 @@ const RefundRequestsPage: React.FC = () => {
       to: null,
     },
   });
-  
 
   // Fetch refund requests on component mount
   useEffect(() => {
@@ -225,7 +231,10 @@ const RefundRequestsPage: React.FC = () => {
     { label: "Custom Range", getValue: () => null },
   ];
 
-  const handleDateRangeSelect = (option: { label: string; getValue: () => Date | null }) => {
+  const handleDateRangeSelect = (option: {
+    label: string;
+    getValue: () => Date | null;
+  }) => {
     const from = option.getValue();
     if (option.label === "Custom Range") {
       return;
@@ -286,30 +295,25 @@ const RefundRequestsPage: React.FC = () => {
   };
 
   // Update Calendar component props type
-const Calendar: React.FC<{
-  mode: "range";
-  selected: DateRange;
-  onSelect: (range: DateRange | undefined) => void;
-  className?: string;
-}> = ({ mode, selected, onSelect, className }) => {
-  // Your Calendar implementation
-  return null; // Replace with actual implementation
-};
+  const Calendar: React.FC<{
+    mode: "range";
+    selected: DateRange;
+    onSelect: (range: DateRange | undefined) => void;
+    className?: string;
+  }> = ({ mode, selected, onSelect, className }) => {
+    // Calendar implementation
+    return null; // Replace with actual implementation
+  };
 
-const handleDenyRequests = () => {
-  setRefundRequests((prev) =>
-    prev.map((request) =>
-      selectedRequests.includes(request.id)
-        ? { ...request, status: "Denied" as RefundStatus }
-        : request
-    )
-  );
-  setSelectedRequests([]);
-};
-
-  // Export functionality (mock)
-  const handleExport = () => {
-    alert("Export functionality will be implemented");
+  const handleDenyRequests = () => {
+    setRefundRequests((prev) =>
+      prev.map((request) =>
+        selectedRequests.includes(request.id)
+          ? { ...request, status: "Denied" as RefundStatus }
+          : request
+      )
+    );
+    setSelectedRequests([]);
   };
 
   if (isLoading) {
@@ -317,7 +321,7 @@ const handleDenyRequests = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 -m-4 -mt-8 bg-gray-50 min-h-screen">
       {/* Header section */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col">
@@ -327,32 +331,47 @@ const handleDenyRequests = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Input
-            type="text"
-            placeholder="Search rides, riders, or drivers"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-64"
-            id={""}
-          />
-          <Button
-            onClick={handleExport}
-            variant="outline"
-            size="sm"
-            className="flex items-center"
-          >
-            <Download className="w-4 h-4 mr-2" /> Export
-          </Button>
-          <Button
-            onClick={() => setIsFilterDialogOpen(true)}
-            variant="outline"
-            size="sm"
-            className="flex items-center"
-          >
-            <FilterIcon className="w-4 h-4 mr-2" /> Filter
-          </Button>
+          <div className="relative w-full lg:w-auto">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <SearchIcon className="w-4 h-4 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search rides, riders, or drivers"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+            />
+          </div>
+          <div className="relative w-full lg:w-auto">
+            <Button
+              onClick={() => setIsExportModalOpen(true)}
+              variant="outline"
+              size="sm"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 disabled:opacity-50"
+            >
+              <Download className="w-4 h-4 mr-2" /> Export
+            </Button>
+          </div>
+          <div className="relative w-full lg:w-auto">
+            <Button
+              onClick={() => setIsFilterDialogOpen(true)}
+              variant="outline"
+              size="sm"
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow hover:bg-gray-300"
+            >
+              <FilterIcon className="w-4 h-4 mr-2" /> Filter
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* the ExportFilterModal here */}
+      <ExportFilterModal
+        open={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        data={refundRequests}
+      />
 
       {/* Filter Dialog */}
       <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
@@ -396,24 +415,27 @@ const handleDenyRequests = () => {
             <div>
               <h3 className="font-medium mb-3">Status</h3>
               <div className="grid grid-cols-4 gap-3">
-                {(["All", "Pending", "Approved", "Denied"] as const).map((status) => (
-                  <button
-                    key={status}
-                    onClick={() =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        status,
-                      }))
-                    }
-                    className={`px-4 py-2 rounded-lg transition-colors text-sm
-                      ${filters.status === status
-                        ? "bg-blue-100 text-blue-800 font-medium"
-                        : "bg-gray-50 hover:bg-gray-100"
+                {(["All", "Pending", "Approved", "Denied"] as const).map(
+                  (status) => (
+                    <button
+                      key={status}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          status,
+                        }))
+                      }
+                      className={`px-4 py-2 rounded-lg transition-colors text-sm
+                      ${
+                        filters.status === status
+                          ? "bg-blue-100 text-blue-800 font-medium"
+                          : "bg-gray-50 hover:bg-gray-100"
                       }`}
-                  >
-                    {status} Requests
-                  </button>
-                ))}
+                    >
+                      {status} Requests
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -478,6 +500,7 @@ const handleDenyRequests = () => {
               <TableCell>{request.date}</TableCell>
               <TableCell>${request.amount.toFixed(2)}</TableCell>
               <TableCell>
+                {/* we need to fliter what we need  */}
                 <span
                   className={`px-2 py-1 rounded text-sm font-medium ${
                     request.status === "Approved"
@@ -503,6 +526,7 @@ const handleDenyRequests = () => {
                   }}
                   className="text-green-600 hover:text-green-700"
                 >
+                  Approve
                   <CheckIcon className="w-4 h-4" />
                 </Button>
                 <Button
@@ -517,6 +541,7 @@ const handleDenyRequests = () => {
                   }}
                   className="text-red-600 hover:text-red-700"
                 >
+                  Deny
                   <XIcon className="w-4 h-4" />
                 </Button>
               </TableCell>
@@ -527,17 +552,50 @@ const handleDenyRequests = () => {
 
       {/* Pagination */}
       <div className="mt-6 flex items-center justify-between">
-        <span className="text-sm text-gray-500">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of{" "}
-          {filteredRequests.length} records
-        </span>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
+  <span className="text-sm text-gray-500">
+    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+    {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of{" "}
+    {filteredRequests.length} records
+  </span>
+  <Pagination>
+    <PaginationContent>
+      <PaginationItem>
+        <PaginationPrevious 
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentPage(currentPage - 1);
+          }} 
+          className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
         />
-      </div>
+      </PaginationItem>
+      {[...Array(totalPages)].map((_, i) => (
+        <PaginationItem key={i + 1}>
+          <PaginationLink 
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrentPage(i + 1);
+            }}
+            isActive={currentPage === i + 1}
+          >
+            {i + 1}
+          </PaginationLink>
+        </PaginationItem>
+      ))}
+      <PaginationItem>
+        <PaginationNext 
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentPage(currentPage + 1);
+          }}
+          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+        />
+      </PaginationItem>
+    </PaginationContent>
+  </Pagination>
+</div>
     </div>
   );
 };
