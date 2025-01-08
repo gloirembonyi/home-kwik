@@ -1,40 +1,23 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
-import useAuth from "@/components/hooks/useAuth";
-
+import useAuth from "@/hooks/useAuth";
 
 const App = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const [isLoginPage, setIsLoginPage] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const pathname = window.location.pathname;
-    setIsLoginPage(pathname === "/login");
-
-    if (!isAuthenticated && pathname !== "/login") {
-      // Redirect unauthenticated users to login
-      router.push("/login");
-    } else {
-      // Allow authenticated users or login page to load
-      setIsLoading(false);
+    if (!loading && !isAuthenticated) {
+      router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
 
-  if (isLoading) {
-    return null; // Show nothing while loading
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  // Render only the children for login page
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
-
-  // Render authenticated layout for other pages
-  return <>{children}</>;
+  return isAuthenticated ? children : null;
 };
 
 export default App;

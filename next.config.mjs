@@ -38,32 +38,9 @@ const nextConfig = {
 
   // Enable experimental features if needed
   experimental: {
-    // Add experimental features here if needed
-    serverActions: true,
-    typedRoutes: true,
-    fontLoaders: [
-      { loader: '@next/font/google' },
-      { loader: '@next/font/local' }
-    ],
+    typedRoutes: true
   },
+  // Add other valid config options here
+}
 
-  // Customize dist directory if needed
-  // distDir: 'build',
-
-  // Add redirects if needed
-  async redirects() {
-    return [];
-  },
-
-  // Add rewrites if needed
-  async rewrites() {
-    return [];
-  },
-
-  // Add headers if needed
-  async headers() {
-    return [];
-  },
-};
-
-export default nextConfig;
+export default nextConfig

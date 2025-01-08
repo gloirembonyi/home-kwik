@@ -47,7 +47,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/base/dialog";
-import { TooltipProps as RechartsTooltipProps } from "recharts";
+import { TooltipProps } from "recharts";
 
 // interface
 
@@ -64,16 +64,20 @@ type FlexibleUser = {
   [key: string]: string | number;
 };
 
-
 type TooltipPayload = {
   rating: string;
   count: number;
   percentage: number;
 };
 
-type CustomTooltipProps = {
-  payload: { payload: TooltipPayload }[]; 
-};
+type ValueType = string | number;
+type NameType = string;
+
+interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
+  payload?: Array<{
+    payload: TooltipPayload;
+  }>;
+}
 
 //mock data with more details
 const mockData = {
@@ -148,14 +152,13 @@ const mockData = {
 };
 
 const VehicleManagement = () => {
-  const [selectedDriver, setSelectedDriver] = useState(null);
+  const [selectedDriver, setSelectedDriver] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({
     key: "rating",
     direction: "desc",
   });
   const [filterRating, setFilterRating] = useState<number | null>(null);
-
 
   // Sorting and filtering logic for top users
   const sortedUsers = useMemo(() => {
@@ -188,7 +191,6 @@ const VehicleManagement = () => {
       }
       return 0;
     });
-    
 
     return users;
   }, [searchTerm, sortConfig, filterRating]);
@@ -200,9 +202,12 @@ const VehicleManagement = () => {
     }));
   };
 
-  const renderRatingDistributionTooltip = ({ payload }: CustomTooltipProps) => {
+  const renderRatingDistributionTooltip = (
+    props: TooltipProps<ValueType, NameType>
+  ) => {
+    const { payload } = props;
     if (payload && payload.length > 0) {
-      const data = payload[0].payload;
+      const data = payload[0].payload as TooltipPayload;
       return (
         <div className="bg-white p-4 shadow-lg rounded-lg border">
           <div className="flex items-center space-x-2">
@@ -217,7 +222,6 @@ const VehicleManagement = () => {
     }
     return null;
   };
-  
 
   return (
     <div className=" space-y-6 bg-gray-50">
@@ -233,7 +237,7 @@ const VehicleManagement = () => {
             >
               {stat.icon}
             </div>
-            <div >
+            <div>
               <h3 className="text-sm font-medium text-gray-600">
                 {stat.label}
               </h3>
@@ -250,7 +254,9 @@ const VehicleManagement = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="text-2xl font-extrabold text-blue-900 tracking-tight">Rating Distribution</CardTitle>
+              <CardTitle className="text-2xl font-extrabold text-blue-900 tracking-tight">
+                Rating Distribution
+              </CardTitle>
               <CardDescription className="text-blue-700 mt-2 font-medium">
                 Comprehensive breakdown of driver ratings
               </CardDescription>

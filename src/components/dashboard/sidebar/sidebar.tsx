@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
   LayoutDashboard,
@@ -299,11 +301,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
             title={isCollapsed ? item.label : undefined}
           >
-            {item.icon && (
-              <span className="">
-                {item.icon}
-              </span>
-            )}
+            {item.icon && <span className="">{item.icon}</span>}
 
             {!isCollapsed && (
               <span className="text-sm font-medium">{item.label}</span>
@@ -404,9 +402,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Menu */}
         <nav className="flex-1 py-6 overflow-y-auto">
-          <div className="space-y-1">
-            {menuItems.map(renderMenuItem)}
-          </div>
+          <div className="space-y-1">{menuItems.map(renderMenuItem)}</div>
         </nav>
 
         {/* Footer Section */}

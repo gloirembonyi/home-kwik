@@ -88,38 +88,19 @@ export class NotificationService {
       const newNotifications: NotificationsState = await response.json();
       this.lastFetchTime = now;
 
+      // Get read status from localStorage
+      const readNotifications = this.getReadNotifications();
+
       // Merge with existing notifications
       Object.entries(newNotifications).forEach(([path, notification]) => {
-        const isPathActive = this.activePaths.has(path);
-        const existing = this.currentNotifications[path];
+        const lastReadTime = readNotifications[path] || 0;
+        const isRead = lastReadTime > notification.lastUpdated;
 
-        if (isPathActive) {
-          // For active paths, only update if newer
-          if (!existing || notification.lastUpdated > existing.lastUpdated) {
-            this.currentNotifications[path] = {
-              ...notification,
-              isRead: false,
-              lastUpdated: now
-            };
-          }
-        } else {
-          // For inactive paths, accumulate notifications
-          if (!existing || existing.isRead) {
-            this.currentNotifications[path] = {
-              ...notification,
-              isRead: false,
-              lastUpdated: now
-            };
-          } else {
-            const newCount = existing.count + notification.count;
-            this.currentNotifications[path] = {
-              ...existing,
-              count: Math.min(newCount, 999),
-              severity: this.calculateSeverity(newCount),
-              lastUpdated: now
-            };
-          }
-        }
+        this.currentNotifications[path] = {
+          ...notification,
+          isRead,
+          lastUpdated: now
+        };
       });
 
       this.saveToStorage();
@@ -133,14 +114,29 @@ export class NotificationService {
 
   markAsRead(path: string) {
     if (this.currentNotifications[path]) {
+      // Store the read status in localStorage
+      const readNotifications = this.getReadNotifications();
+      readNotifications[path] = Date.now();
+      localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+
       this.currentNotifications[path] = {
         ...this.currentNotifications[path],
         isRead: true,
         count: 0,
         lastUpdated: Date.now()
       };
+      
       this.saveToStorage();
       this.notifyListeners();
+    }
+  }
+
+  private getReadNotifications(): Record<string, number> {
+    try {
+      const stored = localStorage.getItem('readNotifications');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
     }
   }
 

@@ -1,45 +1,89 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import React, { useState } from "react";
-// component
-import OverviewDashboard from "@/components/dashboard/Overview/OverviewDashboard";
-import Sidebar from "@/components/dashboard/sidebar/sidebar";
-import DashboardHeader from "@/components/dashboard/DashboardHeader/Header";
-import Revenue from "@/components/dashboard/Revenue/Revenue";
-import VehicleManagement from "@/components/dashboard/vehicles/vehicles";
-import PaymentDashboard from "@/components/dashboard/payment/payment";
-import RidesManagement from "@/components/dashboard/Overview/rides/page";
-import AnalyticsPageRide from "@/components/dashboard/Overview/rides/RideAnalitics";
-import TransactionsPage from "@/components/dashboard/transactions/page";
-import TablePage from "@/components/dashboard/users/all-drivers/driver-request";
-import FlaggedIssuesPage from "@/components/dashboard/transactions/flagged-isues";
-import UserManagement from "@/components/dashboard/users/all-users-page/all-users";
-import RideHistory from "@/components/dashboard/Overview/rides/ride-history/page";
-import SuspensionHistoryPage from "@/components/dashboard/users/suspension/suspension";
-import AuditLogs from "@/components/dashboard/users/audit-logs/audit-logs";
-import RefundRequestsPage from "@/components/dashboard/users/refund-requests/page";
-import DashboardTest from "@/components/dashboard/example/dashboard";
-import { useNotifications } from "@/components/dashboard/sidebar/notification/hooks";
-import NotificationModal from "@/components/dashboard/settings/notification-model";
-import SettingSystem from "@/components/dashboard/settings/settings-system";
-
-type MenuItem = {
-  icon: React.ReactNode;
-  label: string;
-  path: string;
-  badge?: number;
-};
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
-// Main Dashboard
-const Dashboard: React.FC = () => {
-  const [currentPath, setCurrentPath] = useState("/dashboard");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [timeRange, setTimeRange] = useState<TimeRange>("day");
-  useNotifications();
+// Dynamically import components with ssr: false
+const OverviewDashboard = dynamic(
+  () => import("@/components/dashboard/Overview/OverviewDashboard"),
+  { ssr: false }
+);
+const Sidebar = dynamic(
+  () => import("@/components/dashboard/sidebar/sidebar"),
+  {
+    ssr: false,
+  }
+);
+const DashboardHeader = dynamic(
+  () => import("@/components/dashboard/DashboardHeader/Header"),
+  { ssr: false }
+);
+const Revenue = dynamic(
+  () => import("@/components/dashboard/Revenue/Revenue"),
+  {
+    ssr: false,
+  }
+);
+const VehicleManagement = dynamic(
+  () => import("@/components/dashboard/vehicles/vehicles"),
+  { ssr: false }
+);
+const PaymentDashboard = dynamic(
+  () => import("@/components/dashboard/payment/payment"),
+  { ssr: false }
+);
+const RidesManagement = dynamic(
+  () => import("@/components/dashboard/Overview/rides/page"),
+  { ssr: false }
+);
+const AnalyticsPageRide = dynamic(
+  () => import("@/components/dashboard/Overview/rides/RideAnalitics"),
+  { ssr: false }
+);
+const TransactionsPage = dynamic(
+  () => import("@/components/dashboard/transactions/page"),
+  { ssr: false }
+);
+const TablePage = dynamic(
+  () => import("@/components/dashboard/users/all-drivers/driver-request"),
+  { ssr: false }
+);
+const FlaggedIssuesPage = dynamic(
+  () => import("@/components/dashboard/transactions/flagged-isues"),
+  { ssr: false }
+);
+const UserManagement = dynamic(
+  () => import("@/components/dashboard/users/all-users-page/all-users"),
+  { ssr: false }
+);
+const RideHistory = dynamic(
+  () => import("@/components/dashboard/Overview/rides/ride-history/page"),
+  { ssr: false }
+);
+const SuspensionHistoryPage = dynamic(
+  () => import("@/components/dashboard/users/suspension/suspension"),
+  { ssr: false }
+);
+const AuditLogs = dynamic(
+  () => import("@/components/dashboard/users/audit-logs/audit-logs"),
+  { ssr: false }
+);
+const RefundRequestsPage = dynamic(
+  () => import("@/components/dashboard/users/refund-requests/page"),
+  { ssr: false }
+);
+const SettingSystem = dynamic(
+  () => import("@/components/dashboard/settings/settings-system"),
+  { ssr: false }
+);
 
-  const notifications = useNotifications(currentPath);
+// Main Dashboard Component
+const Dashboard = () => {
+  const [currentPath, setCurrentPath] = React.useState("/dashboard");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+  const [timeRange, setTimeRange] = useState<TimeRange>("day");
 
   const handleNavigation = (path: string) => {
     setCurrentPath(path);
@@ -117,7 +161,7 @@ const Dashboard: React.FC = () => {
         onNavigate={handleNavigation}
         onLogout={handleLogout}
         onCollapseChange={handleSidebarCollapse}
-        notificationUpdateInterval={15000} // 15 seconds
+        notificationUpdateInterval={15000}
       />
 
       <div

@@ -1,21 +1,25 @@
 // hooks.ts
-import { useEffect, useState } from 'react';
-import { NotificationService } from './notifications-service';
-import { NotificationsState } from '@/types/notification-types';
-
-
+import { useEffect, useState, useCallback } from "react";
+import { NotificationService } from "./notifications-service";
+import { NotificationsState } from "@/types/notification-types";
 
 export function useNotifications(activePath?: string) {
   const [notifications, setNotifications] = useState<NotificationsState>({});
+  const service = NotificationService.getInstance();
+
+  const handleNotificationUpdate = useCallback(
+    (newNotifications: NotificationsState) => {
+      setNotifications(newNotifications);
+    },
+    []
+  );
 
   useEffect(() => {
-    const service = NotificationService.getInstance();
-
     if (activePath) {
       service.setActivePath(activePath);
     }
 
-    const unsubscribe = service.subscribe(setNotifications);
+    const unsubscribe = service.subscribe(handleNotificationUpdate);
     service.startPolling();
     service.fetchNotifications();
 
@@ -26,7 +30,7 @@ export function useNotifications(activePath?: string) {
       }
       service.stopPolling();
     };
-  }, [activePath]);
+  }, [activePath, service, handleNotificationUpdate]);
 
   return notifications;
 }

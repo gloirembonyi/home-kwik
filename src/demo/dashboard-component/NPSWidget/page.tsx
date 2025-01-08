@@ -3,7 +3,8 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/base/button";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from '@/components/hooks/useAnalytics';
+
 
 export const NPSWidget = () => {
   const [score, setScore] = useState<number | null>(null);
