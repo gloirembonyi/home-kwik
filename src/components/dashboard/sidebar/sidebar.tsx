@@ -143,16 +143,16 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       const severityColorMap = {
         high: {
-          base: "bg-gradient-to-r from-red-500 to-red-600",
-          ring: "ring-red-300",
+          base: "bg-destructive text-destructive-foreground",
+          ring: "ring-destructive/20",
         },
         medium: {
-          base: "bg-gradient-to-r from-yellow-500 to-yellow-600",
-          ring: "ring-yellow-300",
+          base: "bg-warning text-warning-foreground",
+          ring: "ring-warning/20",
         },
         low: {
-          base: "bg-gradient-to-r from-blue-500 to-blue-600",
-          ring: "ring-blue-300",
+          base: "bg-info text-info-foreground",
+          ring: "ring-info/20",
         },
       };
 
@@ -166,7 +166,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             opacity: 1,
           }}
           className={cn(
-            "ml-auto text-white text-xs font-bold rounded-full px-2 py-0.5",
+            "ml-auto text-xs font-bold rounded-full px-2 py-0.5",
             "ring-2 ring-opacity-50 shadow-lg",
             base,
             ring,
@@ -185,7 +185,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         whileHover={{ scale: 1.1 }}
         className={cn(
           "transition-colors duration-200",
-          isActive ? "text-blue-600" : "text-gray-500 group-hover:text-blue-500"
+          isActive
+            ? "text-accent-foreground"
+            : "text-muted-foreground group-hover:text-accent-foreground"
         )}
       >
         {icon}
@@ -216,8 +218,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           "transition-all duration-200 ease-in-out",
           isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
           isActive
-            ? "bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-100"
-            : "text-gray-600 hover:bg-gray-50 hover:text-blue-600",
+            ? "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
+            : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground",
           item.comingSoon && "opacity-50 cursor-not-allowed"
         )}
       >
@@ -228,8 +230,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={cn(
               "text-sm font-medium transition-colors duration-200",
               isActive
-                ? "text-blue-700"
-                : "text-gray-700 group-hover:text-blue-600"
+                ? "text-accent-foreground"
+                : "text-muted-foreground group-hover:text-accent-foreground"
             )}
           >
             {item.label}
@@ -239,7 +241,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed && item.subItems && (
           <motion.span
             animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-            className="ml-auto text-gray-400"
+            className="ml-auto text-muted-foreground"
           >
             <ChevronDown size={16} />
           </motion.span>
@@ -295,20 +297,26 @@ const Sidebar: React.FC<SidebarProps> = ({
               "group relative flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
               isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
               isActive
-                ? "bg-blue-100 text-blue-700 shadow-sm"
-                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800",
+                ? "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground",
               item.comingSoon && "opacity-50 cursor-not-allowed"
             )}
             title={isCollapsed ? item.label : undefined}
           >
-            {item.icon && <span className="">{item.icon}</span>}
+            {item.icon && (
+              <span className="text-muted-foreground group-hover:text-accent-foreground">
+                {item.icon}
+              </span>
+            )}
 
             {!isCollapsed && (
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="text-sm font-medium text-muted-foreground group-hover:text-accent-foreground">
+                {item.label}
+              </span>
             )}
 
             {!isCollapsed && item.subItems && (
-              <span className="ml-auto">
+              <span className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
                 {isDropdownOpen ? (
                   <ChevronUp size={16} />
                 ) : (
@@ -364,9 +372,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       animate={{ width: isCollapsed ? 80 : 256 }}
       transition={{ type: "spring", stiffness: 100, damping: 15 }}
       className={cn(
-        "fixed left-0 top-0 h-screen bg-white border-r",
+        "fixed left-0 top-0 h-screen bg-background border-r border-border",
         "shadow-lg z-40 overflow-hidden",
-        "backdrop-blur-sm bg-white/95",
+        "backdrop-blur-sm",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
@@ -374,14 +382,14 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Logo Section */}
         <div
           className={cn(
-            "px-6 py-6 border-b flex items-center transition-all duration-300",
+            "px-6 py-[0.85rem] border-b border-border flex items-center transition-all duration-300",
             isCollapsed ? "justify-center" : "justify-between"
           )}
         >
           <div className="flex items-center gap-3">
             <motion.div
               whileHover={{ scale: 1.1 }}
-              className="bg-blue-900 text-white w-10 h-9 rounded-full flex items-center justify-center font-bold text-xl shadow-md"
+              className="bg-primary text-primary-foreground w-10 h-9 rounded-full flex items-center justify-center font-bold text-xl shadow-md"
             >
               K
             </motion.div>
@@ -391,7 +399,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="font-bold text-lg text-gray-800 tracking-wider"
+                  className="font-bold text-lg text-foreground tracking-wider"
                 >
                   KWIK RIDE
                 </motion.span>
@@ -406,18 +414,18 @@ const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Footer Section */}
-        <div className="p-4 border-t space-y-2">
+        <div className="p-4 border-t border-border space-y-2">
           <div
             onClick={() => onNavigate("/help")}
             className={cn(
               "group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
               isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
-              "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+              "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
             <HelpCircle
               size={20}
-              className="text-gray-500 group-hover:text-gray-700"
+              className="text-muted-foreground group-hover:text-accent-foreground"
             />
             <AnimatePresence>
               {!isCollapsed && (
@@ -438,12 +446,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={cn(
               "group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
               isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
-              "text-gray-600 hover:bg-red-50 hover:text-red-600"
+              "text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
             )}
           >
             <LogOut
               size={20}
-              className="text-gray-500 group-hover:text-red-500"
+              className="text-muted-foreground group-hover:text-destructive"
             />
             <AnimatePresence>
               {!isCollapsed && (
@@ -464,7 +472,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={cn(
               "w-full flex items-center transition-all duration-300 ease-in-out rounded-lg",
               isCollapsed ? "justify-center p-2" : "justify-between px-4 py-2",
-              "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
             {isCollapsed ? (

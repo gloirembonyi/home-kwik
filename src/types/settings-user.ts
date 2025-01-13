@@ -168,3 +168,41 @@ export interface UserData {
         end: "07:00",
       },
     };
+
+
+    export interface UserData {
+      id: string;
+      fullName: string;
+      email: string;
+      phone: string;
+      country: string;
+      state: string;
+      address1: string;
+      address2?: string;
+      profileImage?: string;
+      roleSwitching: boolean;
+      twoFactorAuth: boolean;
+      privacyLevel: "low" | "medium" | "high";
+      accountCreated: Date;
+      lastLogin: Date;
+      notifications: {
+        email: {
+          security: boolean;
+          updates: boolean;
+          marketing: boolean;
+          newsletter: boolean;
+        };
+        push: {
+          security: boolean;
+          updates: boolean;
+          reminders: boolean;
+          messages: boolean;
+        };
+        quiet_hours: {
+          enabled: boolean;
+          start: string;
+          end: string;
+        };
+        frequency: "immediate" | "daily" | "weekly";
+      };
+    }

@@ -155,7 +155,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar
         currentPath={currentPath}
         onNavigate={handleNavigation}
@@ -174,7 +174,7 @@ const Dashboard = () => {
           ${isSidebarCollapsed ? "ml-20" : "ml-64"}
         `}
       >
-        <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+        <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md">
           <DashboardHeader
             timeRange={timeRange}
             setTimeRange={setTimeRange}

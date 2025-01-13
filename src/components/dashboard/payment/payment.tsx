@@ -76,7 +76,7 @@ const topCardGraph = [
     change: "+8.2%",
     bgColor: "bg-green-50",
     iconColor: "text-green-500",
-  }
+  },
 ];
 
 // Graph Data
@@ -174,10 +174,10 @@ const PaymentDashboard: React.FC = () => {
               </span>
             </div>
             {/* Integrate Dropdown */}
-            <Dropdown 
-              filters={filters} 
-              activeFilter={activeFilter} 
-              setActiveFilter={setActiveFilter} 
+            <Dropdown
+              filters={filters}
+              activeFilter={activeFilter}
+              setActiveFilter={setActiveFilter}
             />
           </div>
           {/* two Card Above the graph */}
@@ -190,9 +190,13 @@ const PaymentDashboard: React.FC = () => {
                 <stat.icon className="h-8 w-8 text-blue-500" />
                 <div>
                   <p className="text-gray-500 text-sm">{stat.title}</p>
-                  <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    {stat.value}
+                  </p>
                 </div>
-                <button className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs ml-4">{stat.change}</button>
+                <button className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs ml-4">
+                  {stat.change}
+                </button>
               </div>
             ))}
           </div>
@@ -204,7 +208,13 @@ const PaymentDashboard: React.FC = () => {
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
                 </linearGradient>
-                <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id="expenseGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                 </linearGradient>
@@ -249,7 +259,6 @@ const PaymentDashboard: React.FC = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-
         </div>
         {/* Recent Transactions */}
         <section className="bg-white rounded-2xl shadow-lg p-6">
@@ -289,11 +298,11 @@ const PaymentDashboard: React.FC = () => {
               </div>
             ))}
           </div>
-            <div className="flex items-center flex-1 p-8 m-6 ">
-              <button className=" flex items-center text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
-                View All <ArrowRightIcon className="h-4 w-4 ml-2" />
-              </button>
-            </div>
+          <div className="flex items-center flex-1 p-8 m-6 ">
+            <button className=" flex items-center text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
+              View All <ArrowRightIcon className="h-4 w-4 ml-2" />
+            </button>
+          </div>
         </section>
       </div>
 

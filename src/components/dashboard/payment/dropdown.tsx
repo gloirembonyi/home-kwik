@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState } from "react";
 
 // Define the props type
 interface DropdownProps {
@@ -7,7 +7,11 @@ interface DropdownProps {
   setActiveFilter: (filter: string) => void; // Function to set active filter
 }
 
-const Dropdown: FC<DropdownProps> = ({ filters, activeFilter, setActiveFilter }) => {
+const Dropdown: FC<DropdownProps> = ({
+  filters,
+  activeFilter,
+  setActiveFilter,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -20,7 +24,7 @@ const Dropdown: FC<DropdownProps> = ({ filters, activeFilter, setActiveFilter })
         {activeFilter}
         <svg
           className={`ml-2 w-5 h-5 transform transition-transform ${
-            isOpen ? 'rotate-180' : ''
+            isOpen ? "rotate-180" : ""
           }`}
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -47,7 +51,9 @@ const Dropdown: FC<DropdownProps> = ({ filters, activeFilter, setActiveFilter })
                 setIsOpen(false);
               }}
               className={`block px-4 py-2 text-sm text-left w-full hover:bg-gray-100 ${
-                activeFilter === filter ? 'text-blue-600 font-semibold' : 'text-gray-700'
+                activeFilter === filter
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-700"
               }`}
             >
               {filter}
