@@ -13,8 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/base/select";
-import { cn } from "@/lib/utils";
-import { Input } from '../ui/Input';
+import { Input } from '@/components/ui/Input';
+import { cn } from '@/components/lib/utils';
 
 // Define interfaces for the component
 interface Subtask {

@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from 'react';
+"use client";
+
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -13,17 +15,28 @@ import {
   HelpCircle,
   LogOut,
   ChevronDown,
-  ChevronUp
-} from 'lucide-react';
-import { signOut } from 'next-auth/react';
-import { cn } from "@/components/lib/utils"
-import { motion, AnimatePresence } from 'framer-motion';
+  ChevronUp,
+} from "lucide-react";
+import { signOut } from "next-auth/react";
+import { cn } from "@/components/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNotifications } from "./notification/hooks";
+import { NotificationService } from "./notification/notifications-service";
+
+interface NotificationCount {
+  count: number;
+  severity: "low" | "medium" | "high";
+  lastUpdated: number;
+  isRead?: boolean;
+}
+
+type NotificationsState = Record<string, NotificationCount>;
 
 interface MenuItem {
   icon?: React.ReactElement;
   label: string;
   path: string;
-  badge?: number;
+  notifications?: NotificationCount;
   comingSoon?: boolean;
   subItems?: MenuItem[];
 }
@@ -33,16 +46,23 @@ interface SidebarProps {
   onNavigate: (path: string) => void;
   onLogout?: () => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
+  notificationUpdateInterval?: number;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   currentPath,
   onNavigate,
   onLogout,
-  onCollapseChange
+  onCollapseChange,
+  notificationUpdateInterval = 30000,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const notificationService = useMemo(
+    () => NotificationService.getInstance(),
+    []
+  );
+  const notifications = useNotifications();
 
   const handleCollapse = useCallback(() => {
     const newCollapsedState = !isCollapsed;
@@ -50,172 +70,326 @@ const Sidebar: React.FC<SidebarProps> = ({
     onCollapseChange?.(newCollapsedState);
   }, [isCollapsed, onCollapseChange]);
 
-  const toggleDropdown = (label: string) => {
-    setOpenDropdown(openDropdown === label ? null : label);
-  };
+  const toggleDropdown = useCallback((label: string) => {
+    setOpenDropdown((prev) => (prev === label ? null : label));
+  }, []);
 
-  const menuItems: MenuItem[] = [
-    { icon: <LayoutDashboard />, label: 'Dashboard', path: '/dashboard', badge: 3 },
-    { 
-      icon: <Users />, 
-      label: 'Users', 
-      path: '/all', 
-      badge: 12, 
-      subItems: [
-        { label: 'All Users', path: '/users' },
-        { label: 'Requests', path: '/requests' },
-        { label: 'Suspension', path: '/suspension' },
-        { label: 'Logs', path: '/logs' },
-      ]
-    },
-    {
-      icon: <Navigation />,
-      label: 'Rides',
-      path: '/rides',
-      subItems: [
-        { label: 'Ride Analytics', path: '/rides/analytics' },
-        { label: 'Ride History', path: '/rides/history' },
-        { label: 'Fleet', path: '/rides/fleet' }
-      ]
-    },
-    { icon: <TrendingUp />, label: 'Revenue', path: '/revenue', badge: 2 },
-    { 
-      icon: <Star />,
-      label: 'Transactions',
-      path: '/ratings',
-      subItems: [
-        { label: 'All Transactions', path: '/transactions' },
-        { label: 'Issues', path: '/issues' },
-      ]
-    },
-    { icon: <BarChart2 />, label: 'Performance', path: '/performance' },
-    { icon: <DollarSign />, label: 'Payment', path: '/cost' },
-    { icon: <Settings />, label: 'Settings', path: '/settings' }
-  ];
+  const menuItems: MenuItem[] = useMemo(
+    () => [
+      {
+        icon: <LayoutDashboard />,
+        label: "Dashboard",
+        path: "/dashboard",
+        notifications: notifications["dashboard"],
+      },
+      {
+        icon: <Users />,
+        label: "Users",
+        path: "/all",
+        notifications: notifications["users"],
+        subItems: [
+          { label: "All Users", path: "/users" },
+          {
+            label: "Requests",
+            path: "/requests",
+            notifications: notifications["requests"],
+          },
+          { label: "Suspension", path: "/suspension" },
+          {
+            label: "Logs",
+            path: "/logs",
+            notifications: notifications["logs"],
+          },
+          {
+            label: "Refunds",
+            path: "/refunds",
+            notifications: notifications["refunds"],
+          },
+        ],
+      },
+      {
+        icon: <Navigation />,
+        label: "Rides",
+        path: "/rides",
+        subItems: [
+          { label: "Ride Analytics", path: "/rides/analytics" },
+          { label: "Ride History", path: "/rides/history" },
+          { label: "Fleet", path: "/rides/fleet" },
+        ],
+      },
+      { icon: <TrendingUp />, label: "Revenue", path: "/revenue", badge: 2 },
+      // { icon: <TrendingUp />, label: "Test", path: "/dash", badge: 2 },
+      {
+        icon: <Star />,
+        label: "Transactions",
+        path: "/ratings",
+        subItems: [
+          { label: "All Transactions", path: "/transactions" },
+          { label: "Issues", path: "/issues" },
+        ],
+      },
+      { icon: <BarChart2 />, label: "Performance", path: "/performance" },
+      { icon: <DollarSign />, label: "Payment", path: "/cost" },
+      { icon: <Settings />, label: "Settings", path: "/settings" },
+    ],
+    [notifications]
+  );
 
-  const renderBadge = (count?: number) => {
-    if (!count) return null;
-    return (
-      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-        {count}
-      </span>
-    );
-  };
+  const NotificationBadge = React.memo(
+    ({ notification }: { notification?: NotificationCount }) => {
+      if (!notification?.count || notification.isRead) return null;
 
-  const renderMenuItem = (item: MenuItem) => {
-    const isActive = currentPath === item.path;
-    const isDropdownOpen = openDropdown === item.label;
+      const displayCount = notification.count > 99 ? "99+" : notification.count;
 
-    return (
-      <div key={item.path || item.label} className="relative">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.2 }}
-          onClick={() =>
-            item.subItems ? toggleDropdown(item.label) : onNavigate(item.path)
-          }
+      const severityColorMap = {
+        high: {
+          base: "bg-destructive text-destructive-foreground",
+          ring: "ring-destructive/20",
+        },
+        medium: {
+          base: "bg-warning text-warning-foreground",
+          ring: "ring-warning/20",
+        },
+        low: {
+          base: "bg-info text-info-foreground",
+          ring: "ring-info/20",
+        },
+      };
+
+      const { base, ring } = severityColorMap[notification.severity];
+
+      return (
+        <motion.span
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{
+            scale: [0.8, 1.2, 1],
+            opacity: 1,
+          }}
           className={cn(
-            'group relative flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
-            isCollapsed ? 'justify-center p-2' : 'px-4 py-3 gap-3',
-            isActive
-              ? 'bg-blue-100 text-blue-700 shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800',
-            item.comingSoon && 'opacity-50 cursor-not-allowed'
+            "ml-auto text-xs font-bold rounded-full px-2 py-0.5",
+            "ring-2 ring-opacity-50 shadow-lg",
+            base,
+            ring,
+            notification.count > 5 ? "animate-pulse" : ""
           )}
-          title={isCollapsed ? item.label : undefined}
         >
-          <div
+          {displayCount}
+        </motion.span>
+      );
+    }
+  );
+
+  const MenuItemIcon = React.memo(
+    ({ icon, isActive }: { icon: React.ReactElement; isActive: boolean }) => (
+      <motion.span
+        whileHover={{ scale: 1.1 }}
+        className={cn(
+          "transition-colors duration-200",
+          isActive
+            ? "text-accent-foreground"
+            : "text-muted-foreground group-hover:text-accent-foreground"
+        )}
+      >
+        {icon}
+      </motion.span>
+    )
+  );
+
+  // MenuItem component
+  const MenuItem = React.memo(
+    ({
+      item,
+      isCollapsed,
+      isActive,
+      onClick,
+      isDropdownOpen,
+    }: {
+      item: MenuItem;
+      isCollapsed: boolean;
+      isActive: boolean;
+      onClick: () => void;
+      isDropdownOpen?: boolean;
+    }) => (
+      <motion.div
+        whileHover={{ x: 4 }}
+        onClick={onClick}
+        className={cn(
+          "group relative flex items-center rounded-lg cursor-pointer",
+          "transition-all duration-200 ease-in-out",
+          isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
+          isActive
+            ? "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
+            : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground",
+          item.comingSoon && "opacity-50 cursor-not-allowed"
+        )}
+      >
+        {item.icon && <MenuItemIcon icon={item.icon} isActive={isActive} />}
+
+        {!isCollapsed && (
+          <span
             className={cn(
-              'transition-colors duration-200 relative flex items-center',
-              isActive ? 'text-blue-800' : 'text-gray-500 group-hover:text-gray-700'
+              "text-sm font-medium transition-colors duration-200",
+              isActive
+                ? "text-accent-foreground"
+                : "text-muted-foreground group-hover:text-accent-foreground"
             )}
           >
-            {item.icon &&
-              React.cloneElement(item.icon, {
-                size: 20,
-                strokeWidth: isActive ? 2.5 : 1.5
-              })}
-          </div>
+            {item.label}
+          </span>
+        )}
+
+        {!isCollapsed && item.subItems && (
+          <motion.span
+            animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+            className="ml-auto text-muted-foreground"
+          >
+            <ChevronDown size={16} />
+          </motion.span>
+        )}
+
+        {item.notifications && (
+          <NotificationBadge notification={item.notifications} />
+        )}
+      </motion.div>
+    )
+  );
+
+  const handleNavigation = useCallback(
+    (path: string) => {
+      console.log("Navigating to:", path); // Debug log
+      onNavigate(path);
+
+      // Check if there's a notification for this path
+      const notification = notifications[path];
+      if (notification && !notification.isRead) {
+        console.log("Found unread notification for:", path); // Debug log
+        notificationService.markAsRead(path);
+      }
+    },
+    [notifications, onNavigate, notificationService]
+  );
+
+  const renderMenuItem = useCallback(
+    (item: MenuItem) => {
+      const isActive = currentPath === item.path;
+      const isDropdownOpen = openDropdown === item.label;
+
+      const handleItemClick = () => {
+        if (item.subItems) {
+          toggleDropdown(item.label);
+        } else {
+          handleNavigation(item.path);
+        }
+      };
+
+      const handleSubItemClick = (subItem: MenuItem) => {
+        handleNavigation(subItem.path);
+      };
+
+      return (
+        <div key={item.path || item.label} className="relative">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={handleItemClick}
+            className={cn(
+              "group relative flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
+              isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
+              isActive
+                ? "bg-accent text-accent-foreground shadow-sm ring-1 ring-accent"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground",
+              item.comingSoon && "opacity-50 cursor-not-allowed"
+            )}
+            title={isCollapsed ? item.label : undefined}
+          >
+            {item.icon && (
+              <span className="text-muted-foreground group-hover:text-accent-foreground">
+                {item.icon}
+              </span>
+            )}
+
+            {!isCollapsed && (
+              <span className="text-sm font-medium text-muted-foreground group-hover:text-accent-foreground">
+                {item.label}
+              </span>
+            )}
+
+            {!isCollapsed && item.subItems && (
+              <span className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
+                {isDropdownOpen ? (
+                  <ChevronUp size={16} />
+                ) : (
+                  <ChevronDown size={16} />
+                )}
+              </span>
+            )}
+
+            {!isCollapsed &&
+              item.notifications &&
+              !item.notifications.isRead && (
+                <NotificationBadge notification={item.notifications} />
+              )}
+          </motion.div>
 
           <AnimatePresence>
-            {!isCollapsed && (
-              <motion.div 
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                className="flex items-center gap-2"
+            {isDropdownOpen && item.subItems && !isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="ml-8 space-y-1 overflow-hidden"
               >
-                <span className="font-medium whitespace-nowrap text-sm">
-                  {item.label}
-                </span>
-                {renderBadge(item.badge)}
+                {item.subItems.map((subItem) => (
+                  <div
+                    key={subItem.path}
+                    onClick={() => handleSubItemClick(subItem)}
+                    className={cn(
+                      "flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out px-4 py-2 gap-3 text-sm",
+                      currentPath === subItem.path
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                    )}
+                  >
+                    {subItem.label}
+                    {subItem.notifications && !subItem.notifications.isRead && (
+                      <NotificationBadge notification={subItem.notifications} />
+                    )}
+                  </div>
+                ))}
               </motion.div>
             )}
           </AnimatePresence>
-
-          {!isCollapsed && item.subItems && (
-            <div className="ml-auto">
-              {isDropdownOpen ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
-            </div>
-          )}
-        </motion.div>
-
-        <AnimatePresence>
-          {isDropdownOpen && item.subItems && !isCollapsed && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="ml-8 space-y-1 overflow-hidden"
-            >
-              {item.subItems.map((subItem) => (
-                <div
-                  key={subItem.path}
-                  onClick={() => onNavigate(subItem.path)}
-                  className={cn(
-                    'flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out px-4 py-2 gap-3 text-sm',
-                    currentPath === subItem.path
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
-                  )}
-                >
-                  {subItem.label}
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  };
+        </div>
+      );
+    },
+    [currentPath, isCollapsed, openDropdown, toggleDropdown, handleNavigation]
+  );
 
   return (
     <motion.aside
       initial={{ width: 256 }}
       animate={{ width: isCollapsed ? 80 : 256 }}
-      transition={{ type: 'tween', duration: 0.3 }}
+      transition={{ type: "spring", stiffness: 100, damping: 15 }}
       className={cn(
-        'fixed left-0 top-0 h-screen bg-white border-r shadow-lg z-40 overflow-hidden',
-        isCollapsed ? 'w-20' : 'w-64'
+        "fixed left-0 top-0 h-screen bg-background border-r border-border",
+        "shadow-lg z-40 overflow-hidden",
+        "backdrop-blur-sm",
+        isCollapsed ? "w-20" : "w-64"
       )}
     >
       <div className="flex flex-col h-full">
         {/* Logo Section */}
         <div
           className={cn(
-            'px-6 py-6 border-b flex items-center transition-all duration-300',
-            isCollapsed ? 'justify-center' : 'justify-between'
+            "px-6 py-[0.85rem] border-b border-border flex items-center transition-all duration-300",
+            isCollapsed ? "justify-center" : "justify-between"
           )}
         >
           <div className="flex items-center gap-3">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.1 }}
-              className="bg-blue-900 text-white w-10 h-9 rounded-full flex items-center justify-center font-bold text-xl shadow-md"
+              className="bg-primary text-primary-foreground w-10 h-9 rounded-full flex items-center justify-center font-bold text-xl shadow-md"
             >
               K
             </motion.div>
@@ -225,7 +399,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="font-bold text-lg text-gray-800 tracking-wider"
+                  className="font-bold text-lg text-foreground tracking-wider"
                 >
                   KWIK RIDE
                 </motion.span>
@@ -235,21 +409,24 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 px-4 py-4 overflow-y-auto">
-          <div className="space-y-2">{menuItems.map(renderMenuItem)}</div>
+        <nav className="flex-1 py-6 overflow-y-auto">
+          <div className="space-y-1">{menuItems.map(renderMenuItem)}</div>
         </nav>
 
         {/* Footer Section */}
-        <div className="p-4 border-t space-y-2">
+        <div className="p-4 border-t border-border space-y-2">
           <div
-            onClick={() => onNavigate('/help')}
+            onClick={() => onNavigate("/help")}
             className={cn(
-              'group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
-              isCollapsed ? 'justify-center p-2' : 'px-4 py-3 gap-3',
-              'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+              "group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
+              isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
+              "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
-            <HelpCircle size={20} className="text-gray-500 group-hover:text-gray-700" />
+            <HelpCircle
+              size={20}
+              className="text-muted-foreground group-hover:text-accent-foreground"
+            />
             <AnimatePresence>
               {!isCollapsed && (
                 <motion.span
@@ -267,12 +444,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div
             onClick={onLogout || (() => signOut())}
             className={cn(
-              'group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
-              isCollapsed ? 'justify-center p-2' : 'px-4 py-3 gap-3',
-              'text-gray-600 hover:bg-red-50 hover:text-red-600'
+              "group flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out",
+              isCollapsed ? "justify-center p-2" : "px-4 py-3 gap-3",
+              "text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
             )}
           >
-            <LogOut size={20} className="text-gray-500 group-hover:text-red-500" />
+            <LogOut
+              size={20}
+              className="text-muted-foreground group-hover:text-destructive"
+            />
             <AnimatePresence>
               {!isCollapsed && (
                 <motion.span
@@ -290,9 +470,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={handleCollapse}
             className={cn(
-              'w-full flex items-center transition-all duration-300 ease-in-out rounded-lg',
-              isCollapsed ? 'justify-center p-2' : 'justify-between px-4 py-2',
-              'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              "w-full flex items-center transition-all duration-300 ease-in-out rounded-lg",
+              isCollapsed ? "justify-center p-2" : "justify-between px-4 py-2",
+              "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
             {isCollapsed ? (

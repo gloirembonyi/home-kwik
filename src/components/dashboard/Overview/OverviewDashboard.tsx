@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/base/card";
 import RidesOverviewChart from "./rides/RidesOverview";
 import StatsDashboard from "./rides/charts/StatsDashboard";
+import { cn } from "@/components/lib/utils";
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
@@ -38,19 +39,18 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <RidesOverviewChart />
 
           {/* Frequent Users Table */}
-          <Card className="shadow-lg rounded-2xl overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-blue-50 to-white p-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between bg-card p-6">
               <div>
-                <CardTitle className="text-xl font-bold text-slate-800">
+                <CardTitle className="text-xl font-bold text-foreground">
                   Frequent Users
                 </CardTitle>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Users with highest ride counts
                 </p>
               </div>
-              {/* Navigation handled via onNavigate */}
               <button
-                className="text-blue-600 text-sm hover:underline font-semibold"
+                className="text-primary hover:text-primary/90 text-sm hover:underline font-semibold"
                 onClick={() => onNavigate("/users")}
               >
                 View All Users
@@ -60,20 +60,20 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left border-b border-slate-200">
-                      <th className="py-4 px-4 text-slate-500 font-medium">
+                    <tr className="text-left border-b border-border">
+                      <th className="py-4 px-4 text-muted-foreground font-medium">
                         User Name
                       </th>
-                      <th className="py-4 px-4 text-slate-500 font-medium">
+                      <th className="py-4 px-4 text-muted-foreground font-medium">
                         Role
                       </th>
-                      <th className="py-4 px-4 text-slate-500 font-medium">
+                      <th className="py-4 px-4 text-muted-foreground font-medium">
                         Gender
                       </th>
-                      <th className="py-4 px-4 text-slate-500 font-medium">
+                      <th className="py-4 px-4 text-muted-foreground font-medium">
                         Total Rides
                       </th>
-                      <th className="py-4 px-4 text-slate-500 font-medium">
+                      <th className="py-4 px-4 text-muted-foreground font-medium">
                         Status
                       </th>
                     </tr>
@@ -82,37 +82,38 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     {users?.map((user, index) => (
                       <tr
                         key={index}
-                        className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors"
+                        className="border-b border-border hover:bg-accent/50 transition-colors"
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-950 to-blue-900 flex items-center justify-center text-white font-semibold shadow-md">
+                            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold shadow-md">
                               {user.name
                                 .split(" ")
                                 .map((n) => n[0])
                                 .join("")}
                             </div>
-                            <span className="font-medium text-slate-800">
+                            <span className="font-medium text-foreground">
                               {user.name}
                             </span>
                           </div>
                         </td>
-                        <td className="py-4 px-4 text-slate-600">
+                        <td className="py-4 px-4 text-muted-foreground">
                           {user.role}
                         </td>
-                        <td className="py-4 px-4 text-slate-600">
+                        <td className="py-4 px-4 text-muted-foreground">
                           {user.gender}
                         </td>
-                        <td className="py-4 px-4 text-slate-600">
+                        <td className="py-4 px-4 text-muted-foreground">
                           {user.rides}
                         </td>
                         <td className="py-4 px-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            className={cn(
+                              "px-3 py-1 rounded-full text-sm font-medium",
                               user.status === "Active"
-                                ? "bg-green-100 text-green-600"
-                                : "bg-yellow-100 text-yellow-600"
-                            }`}
+                                ? "bg-success/20 text-success"
+                                : "bg-warning/20 text-warning"
+                            )}
                           >
                             {user.status}
                           </span>

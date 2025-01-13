@@ -13,13 +13,15 @@ import {
   Check,
   Menu,
   Download,
+  Navigation,
 } from "lucide-react";
 import { SortConfig, FilterConfig } from "@/types/types";
 import UserDetail from "./all-users-details";
+import SMSDialog from "./SMS";
+import ExportDialog from "./export-model";
 
 
-
-interface User {
+export interface User {
   id: number;
   name: string;
   fullName?: string;
@@ -49,6 +51,7 @@ const UserManagement: React.FC = () => {
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] =
     useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isSMSDialogOpen, setIsSMSDialogOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,6 +67,7 @@ const UserManagement: React.FC = () => {
   const [isDetailView, setIsDetailView] = useState(false);
   const [currentView, setCurrentView] = useState<"list" | "detail">("list");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const itemsPerPage = 5;
 
@@ -196,6 +200,20 @@ const UserManagement: React.FC = () => {
       return searchMatch && roleMatch && statusMatch && genderMatch;
     });
   }, [searchTerm, users, filterConfig]);
+
+  // Add handler for SMS dialog
+  const handleSendSMS = () => {
+    if (selectedUsers.length > 0) {
+      // Filter selected users data to pass to SMS dialog
+      const selectedUsersData = users.filter(user => 
+        selectedUsers.includes(user.id)
+      );
+      setIsSMSDialogOpen(true);
+    } else {
+      // If no users selected, show all users
+      setIsSMSDialogOpen(true);
+    }
+  };
 
   // Sorting Logic
   const sortedUsers = useMemo(() => {
@@ -363,11 +381,22 @@ const UserManagement: React.FC = () => {
                   />
                   <Search className="absolute left-4 top-4 text-gray-400" />
                 </div>
+                {/* send sms to the user Button */}
+                <button
+                  onClick={handleSendSMS}
+                  className="bg-blue-900 text-white px-6 py-3 rounded-lg 
+                  flex items-center space-x-3 hover:bg-blue-700 transition 
+                  shadow-md hover:shadow-lg"
+                >
+                  <Navigation className="w-6 h-6" />
+                  <span className="font-semibold">Send SMS</span>
+                </button>
                 {/* Export Button */}
                 <button
+                  onClick={() => setIsExportDialogOpen(true)}
                   className="bg-blue-900 text-white px-6 py-3 rounded-lg 
-            flex items-center space-x-3 hover:bg-blue-700 transition 
-            shadow-md hover:shadow-lg"
+                  flex items-center space-x-3 hover:bg-blue-700 transition 
+                  shadow-md hover:shadow-lg"
                 >
                   <Download className="w-6 h-6" />
                   <span className="font-semibold">Export</span>
@@ -635,6 +664,21 @@ const UserManagement: React.FC = () => {
           <Trash2 className="mr-2" /> Delete {selectedUsers.length} Users
         </button>
       )}
+
+       {/* Add SMS Dialog */}
+       <SMSDialog
+        isOpen={isSMSDialogOpen}
+        onClose={() => setIsSMSDialogOpen(false)}
+        users={users}
+      />
+
+       {/* ExportDialog component */}
+       <ExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        users={users}
+        selectedUsers={selectedUsers}
+      />
     </div>
   );
 };

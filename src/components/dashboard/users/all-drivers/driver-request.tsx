@@ -377,11 +377,14 @@ const TablePage = () => {
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
             <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 flex items-center px-2 text-gray-700">
+                <Filter className="h-5 w-5" />
+              </div>
               <select
                 name="status"
                 value={filters.status}
                 onChange={handleFilterChange}
-                className="border border-gray-300 rounded-md px-4 py-2 pr-10"
+                className="border border-gray-300 rounded-md items-center pl-7 px-4 py-2"
               >
                 <option value="All">
                   <span className="flex items-center">
@@ -392,9 +395,6 @@ const TablePage = () => {
                 <option value="In Process">In Process</option>
                 <option value="Rejected">Rejected</option>
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <Filter className="h-5 w-5" />
-              </div>
             </div>
 
             {/* Export Button */}

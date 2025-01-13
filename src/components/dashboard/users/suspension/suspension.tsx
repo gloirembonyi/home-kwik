@@ -163,7 +163,7 @@ const SuspensionHistory = () => {
   const totalPages = Math.ceil(filteredSuspensions.length / itemsPerPage);
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen p-6 -m-4 -mt-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">

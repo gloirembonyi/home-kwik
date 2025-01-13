@@ -1,5 +1,6 @@
+import { Input } from '@/components/ui/Input';
 import React from 'react';
-import { Input } from '../ui/Input';
+
 
 interface SearchBarProps {
   searchFocused: boolean;

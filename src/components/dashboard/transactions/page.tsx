@@ -8,6 +8,24 @@ import {
   ChevronRight 
 } from 'lucide-react';
 import TransactionDetailsPage from './transaction-detail';
+import { DateRange } from 'react-day-picker';
+import ExportFilterModal from './export-filter-transactions';
+
+type Transaction = {
+  transactionId: string;
+  phoneNumber: string;
+  payeeName: string;
+  driverName: string;
+  date: string; // Use Date if you handle Date objects
+  amount: string;
+  status: string;
+  description?: string; // Optional field
+};
+
+type ExportData = {
+  [key: string]: string; // Generic object with string keys and values
+};
+
 
 // Mock data generator
 const generateMockTransactions = () => {
@@ -32,9 +50,17 @@ const TransactionsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [transactions] = useState(generateMockTransactions());
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const transactions: Transaction[] = generateMockTransactions();
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  const convertToTimezone = (date: Date, timezone: string): Date => {
+    if (timezone === "GMT+2") {
+      return new Date(date.getTime() + 2 * 60 * 60 * 1000);
+    }
+    return date;
+  };
 
   // Simulate loading state
   React.useEffect(() => {
@@ -77,33 +103,59 @@ const TransactionsPage: React.FC = () => {
     setSelectedTransaction(null);
   };
 
-  const handleExport = () => {
-    // Convert transactions to CSV
-    const csvContent = [
-      ['Transaction ID', 'Phone Number', 'Payee Name', 'Driver Name', 'Date', 'Amount', 'Status'],
-      ...transactions.map(t => [
-        t.transactionId, 
-        t.phoneNumber, 
-        t.payeeName, 
-        t.driverName, 
-        t.date, 
-        `£${t.amount}`, 
-        t.status
-      ])
-    ].map(e => e.join(",")).join("\n");
+  
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", "transactions_export.csv");
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+  const filterTransactionsByDate = (
+    transactions: Transaction[],
+    range: DateRange | undefined
+  ) => {
+    if (!range?.from || !range?.to) return transactions;
+  
+    return transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.date.split('/').reverse().join('-'));
+      return (
+        transactionDate >= range.from! &&
+        transactionDate <= range.to!
+      );
+    });
   };
+
+  const handleExport = async (dateRange: DateRange | undefined, timezone: string) => {
+    const filteredTransactions = filterTransactionsByDate(transactions, dateRange);
+  
+    const exportData: ExportData[] = filteredTransactions.map(transaction => ({
+      'Transaction ID': transaction.transactionId,
+      'Phone Number': transaction.phoneNumber,
+      'Payee Name': transaction.payeeName,
+      'Driver Name': transaction.driverName,
+      'Date': convertToTimezone(
+        new Date(transaction.date.split('/').reverse().join('-')),
+        timezone
+      ).toISOString().replace('T', ' ').split('.')[0],
+      'Amount': `£${transaction.amount}`,
+      'Status': transaction.status
+    }));
+  
+    const headers = Object.keys(exportData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...exportData.map(row =>
+        headers.map(header => JSON.stringify(row[header as keyof ExportData] || '')).join(',')
+      )
+    ].join('\n');
+  
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const filename = `transactions_export_${new Date().toISOString().split('T')[0]}.csv`;
+  
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
 
   // If a transaction is selected, show its details
   if (selectedTransaction) {
@@ -169,7 +221,7 @@ const TransactionsPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen p-6 -m-4 -mt-8">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Transaction History</h1>
         <p className="text-gray-600">Overview of all payment transactions</p>
@@ -183,7 +235,7 @@ const TransactionsPage: React.FC = () => {
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              setCurrentPage(1); // Reset to first page on new search
+              setCurrentPage(1);
             }}
             className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
@@ -191,7 +243,7 @@ const TransactionsPage: React.FC = () => {
         </div>
         <div className="flex items-center space-x-4">
           <button 
-            onClick={handleExport}
+            onClick={() => setIsExportModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md"
           >
             <Download className="h-5 w-5" />
@@ -279,6 +331,11 @@ const TransactionsPage: React.FC = () => {
           </button>
         </div>
       </div>
+      <ExportFilterModal
+        open={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={handleExport}
+      />
     </div>
   );
 };

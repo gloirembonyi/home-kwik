@@ -22,6 +22,7 @@ import {
 import { ChartLineIcon, FilterIcon } from "lucide-react";
 import Dropdown from "./dropdown";
 import PaymentMethod from "./PaymentMethod";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 // Mock Data with more realistic structure
 const topStatistics = [
@@ -75,7 +76,7 @@ const topCardGraph = [
     change: "+8.2%",
     bgColor: "bg-green-50",
     iconColor: "text-green-500",
-  }
+  },
 ];
 
 // Graph Data
@@ -146,7 +147,7 @@ const PaymentDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Top Statistics Cards */}
-      <section className="grid grid-cols-4 gap-6 mb-8">
+      <section className="grid grid-cols-4 gap-6 mb-6">
         {topStatistics.map((stat, index) => (
           <div
             key={index}
@@ -162,7 +163,7 @@ const PaymentDashboard: React.FC = () => {
       </section>
 
       {/* Main Dashboard Content */}
-      <div className="grid grid-cols-3 gap-8">
+      <div className="grid grid-cols-3 gap-6">
         {/*Overview Graph */}
         <div className="col-span-2 bg-white rounded-2xl shadow-lg p-6">
           <div className="flex justify-between items-center mb-6">
@@ -173,10 +174,10 @@ const PaymentDashboard: React.FC = () => {
               </span>
             </div>
             {/* Integrate Dropdown */}
-            <Dropdown 
-              filters={filters} 
-              activeFilter={activeFilter} 
-              setActiveFilter={setActiveFilter} 
+            <Dropdown
+              filters={filters}
+              activeFilter={activeFilter}
+              setActiveFilter={setActiveFilter}
             />
           </div>
           {/* two Card Above the graph */}
@@ -189,9 +190,13 @@ const PaymentDashboard: React.FC = () => {
                 <stat.icon className="h-8 w-8 text-blue-500" />
                 <div>
                   <p className="text-gray-500 text-sm">{stat.title}</p>
-                  <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    {stat.value}
+                  </p>
                 </div>
-                <button className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs ml-4">{stat.change}</button>
+                <button className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs ml-4">
+                  {stat.change}
+                </button>
               </div>
             ))}
           </div>
@@ -203,7 +208,13 @@ const PaymentDashboard: React.FC = () => {
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
                 </linearGradient>
-                <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id="expenseGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                 </linearGradient>
@@ -248,7 +259,6 @@ const PaymentDashboard: React.FC = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-
         </div>
         {/* Recent Transactions */}
         <section className="bg-white rounded-2xl shadow-lg p-6">
@@ -256,9 +266,6 @@ const PaymentDashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800">
               Top Earnings Users
             </h2>
-            <button className="text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
-              View All
-            </button>
           </div>
 
           <div className="divide-y divide-gray-100">
@@ -290,6 +297,11 @@ const PaymentDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="flex items-center flex-1 p-8 m-6 ">
+            <button className=" flex items-center text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-full transition-colors">
+              View All <ArrowRightIcon className="h-4 w-4 ml-2" />
+            </button>
           </div>
         </section>
       </div>
