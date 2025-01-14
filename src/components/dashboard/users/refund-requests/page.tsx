@@ -14,8 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/base/table";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/base/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/base/pagination";
 import { Button } from "@/components/ui/base/button";
+import { Checkbox } from "@/components/ui/base/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -317,52 +325,51 @@ const RefundRequestsPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return <div className="p-6 text-center text-foreground">Loading...</div>;
   }
 
   return (
-    <div className="p-6 -m-4 -mt-8 bg-gray-50 min-h-screen">
+    <div className="p-6 -m-4 -mt-8 bg-background min-h-screen">
       {/* Header section */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-800">Refund Requests</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground">
+            Refund Requests
+          </h1>
+          <p className="text-sm text-muted-foreground">
             {filteredRequests.length} refund requests found
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative w-full lg:w-auto">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-4 h-4 text-gray-400" />
+              <SearchIcon className="w-4 h-4 text-muted-foreground" />
             </div>
-            <input
+            <Input
               type="text"
+              id="search-refunds"
               placeholder="Search rides, riders, or drivers"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full pl-10"
             />
           </div>
-          <div className="relative w-full lg:w-auto">
-            <Button
-              onClick={() => setIsExportModalOpen(true)}
-              variant="outline"
-              size="sm"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 disabled:opacity-50"
-            >
-              <Download className="w-4 h-4 mr-2" /> Export
-            </Button>
-          </div>
-          <div className="relative w-full lg:w-auto">
-            <Button
-              onClick={() => setIsFilterDialogOpen(true)}
-              variant="outline"
-              size="sm"
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow hover:bg-gray-300"
-            >
-              <FilterIcon className="w-4 h-4 mr-2" /> Filter
-            </Button>
-          </div>
+          <Button
+            onClick={() => setIsExportModalOpen(true)}
+            variant="default"
+            size="sm"
+            className="gap-2"
+          >
+            <Download className="w-4 h-4" /> Export
+          </Button>
+          <Button
+            onClick={() => setIsFilterDialogOpen(true)}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <FilterIcon className="w-4 h-4" /> Filter
+          </Button>
         </div>
       </div>
 
@@ -376,7 +383,7 @@ const RefundRequestsPage: React.FC = () => {
       {/* Filter Dialog */}
       <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
-          <DialogTitle className="text-lg font-bold mb-4">
+          <DialogTitle className="text-lg font-bold mb-4 text-foreground">
             Filter Refund Requests
           </DialogTitle>
 
@@ -385,13 +392,13 @@ const RefundRequestsPage: React.FC = () => {
             <div className="flex gap-6">
               {/* Left: Date Range Options */}
               <div className="w-64 flex-shrink-0">
-                <h3 className="font-medium mb-3">Date Range</h3>
-                <div className="space-y-2 bg-gray-50 rounded-lg p-3">
+                <h3 className="font-medium mb-3 text-foreground">Date Range</h3>
+                <div className="space-y-2 bg-muted rounded-lg p-3">
                   {dateRangeOptions.map((option) => (
                     <button
                       key={option.label}
                       onClick={() => handleDateRangeSelect(option)}
-                      className="w-full text-left px-3 py-2 rounded text-sm hover:bg-white transition-colors"
+                      className="w-full text-left px-3 py-2 rounded text-sm hover:bg-accent/50 text-foreground transition-colors"
                     >
                       {option.label}
                     </button>
@@ -401,19 +408,21 @@ const RefundRequestsPage: React.FC = () => {
 
               {/* Right: Calendar */}
               <div className="flex-grow">
-                <h3 className="font-medium mb-3">Select Dates</h3>
+                <h3 className="font-medium mb-3 text-foreground">
+                  Select Dates
+                </h3>
                 <Calendar
                   mode="range"
                   selected={filters.dateRange}
                   onSelect={handleCalendarSelect}
-                  className="rounded-lg border bg-white w-full"
+                  className="rounded-lg border border-border bg-card w-full"
                 />
               </div>
             </div>
 
             {/* Status Filter Row */}
             <div>
-              <h3 className="font-medium mb-3">Status</h3>
+              <h3 className="font-medium mb-3 text-foreground">Status</h3>
               <div className="grid grid-cols-4 gap-3">
                 {(["All", "Pending", "Approved", "Denied"] as const).map(
                   (status) => (
@@ -428,8 +437,8 @@ const RefundRequestsPage: React.FC = () => {
                       className={`px-4 py-2 rounded-lg transition-colors text-sm
                       ${
                         filters.status === status
-                          ? "bg-blue-100 text-blue-800 font-medium"
-                          : "bg-gray-50 hover:bg-gray-100"
+                          ? "bg-primary/20 text-primary font-medium"
+                          : "bg-muted hover:bg-accent/50 text-foreground"
                       }`}
                     >
                       {status} Requests
@@ -461,141 +470,144 @@ const RefundRequestsPage: React.FC = () => {
       </Dialog>
 
       {/* Table */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableCell className="w-[50px]">
-              <input
-                type="checkbox"
-                checked={selectedRequests.length === paginatedData.length}
-                onChange={handleSelectAll}
-                className="h-4 w-4"
-              />
-            </TableCell>
-            <TableCell>Ride ID</TableCell>
-            <TableCell>Reason</TableCell>
-            <TableCell>Rider</TableCell>
-            <TableCell>Driver</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell>Amount</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedData.map((request) => (
-            <TableRow key={request.id}>
-              <TableCell>
-                <input
-                  type="checkbox"
-                  checked={selectedRequests.includes(request.id)}
-                  onChange={() => handleSelectRequest(request.id)}
-                  className="h-4 w-4"
+      <div className="border border-border rounded-lg bg-card shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableCell className="w-[50px]">
+                <Checkbox
+                  checked={selectedRequests.length === paginatedData.length}
+                  onCheckedChange={handleSelectAll}
                 />
               </TableCell>
-              <TableCell>{request.rideId}</TableCell>
-              <TableCell>{request.reason}</TableCell>
-              <TableCell>{request.rider}</TableCell>
-              <TableCell>{request.driver}</TableCell>
-              <TableCell>{request.date}</TableCell>
-              <TableCell>${request.amount.toFixed(2)}</TableCell>
-              <TableCell>
-                {/* we need to fliter what we need  */}
-                <span
-                  className={`px-2 py-1 rounded text-sm font-medium ${
-                    request.status === "Approved"
-                      ? "bg-green-100 text-green-600"
-                      : request.status === "Pending"
-                      ? "bg-yellow-100 text-yellow-600"
-                      : "bg-red-100 text-red-600"
-                  }`}
-                >
-                  {request.status}
-                </span>
-              </TableCell>
-              <TableCell className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setRefundRequests((prev) =>
-                      prev.map((r) =>
-                        r.id === request.id ? { ...r, status: "Approved" } : r
-                      )
-                    );
-                  }}
-                  className="text-green-600 hover:text-green-700"
-                >
-                  Approve
-                  <CheckIcon className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setRefundRequests((prev) =>
-                      prev.map((r) =>
-                        r.id === request.id ? { ...r, status: "Denied" } : r
-                      )
-                    );
-                  }}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  Deny
-                  <XIcon className="w-4 h-4" />
-                </Button>
-              </TableCell>
+              <TableCell className="font-medium">Ride ID</TableCell>
+              <TableCell className="font-medium">Reason</TableCell>
+              <TableCell className="font-medium">Rider</TableCell>
+              <TableCell className="font-medium">Driver</TableCell>
+              <TableCell className="font-medium">Date</TableCell>
+              <TableCell className="font-medium">Amount</TableCell>
+              <TableCell className="font-medium">Status</TableCell>
+              <TableCell className="font-medium">Actions</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {paginatedData.map((request) => (
+              <TableRow key={request.id} className="hover:bg-accent/5">
+                <TableCell>
+                  <Checkbox
+                    checked={selectedRequests.includes(request.id)}
+                    onCheckedChange={() => handleSelectRequest(request.id)}
+                  />
+                </TableCell>
+                <TableCell>{request.rideId}</TableCell>
+                <TableCell>{request.reason}</TableCell>
+                <TableCell>{request.rider}</TableCell>
+                <TableCell>{request.driver}</TableCell>
+                <TableCell>{request.date}</TableCell>
+                <TableCell>${request.amount.toFixed(2)}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded text-sm font-medium ${
+                      request.status === "Approved"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                        : request.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                        : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                    }`}
+                  >
+                    {request.status}
+                  </span>
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setRefundRequests((prev) =>
+                        prev.map((r) =>
+                          r.id === request.id ? { ...r, status: "Approved" } : r
+                        )
+                      );
+                    }}
+                    className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+                  >
+                    <CheckIcon className="w-4 h-4 mr-1" />
+                    Approve
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setRefundRequests((prev) =>
+                        prev.map((r) =>
+                          r.id === request.id ? { ...r, status: "Denied" } : r
+                        )
+                      );
+                    }}
+                    className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                  >
+                    <XIcon className="w-4 h-4 mr-1" />
+                    Deny
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Pagination */}
       <div className="mt-6 flex items-center justify-between">
-  <span className="text-sm text-gray-500">
-    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-    {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of{" "}
-    {filteredRequests.length} records
-  </span>
-  <Pagination>
-    <PaginationContent>
-      <PaginationItem>
-        <PaginationPrevious 
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setCurrentPage(currentPage - 1);
-          }} 
-          className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
-        />
-      </PaginationItem>
-      {[...Array(totalPages)].map((_, i) => (
-        <PaginationItem key={i + 1}>
-          <PaginationLink 
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentPage(i + 1);
-            }}
-            isActive={currentPage === i + 1}
-          >
-            {i + 1}
-          </PaginationLink>
-        </PaginationItem>
-      ))}
-      <PaginationItem>
-        <PaginationNext 
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setCurrentPage(currentPage + 1);
-          }}
-          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
-        />
-      </PaginationItem>
-    </PaginationContent>
-  </Pagination>
-</div>
+        <span className="text-sm text-muted-foreground">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of{" "}
+          {filteredRequests.length} records
+        </span>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage > 1) setCurrentPage(currentPage - 1);
+                }}
+                className={
+                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                }
+              />
+            </PaginationItem>
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i + 1}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(i + 1);
+                  }}
+                  isActive={currentPage === i + 1}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                }}
+                className={
+                  currentPage >= totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 };

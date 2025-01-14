@@ -1,4 +1,4 @@
-import { Filter, Menu, PlusCircle, Search } from 'lucide-react'
+import { Filter, Menu, PlusCircle, Search, UploadIcon } from 'lucide-react'
 import React, { useState } from 'react'
 
 const HistoryPageRide = () => { 

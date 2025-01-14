@@ -175,22 +175,22 @@ const StatsCard: React.FC<StatsCardProps> = ({
         relative overflow-hidden rounded-3xl 
         transition-all duration-300 
         hover:shadow-2xl hover:scale-105
-        
+        bg-card
       `}
     >
-      <CardHeader className="relative p-6 ">
+      <CardHeader className="relative p-6">
         <div className="absolute top-4 right-4 flex space-x-2">
           <button
             onClick={() => setShowDetails(!showDetails)}
-            className="hover:bg-white/20 rounded-full p-2 transition-colors"
+            className="hover:bg-accent rounded-full p-2 transition-colors"
           >
-            <Info className="w-5 h-5 text-slate-700" />
+            <Info className="w-5 h-5 text-muted-foreground" />
           </button>
-          <div className="p-2 bg-white/20 rounded-full">
-            <Icon className={`w-6 h-6 text-slate-800`} />
+          <div className="p-2 bg-accent rounded-full">
+            <Icon className={`w-6 h-6 text-foreground`} />
           </div>
         </div>
-        <CardTitle className="text-sm font-medium text-slate-600 tracking-wide">
+        <CardTitle className="text-sm font-medium text-muted-foreground tracking-wide">
           {title}
         </CardTitle>
       </CardHeader>
@@ -198,41 +198,47 @@ const StatsCard: React.FC<StatsCardProps> = ({
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-sm text-slate-500 font-medium mt-2 tracking-wide">
-              </p>
-              <div className="text-3xl font-bold text-slate-800 leading-tight">
+              <p className="text-sm text-muted-foreground font-medium mt-2 tracking-wide"></p>
+              <div className="text-3xl font-bold text-foreground leading-tight">
                 {value}
               </div>
             </div>
             {change && (
               <div className="flex items-center gap-1 text-sm">
                 {trend === "up" ? (
-                  <TrendingUp className="text-green-600 w-5 h-5" />
+                  <TrendingUp className="text-green-600 dark:text-green-400 w-5 h-5" />
                 ) : (
-                  <TrendingDown className="text-red-600 w-5 h-5" />
+                  <TrendingDown className="text-red-600 dark:text-red-400 w-5 h-5" />
                 )}
-                <span className={`font-semibold ${trend === "up" ? "text-green-600" : "text-red-600"}`}>
+                <span
+                  className={`font-semibold ${
+                    trend === "up"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  }`}
+                >
                   {change}%
                 </span>
               </div>
             )}
           </div>
-          
-          {/* Separator Line */}
-          <div className="border-t border-slate-200"></div>
-          
-          {/* Last Update */}
-          <p className="text-xs text-slate-500">
+
+          <div className="border-t border-border"></div>
+
+          <p className="text-xs text-muted-foreground">
             Last Update: {lastUpdate}
           </p>
         </div>
 
         {showDetails && (
-          <div className="absolute inset-0 bg-white/95 p-4 z-10">
-            <h4 className="font-semibold text-slate-800">{description}</h4>
+          <div className="absolute inset-0 bg-background/95 dark:bg-background/95 p-4 z-10">
+            <h4 className="font-semibold text-foreground">{description}</h4>
             <ResponsiveContainer width="100%" height={100}>
               <BarChart data={chartData}>
-                <XAxis dataKey={Object.keys(chartData[0])[0]} />
+                <XAxis
+                  dataKey={Object.keys(chartData[0])[0]}
+                  tick={{ fill: "var(--foreground)" }}
+                />
                 <Bar
                   dataKey={Object.keys(chartData[0])[1]}
                   fill={color.light}
@@ -241,7 +247,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
             </ResponsiveContainer>
             <button
               onClick={() => setShowDetails(false)}
-              className="absolute top-2 right-2 hover:bg-slate-100 rounded-full p-2"
+              className="absolute top-2 right-2 hover:bg-accent rounded-full p-2"
             >
               ✕
             </button>
@@ -257,82 +263,88 @@ const RoleDistributionChart = () => {
   const [activeSegment, setActiveSegment] = useState(null);
 
   return (
-    <Card className="rounded-3xl overflow-hidden shadow-xl">
-    <CardHeader className="bg-gradient-to-r from-blue-50 to-white p-6">
-      <div className="flex justify-between items-center">
-        <CardTitle className="text-xl font-bold text-slate-800">
-          Role Usage
-        </CardTitle>
-        <div className="flex space-x-2">
-          <button className="hover:bg-blue-100 p-2 rounded-full transition-colors">
-            <RefreshCw className="w-5 h-5 text-slate-600" />
-          </button>
-          <button className="hover:bg-blue-100 p-2 rounded-full transition-colors">
-            <Filter className="w-5 h-5 text-slate-600" />
-          </button>
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="relative h-80">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={roleData}
-            cx="50%"
-            cy="50%"
-            innerRadius={0}
-            outerRadius={100}
-            paddingAngle={0}
-            dataKey="value"
-            labelLine={false}
-            onMouseEnter={(data) => setActiveSegment(data.name)}
-            onMouseLeave={() => setActiveSegment(null)}
-          >
-            {roleData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={entry.color}
-                opacity={
-                  activeSegment === null || activeSegment === entry.name
-                    ? 1
-                    : 0.5
-                }
-              />
-            ))}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
-
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6">
-        {roleData.map((entry) => (
-          <div
-            key={entry.name}
-            className={`
-              flex items-center gap-2 p-2 rounded-lg 
-              transition-all duration-300 
-              ${activeSegment === entry.name ? "bg-blue-50 shadow-md" : ""}
-            `}
-          >
-            <div
-              className="w-4 h-4 rounded-full shadow-md"
-              style={{ backgroundColor: entry.color }}
-            />
-            <div>
-              <span className="text-sm font-semibold text-slate-600">
-                {entry.name}: {entry.value}%
-              </span>
-              {activeSegment === entry.name && (
-                <p className="text-xs text-slate-500 mt-1">
-                  {entry.description}
-                </p>
-              )}
-            </div>
+    <Card className="rounded-3xl overflow-hidden shadow-xl bg-card">
+      <CardHeader className="bg-gradient-to-r from-accent to-background p-6">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-xl font-bold text-foreground">
+            Role Usage
+          </CardTitle>
+          <div className="flex space-x-2">
+            <button className="hover:bg-accent p-2 rounded-full transition-colors">
+              <RefreshCw className="w-5 h-5 text-muted-foreground" />
+            </button>
+            <button className="hover:bg-accent p-2 rounded-full transition-colors">
+              <Filter className="w-5 h-5 text-muted-foreground" />
+            </button>
           </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
+        </div>
+      </CardHeader>
+      <CardContent className="relative h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={roleData}
+              cx="50%"
+              cy="50%"
+              innerRadius={0}
+              outerRadius={100}
+              paddingAngle={0}
+              dataKey="value"
+              labelLine={false}
+              onMouseEnter={(data) => setActiveSegment(data.name)}
+              onMouseLeave={() => setActiveSegment(null)}
+            >
+              {roleData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.color}
+                  opacity={
+                    activeSegment === null || activeSegment === entry.name
+                      ? 1
+                      : 0.5
+                  }
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--background)",
+                borderColor: "var(--border)",
+                color: "var(--foreground)",
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6">
+          {roleData.map((entry) => (
+            <div
+              key={entry.name}
+              className={`
+                flex items-center gap-2 p-2 rounded-lg 
+                transition-all duration-300 
+                ${activeSegment === entry.name ? "bg-accent shadow-md" : ""}
+              `}
+            >
+              <div
+                className="w-4 h-4 rounded-full shadow-md"
+                style={{ backgroundColor: entry.color }}
+              />
+              <div>
+                <span className="text-sm font-semibold text-foreground">
+                  {entry.name}: {entry.value}%
+                </span>
+                {activeSegment === entry.name && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {entry.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

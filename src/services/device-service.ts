@@ -32,4 +32,4 @@ export const deviceService = {
     const response = await apiClient.patch(`/devices/${deviceId}`, { name });
     return response.data;
   },
-}; 
+};

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/base/card";
 import { Label } from "@/components/ui/base/label";
@@ -24,10 +26,15 @@ import {
   Phone,
   Clock,
   Tablet,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
+import { userService } from "@/services/user-service";
+import { teamService } from "@/services/team-service";
+import { deviceService } from "@/services/device-service";
+import { notificationService } from "@/services/notification-service";
 import { toast } from "react-hot-toast";
-import { cn } from "@/components/lib/utils";
 
 interface UserSettings {
   id: string;
@@ -236,10 +243,201 @@ const SettingSystem = () => {
     { id: "Security", label: "Security", icon: Shield },
   ];
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [devices, members] = await Promise.all([
+          deviceService.getDevices(),
+          teamService.getMembers(),
+        ]);
+
+        const devicesWithIcons = devices.map((device) => ({
+          ...device,
+          icon:
+            device.device.toLowerCase().includes("macbook") ||
+            device.device.toLowerCase().includes("pc")
+              ? Laptop
+              : device.device.toLowerCase().includes("iphone")
+              ? Phone
+              : device.device.toLowerCase().includes("ipad")
+              ? Tablet
+              : Laptop,
+        }));
+
+        setSettings((prev) => ({
+          ...prev,
+          devices: devicesWithIcons,
+          team: members,
+        }));
+      } catch (error) {
+        console.error("Failed to load initial data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const handleUpdateProfile = async (
+    field: keyof Pick<UserSettings, "fullName" | "email">,
+    value: string
+  ) => {
+    setIsLoading(true);
+    try {
+      await userService.updateProfile({ [field]: value });
+      setSettings((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+      toast.success(`${field} updated successfully`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleSetting = async (
+    field: keyof Pick<UserSettings, "passwordlessLogin" | "twoFactorAuth">
+  ) => {
+    setIsLoading(true);
+    try {
+      const newValue = !settings[field];
+      if (field === "passwordlessLogin") {
+        await userService.togglePasswordlessLogin(newValue);
+      } else if (field === "twoFactorAuth") {
+        await userService.toggle2FA(newValue);
+      }
+
+      setSettings((prev) => ({
+        ...prev,
+        [field]: newValue,
+      }));
+      toast.success(`${field} setting updated`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateNotification = async (
+    type: "email" | "phone",
+    setting: string,
+    value: boolean
+  ) => {
+    setIsLoading(true);
+    try {
+      if (type === "email") {
+        await notificationService.updateEmailSettings({
+          ...settings.notifications.email,
+          [setting]: value,
+        });
+      } else {
+        await notificationService.updatePhoneSettings({
+          ...settings.notifications.phone,
+          [setting]: value,
+        });
+      }
+
+      setSettings((prev) => ({
+        ...prev,
+        notifications: {
+          ...prev.notifications,
+          [type]: {
+            ...prev.notifications[type],
+            [setting]: value,
+          },
+        },
+      }));
+      toast.success("Notification settings updated");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRevokeDevice = async (deviceId: string) => {
+    setIsLoading(true);
+    try {
+      await deviceService.revokeDevice(deviceId);
+      setSettings((prev) => ({
+        ...prev,
+        devices: prev.devices.filter((device) => device.id !== deviceId),
+      }));
+      toast.success("Device access revoked");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInviteTeamMember = async (email: string) => {
+    setIsLoading(true);
+    try {
+      await teamService.inviteMember(email, "MEMBER");
+      toast.success(`Invitation sent to ${email}`);
+      setInviteEmail("");
+
+      // Refresh team members list
+      const members = await teamService.getMembers();
+      setSettings((prev) => ({
+        ...prev,
+        team: members,
+      }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await userService.deleteAccount();
+      toast.success("Account deleted successfully");
+      // Redirect to logout
+      window.location.href = "/auth/login";
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const calculatePasswordStrength = (password: string) => {
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 25;
+    return strength;
+  };
+
   const renderGeneral = () => (
     <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <div className="relative h-32 bg-gradient-to-r from-primary/20 to-primary/40">
+      <Card className="border border-border">
+        <div className="relative h-32 bg-gradient-to-r from-primary to-primary/60">
           <div className="absolute -bottom-12 left-6">
             <Avatar className="h-24 w-24 ring-4 ring-background">
               <AvatarImage src={settings.profileImage} alt="Profile" />
@@ -265,7 +463,7 @@ const SettingSystem = () => {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border border-border"
               disabled={isLoading}
             >
               <Camera className="h-4 w-4" />
@@ -285,11 +483,16 @@ const SettingSystem = () => {
                   onChange={(e) =>
                     handleUpdateProfile("fullName", e.target.value)
                   }
-                  className="max-w-md bg-muted/50"
+                  className="max-w-md bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
                   id={"fullName"}
                   disabled={isLoading}
                 />
-                <Button variant="outline" size="sm" disabled={isLoading}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading}
+                  className="border border-border"
+                >
                   Save
                 </Button>
               </div>
@@ -304,11 +507,16 @@ const SettingSystem = () => {
                 <Input
                   value={settings.email}
                   onChange={(e) => handleUpdateProfile("email", e.target.value)}
-                  className="max-w-md bg-muted/50"
+                  className="max-w-md bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
                   id={"email"}
                   disabled={isLoading}
                 />
-                <Button variant="outline" size="sm" disabled={isLoading}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading}
+                  className="border border-border"
+                >
                   Edit
                 </Button>
               </div>
@@ -317,7 +525,7 @@ const SettingSystem = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Shield className="h-5 w-5 text-primary" />
@@ -326,7 +534,7 @@ const SettingSystem = () => {
             </h3>
           </div>
           <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
               <div>
                 <p className="font-medium mb-1 flex items-center gap-2 text-foreground">
                   <Lock className="h-4 w-4 text-muted-foreground" />
@@ -343,7 +551,7 @@ const SettingSystem = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
               <div>
                 <p className="font-medium mb-1 flex items-center gap-2 text-foreground">
                   <Shield className="h-4 w-4 text-muted-foreground" />
@@ -363,7 +571,7 @@ const SettingSystem = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-destructive/50">
+      <Card className="border border-destructive/50">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
@@ -391,7 +599,7 @@ const SettingSystem = () => {
   );
 
   const renderTeam = () => (
-    <Card>
+    <Card className="border border-border">
       <CardContent className="p-6">
         <div className="space-y-6">
           <div>
@@ -408,7 +616,7 @@ const SettingSystem = () => {
               <div className="flex-1 relative">
                 <Input
                   placeholder="Email address"
-                  className="pl-10 w-full bg-muted/50"
+                  className="pl-10 w-full bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
                   id={"invite-email"}
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
@@ -430,7 +638,7 @@ const SettingSystem = () => {
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between items-center px-4 py-2 bg-muted/50 rounded-lg">
+            <div className="flex justify-between items-center px-4 py-2 bg-muted rounded-lg">
               <span className="text-sm font-medium text-muted-foreground">
                 MEMBER
               </span>
@@ -442,7 +650,7 @@ const SettingSystem = () => {
             {settings.team.map((member) => (
               <div
                 key={member.id}
-                className="flex justify-between items-center p-4 rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex justify-between items-center p-4 rounded-lg hover:bg-muted/50 transition-colors border border-border"
               >
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10 bg-primary/10">
@@ -462,12 +670,11 @@ const SettingSystem = () => {
                 </div>
                 <div className="flex items-center space-x-4">
                   <span
-                    className={cn(
-                      "text-sm font-medium px-3 py-1 rounded-full",
+                    className={`text-sm font-medium px-3 py-1 rounded-full ${
                       member.role === "OWNER"
-                        ? "bg-primary/10 text-primary"
-                        : "bg-muted text-muted-foreground"
-                    )}
+                        ? "text-primary bg-primary/10"
+                        : "text-muted-foreground bg-muted"
+                    }`}
                   >
                     {member.role}
                   </span>
@@ -490,7 +697,7 @@ const SettingSystem = () => {
 
   const renderNotifications = () => (
     <div className="space-y-6">
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Mail className="h-5 w-5 text-primary" />
@@ -499,9 +706,9 @@ const SettingSystem = () => {
             </h3>
           </div>
           <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
               <div>
-                <p className="font-medium">Product updates</p>
+                <p className="font-medium text-foreground">Product updates</p>
                 <p className="text-sm text-muted-foreground">
                   News, announcements, and product updates.
                 </p>
@@ -515,9 +722,9 @@ const SettingSystem = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
               <div>
-                <p className="font-medium">Security updates</p>
+                <p className="font-medium text-foreground">Security updates</p>
                 <p className="text-sm text-muted-foreground">
                   Important notifications about your account security.
                 </p>
@@ -534,7 +741,7 @@ const SettingSystem = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Smartphone className="h-5 w-5 text-primary" />
@@ -543,9 +750,9 @@ const SettingSystem = () => {
             </h3>
           </div>
           <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
               <div>
-                <p className="font-medium">Security updates</p>
+                <p className="font-medium text-foreground">Security updates</p>
                 <p className="text-sm text-muted-foreground">
                   Important notifications about your account security.
                 </p>
@@ -566,7 +773,7 @@ const SettingSystem = () => {
 
   const renderDevices = () => (
     <div className="space-y-6">
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Laptop className="h-5 w-5 text-primary" />
@@ -586,13 +793,13 @@ const SettingSystem = () => {
                 <h4 className="text-sm font-medium text-muted-foreground mb-3">
                   CURRENT DEVICE
                 </h4>
-                <div className="flex justify-between items-center p-4 bg-primary/25 border border-primary rounded-lg">
+                <div className="flex justify-between items-center p-4 bg-primary/5 border border-primary/20 rounded-lg">
                   <div className="flex gap-4">
                     <div className="mt-1">
                       <currentDevice.icon className="h-5 w-5 text-primary" />
                     </div>
                     <div className="space-y-1">
-                      <p className="font-medium flex items-center gap-2">
+                      <p className="font-medium text-foreground flex items-center gap-2">
                         {currentDevice.device}
                         <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
                           Current
@@ -628,14 +835,16 @@ const SettingSystem = () => {
             {settings.devices.map((device) => (
               <div
                 key={device.id}
-                className="flex justify-between items-center p-4 bg-muted/50 rounded-lg hover:bg-muted/10 transition-colors"
+                className="flex justify-between items-center p-4 bg-muted rounded-lg hover:bg-muted/70 transition-colors border border-border"
               >
                 <div className="flex gap-4">
                   <div className="mt-1">
                     <device.icon className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-medium">{device.device}</p>
+                    <p className="font-medium text-foreground">
+                      {device.device}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       {device.browser}
                     </p>
@@ -652,7 +861,7 @@ const SettingSystem = () => {
                   </p>
                   <Button
                     variant="link"
-                    className="text-destructive hover:text-destructive"
+                    className="text-destructive hover:text-destructive/90"
                     onClick={() => handleRevokeDevice(device.id)}
                     disabled={isLoading}
                   >
@@ -675,35 +884,190 @@ const SettingSystem = () => {
 
   const renderSecurity = () => (
     <div className="space-y-6">
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Lock className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">
-              Change password
-            </h3>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">
+                Change password
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Ensure your account is using a strong password
+              </p>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <Input
-              type="password"
-              value="Thebestpasswordever123#"
-              className="max-w-md bg-muted/50"
-              id={"password"}
-            />
-            <Button variant="outline" size="sm">
-              Edit
-            </Button>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-foreground">Current Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={passwordData.currentPassword}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      currentPassword: e.target.value,
+                    }))
+                  }
+                  className="pr-10 bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
+                  placeholder="Enter current password"
+                  id="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-foreground">New Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      newPassword: e.target.value,
+                    }))
+                  }
+                  className="pr-10 bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
+                  placeholder="Enter new password"
+                  id="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              {passwordData.newPassword && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-muted-foreground">
+                      Password strength
+                    </span>
+                    <span className="text-sm font-medium text-foreground">
+                      {calculatePasswordStrength(passwordData.newPassword)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full transition-all duration-300"
+                      style={{
+                        width: `${calculatePasswordStrength(
+                          passwordData.newPassword
+                        )}%`,
+                        backgroundColor:
+                          calculatePasswordStrength(passwordData.newPassword) <
+                          50
+                            ? "rgb(239 68 68)"
+                            : calculatePasswordStrength(
+                                passwordData.newPassword
+                              ) < 75
+                            ? "rgb(234 179 8)"
+                            : "rgb(34 197 94)",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label className="text-foreground">Confirm New Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
+                  className="pr-10 bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
+                  placeholder="Confirm new password"
+                  id="confirm-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={() => {
+                  if (
+                    passwordData.newPassword !== passwordData.confirmPassword
+                  ) {
+                    toast.error("New passwords don't match");
+                    return;
+                  }
+                  if (
+                    calculatePasswordStrength(passwordData.newPassword) < 75
+                  ) {
+                    toast.error("Please use a stronger password");
+                    return;
+                  }
+                  // Handle password update
+                  toast.success("Password updated successfully");
+                  setPasswordData({
+                    currentPassword: "",
+                    newPassword: "",
+                    confirmPassword: "",
+                  });
+                }}
+                disabled={
+                  !passwordData.currentPassword ||
+                  !passwordData.newPassword ||
+                  !passwordData.confirmPassword
+                }
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                Update Password
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Shield className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">
-              Multi Factor Authentication
-            </h3>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">
+                Multi Factor Authentication
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Add an extra layer of security to your account
+              </p>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-6">
             {[
@@ -712,29 +1076,60 @@ const SettingSystem = () => {
                 description:
                   "Use an authenticator app to generate one time security codes.",
                 icon: Smartphone,
+                setupSteps: [
+                  "Install an authenticator app",
+                  "Scan the QR code",
+                  "Enter the 6-digit code",
+                ],
               },
               {
                 title: "Text Message",
                 description:
                   "Use your mobile phone to receive security codes via SMS.",
                 icon: Phone,
+                setupSteps: [
+                  "Enter your phone number",
+                  "Verify with a code sent via SMS",
+                  "Enable SMS authentication",
+                ],
               },
             ].map((method, index) => (
-              <div key={index} className="p-4 bg-muted/50 rounded-lg space-y-4">
+              <div
+                key={index}
+                className="p-4 bg-muted rounded-lg space-y-4 border border-border"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <method.icon className="h-5 w-5 text-muted-foreground" />
-                    <h4 className="font-medium">{method.title}</h4>
+                    <h4 className="font-medium text-foreground">
+                      {method.title}
+                    </h4>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-red-500" />
-                    <span className="text-sm text-red-500">Off</span>
+                    <div className="h-2 w-2 rounded-full bg-destructive" />
+                    <span className="text-sm text-destructive">Off</span>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {method.description}
                 </p>
-                <Button variant="outline" className="w-full">
+                <div className="space-y-2">
+                  {method.setupSteps.map((step, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 text-sm text-muted-foreground"
+                    >
+                      <div className="h-5 w-5 rounded-full bg-muted-foreground/20 flex items-center justify-center text-xs font-medium text-muted-foreground">
+                        {i + 1}
+                      </div>
+                      {step}
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full border border-border"
+                >
                   Set Up
                 </Button>
               </div>
@@ -743,7 +1138,7 @@ const SettingSystem = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border border-border">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Clock className="h-5 w-5 text-primary" />
@@ -756,7 +1151,7 @@ const SettingSystem = () => {
               </p>
             </div>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="grid grid-cols-3 text-sm font-medium text-muted-foreground px-4">
               <span>LOGIN TYPE</span>
               <span>IP ADDRESS</span>
@@ -768,26 +1163,44 @@ const SettingSystem = () => {
                 date: "08:14 AM 01/31/2024",
                 ip: "95.130.17.84",
                 client: "Chrome, Mac OS 10.15.7",
+                status: "success",
               },
               {
-                type: "Credential login",
+                type: "Failed attempt",
+                date: "07:23 AM 01/31/2024",
+                ip: "92.145.18.92",
+                client: "Firefox, Windows 10",
+                status: "failed",
+              },
+              {
+                type: "2FA verification",
                 date: "05:54 AM 01/31/2024",
                 ip: "95.130.17.84",
                 client: "Chrome, Mac OS 10.15.7",
+                status: "success",
               },
             ].map((login, index) => (
               <div
                 key={index}
-                className="grid grid-cols-3 p-4 bg-muted/50 rounded-lg"
+                className="grid grid-cols-3 p-4 bg-muted rounded-lg items-center border border-border"
               >
                 <div>
-                  <p className="font-medium">{login.type}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`h-2 w-2 rounded-full ${
+                        login.status === "success"
+                          ? "bg-green-500"
+                          : "bg-destructive"
+                      }`}
+                    />
+                    <p className="font-medium text-foreground">{login.type}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
                     on {login.date}
                   </p>
                 </div>
-                <span className="self-center">{login.ip}</span>
-                <span className="self-center">{login.client}</span>
+                <span className="text-muted-foreground">{login.ip}</span>
+                <span className="text-muted-foreground">{login.client}</span>
               </div>
             ))}
           </div>
@@ -813,130 +1226,6 @@ const SettingSystem = () => {
     }
   };
 
-  const handleUpdateProfile = async (
-    field: keyof Pick<UserSettings, "fullName" | "email">,
-    value: string
-  ) => {
-    setIsLoading(true);
-    try {
-      // Here you would make an API call to update the user profile
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-      setSettings((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-      toast.success(`${field} updated successfully`);
-    } catch (error) {
-      toast.error(`Failed to update ${field}`);
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleToggleSetting = async (
-    field: keyof Pick<UserSettings, "passwordlessLogin" | "twoFactorAuth">
-  ) => {
-    setIsLoading(true);
-    try {
-      // Here you would make an API call to update the setting
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-      setSettings((prev) => ({
-        ...prev,
-        [field]: !prev[field],
-      }));
-      toast.success(`${field} setting updated`);
-    } catch (error) {
-      toast.error(`Failed to update ${field}`);
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleUpdateNotification = async (
-    type: "email" | "phone",
-    setting: string,
-    value: boolean
-  ) => {
-    setIsLoading(true);
-    try {
-      // Here you would make an API call to update notification settings
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-      setSettings((prev) => ({
-        ...prev,
-        notifications: {
-          ...prev.notifications,
-          [type]: {
-            ...prev.notifications[type],
-            [setting]: value,
-          },
-        },
-      }));
-      toast.success("Notification settings updated");
-    } catch (error) {
-      toast.error("Failed to update notification settings");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRevokeDevice = async (deviceId: string) => {
-    setIsLoading(true);
-    try {
-      // Here you would make an API call to revoke the device
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-      setSettings((prev) => ({
-        ...prev,
-        devices: prev.devices.filter((device) => device.id !== deviceId),
-      }));
-      toast.success("Device access revoked");
-    } catch (error) {
-      toast.error("Failed to revoke device access");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleInviteTeamMember = async (email: string) => {
-    setIsLoading(true);
-    try {
-      // Here you would make an API call to send the invitation
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-      toast.success(`Invitation sent to ${email}`);
-    } catch (error) {
-      toast.error("Failed to send invitation");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Here you would make an API call to delete the account
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-      toast.success("Account deleted successfully");
-      // Redirect to logout or home page
-    } catch (error) {
-      toast.error("Failed to delete account");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="w-full max-w-6xl mx-auto p-6">
       <div className="flex items-center gap-3 mb-8">
@@ -950,12 +1239,11 @@ const SettingSystem = () => {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                className={cn(
-                  "py-4 px-4 -mb-px text-sm font-medium flex items-center gap-2 transition-colors",
+                className={`py-4 px-4 -mb-px text-sm font-medium flex items-center gap-2 transition-colors ${
                   activeTab === tab.id
                     ? "border-b-2 border-primary text-primary"
                     : "text-muted-foreground hover:text-foreground"
-                )}
+                }`}
                 onClick={() => setActiveTab(tab.id)}
               >
                 <tab.icon className="h-4 w-4" />

@@ -20,7 +20,6 @@ import UserDetail from "./all-users-details";
 import SMSDialog from "./SMS";
 import ExportDialog from "./export-model";
 
-
 export interface User {
   id: number;
   name: string;
@@ -205,7 +204,7 @@ const UserManagement: React.FC = () => {
   const handleSendSMS = () => {
     if (selectedUsers.length > 0) {
       // Filter selected users data to pass to SMS dialog
-      const selectedUsersData = users.filter(user => 
+      const selectedUsersData = users.filter((user) =>
         selectedUsers.includes(user.id)
       );
       setIsSMSDialogOpen(true);
@@ -288,8 +287,6 @@ const UserManagement: React.FC = () => {
 
   const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
 
-
-
   // Bulk Delete Handler
   const handleBulkDelete = useCallback(() => {
     setUsers((prevUsers) =>
@@ -320,30 +317,30 @@ const UserManagement: React.FC = () => {
   // Skeleton Placeholder
   if (isLoading) {
     return (
-      <div className="p-6 bg-white shadow-lg rounded-lg">
+      <div className="p-6 bg-background shadow-lg rounded-lg">
         <div className="animate-pulse">
           {/* Toolbar Skeleton */}
           <div className="flex items-center justify-between mb-4">
-            <div className="h-10 bg-gray-200 rounded w-2/3"></div>
-            <div className="h-10 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-10 bg-muted rounded w-2/3"></div>
+            <div className="h-10 bg-muted rounded w-1/3"></div>
           </div>
 
           {/* Table Skeleton */}
-          <div className="overflow-hidden border rounded-lg">
-            <div className="bg-gray-100 p-4 flex items-center">
-              <div className="h-5 bg-gray-200 rounded w-full"></div>
+          <div className="overflow-hidden border border-border rounded-lg">
+            <div className="bg-muted p-4 flex items-center">
+              <div className="h-5 bg-muted/50 rounded w-full"></div>
             </div>
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-border">
               {Array(5)
                 .fill(null)
                 .map((_, index) => (
                   <div key={index} className="p-4 flex items-center space-x-4">
-                    <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+                    <div className="h-10 w-10 bg-muted rounded-full"></div>
                     <div className="flex-grow">
-                      <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                      <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
+                      <div className="h-4 bg-muted rounded w-1/3"></div>
                     </div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                    <div className="h-4 bg-muted rounded w-1/6"></div>
                   </div>
                 ))}
             </div>
@@ -354,17 +351,17 @@ const UserManagement: React.FC = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div className="bg-background min-h-screen">
       <div className="container mx-auto">
         {currentView === "list" ? (
           <>
             {/* Search and Filters */}
-            <div className="bg-white shadow-lg rounded-xl p-4 md:p-6 mb-6">
+            <div className="bg-card shadow-lg rounded-xl p-4 md:p-6 mb-6 border border-border">
               {/* Mobile Menu Toggle */}
               <div className="md:hidden flex justify-end mb-4">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="text-gray-600 hover:text-blue-600"
+                  className="text-muted-foreground hover:text-primary"
                 >
                   <Menu className="w-6 h-6" />
                 </button>
@@ -376,16 +373,16 @@ const UserManagement: React.FC = () => {
                     placeholder="Search users by name, email, ID, or gender"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg 
-                    focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full pl-12 pr-4 py-3 bg-background border-2 border-input rounded-lg 
+                    focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none text-foreground"
                   />
-                  <Search className="absolute left-4 top-4 text-gray-400" />
+                  <Search className="absolute left-4 top-4 text-muted-foreground" />
                 </div>
                 {/* send sms to the user Button */}
                 <button
                   onClick={handleSendSMS}
-                  className="bg-blue-900 text-white px-6 py-3 rounded-lg 
-                  flex items-center space-x-3 hover:bg-blue-700 transition 
+                  className="bg-primary text-primary-foreground px-6 py-3 rounded-lg 
+                  flex items-center space-x-3 hover:bg-primary/90 transition 
                   shadow-md hover:shadow-lg"
                 >
                   <Navigation className="w-6 h-6" />
@@ -394,8 +391,8 @@ const UserManagement: React.FC = () => {
                 {/* Export Button */}
                 <button
                   onClick={() => setIsExportDialogOpen(true)}
-                  className="bg-blue-900 text-white px-6 py-3 rounded-lg 
-                  flex items-center space-x-3 hover:bg-blue-700 transition 
+                  className="bg-primary text-primary-foreground px-6 py-3 rounded-lg 
+                  flex items-center space-x-3 hover:bg-primary/90 transition 
                   shadow-md hover:shadow-lg"
                 >
                   <Download className="w-6 h-6" />
@@ -403,8 +400,8 @@ const UserManagement: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="bg-gray-100 text-gray-700 px-5 py-3 
-                  rounded-lg flex items-center space-x-2 hover:bg-gray-200"
+                  className="bg-muted text-muted-foreground px-5 py-3 
+                  rounded-lg flex items-center space-x-2 hover:bg-accent/50"
                 >
                   <Filter className="w-6 h-6" />
                   <span>Filters</span>
@@ -422,7 +419,7 @@ const UserManagement: React.FC = () => {
                         role: e.target.value,
                       }))
                     }
-                    className="p-2 border rounded"
+                    className="p-2 bg-background border border-input rounded text-foreground"
                   >
                     <option value="">All Roles</option>
                     <option value="Driver">Driver</option>
@@ -437,7 +434,7 @@ const UserManagement: React.FC = () => {
                         status: e.target.value,
                       }))
                     }
-                    className="p-2 border rounded"
+                    className="p-2 bg-background border border-input rounded text-foreground"
                   >
                     <option value="">All Statuses</option>
                     <option value="Active">Active</option>
@@ -453,7 +450,7 @@ const UserManagement: React.FC = () => {
                         gender: e.target.value,
                       }))
                     }
-                    className="p-2 border rounded"
+                    className="p-2 bg-background border border-input rounded text-foreground"
                   >
                     <option value="">All Genders</option>
                     <option value="Male">Male</option>
@@ -464,69 +461,69 @@ const UserManagement: React.FC = () => {
             </div>
 
             {/* User Table */}
-            <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+            <div className="bg-card shadow-md rounded-lg overflow-x-auto border border-border">
               <table className="w-full hidden md:table">
-                <thead className="bg-gradient-to-r from-blue-50 to-blue-100 border-b-2 border-blue-200 shadow-sm">
+                <thead className="bg-muted border-b border-border">
                   <tr className="transition-all duration-300">
                     <th className="p-4 text-left w-12">
                       <input
                         type="checkbox"
                         checked={selectedUsers.length === paginatedUsers.length}
                         onChange={handleSelectAllUsers}
-                        className="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="form-checkbox h-5 w-5 text-primary rounded border-input focus:ring-2 focus:ring-primary transition-all"
                       />
                     </th>
                     <th
                       onClick={() => handleSort("name")}
-                      className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                      className="p-4 text-left cursor-pointer group hover:bg-accent/50 rounded-lg transition-all duration-300 ease-in-out"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
                           User Name
                         </span>
-                        <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                        <ChevronDown className="ml-2 w-4 h-4 text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
                       </div>
                     </th>
-                    <th className="p-4 text-left font-medium text-gray-600">
+                    <th className="p-4 text-left font-medium text-muted-foreground">
                       User ID
                     </th>
-                    <th className="p-4 text-left font-medium text-gray-600">
+                    <th className="p-4 text-left font-medium text-muted-foreground">
                       Phone Number
                     </th>
                     <th
                       onClick={() => handleSort("role")}
-                      className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                      className="p-4 text-left cursor-pointer group hover:bg-accent/50 rounded-lg transition-all duration-300 ease-in-out"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
                           Role
                         </span>
-                        <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                        <ChevronDown className="ml-2 w-4 h-4 text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
                       </div>
                     </th>
                     <th
                       onClick={() => handleSort("gender")}
-                      className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                      className="p-4 text-left cursor-pointer group hover:bg-accent/50 rounded-lg transition-all duration-300 ease-in-out"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
                           Gender
                         </span>
-                        <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                        <ChevronDown className="ml-2 w-4 h-4 text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
                       </div>
                     </th>
                     <th
                       onClick={() => handleSort("status")}
-                      className="p-4 text-left cursor-pointer group hover:bg-blue-100 rounded-lg transition-all duration-300 ease-in-out"
+                      className="p-4 text-left cursor-pointer group hover:bg-accent/50 rounded-lg transition-all duration-300 ease-in-out"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-700 group-hover:text-blue-800 transition-colors">
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
                           Status
                         </span>
-                        <ChevronDown className="ml-2 w-4 h-4 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all" />
+                        <ChevronDown className="ml-2 w-4 h-4 text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
                       </div>
                     </th>
-                    <th className="p-4 text-left font-medium text-gray-600">
+                    <th className="p-4 text-left font-medium text-muted-foreground">
                       Actions
                     </th>
                   </tr>
@@ -535,38 +532,40 @@ const UserManagement: React.FC = () => {
                   {paginatedUsers.map((user, index) => (
                     <tr
                       key={user.id}
-                      className={`${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } 
-                  hover:bg-blue-50 transition`}
+                      className={`${index % 2 === 0 ? "bg-card" : "bg-muted/5"} 
+                  hover:bg-accent/5 transition`}
                     >
                       <td className="p-4">
                         <input
                           type="checkbox"
                           checked={selectedUsers.includes(user.id)}
                           onChange={() => handleSelectUser(user.id)}
-                          className="form-checkbox h-5 w-5 text-blue-600"
+                          className="form-checkbox h-5 w-5 text-primary border-input"
                         />
                       </td>
                       <td className="p-4 flex items-center">
                         <div
-                          className="w-10 h-10 rounded-full bg-blue-200 
-                      flex items-center justify-center mr-3 text-blue-800"
+                          className="w-10 h-10 rounded-full bg-primary/10 
+                      flex items-center justify-center mr-3 text-primary"
                         >
                           {user.name.charAt(0)}
                         </div>
                         <div>
-                          <div className="font-semibold">{user.name}</div>
-                          <div className="text-sm text-gray-500">
+                          <div className="font-semibold text-foreground">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
                             {user.email}
                           </div>
                         </div>
                       </td>
-                      <td className="p-4">{user.userId}</td>
-                      <td className="p-4">{user.phoneNumber}</td>
-                      <td className="p-4">{user.role}</td>
+                      <td className="p-4 text-foreground">{user.userId}</td>
+                      <td className="p-4 text-foreground">
+                        {user.phoneNumber}
+                      </td>
+                      <td className="p-4 text-foreground">{user.role}</td>
                       <td className="p-4">
-                        <span className="flex items-center">
+                        <span className="flex items-center text-foreground">
                           <span className="mr-2">
                             {getGenderIcon(user.gender)}
                           </span>
@@ -586,7 +585,7 @@ const UserManagement: React.FC = () => {
                       <td className="p-4 space-x-2">
                         <button
                           onClick={() => handleViewUser(user)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-primary hover:text-primary/80"
                         >
                           <Eye className="w-5 h-5" />
                         </button>
@@ -597,8 +596,8 @@ const UserManagement: React.FC = () => {
               </table>
 
               {/* Pagination */}
-              <div className="flex justify-between items-center p-4 bg-gray-100">
-                <span className="text-sm text-gray-600">
+              <div className="flex justify-between items-center p-4 bg-muted border-t border-border">
+                <span className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
                   {Math.min(currentPage * itemsPerPage, sortedUsers.length)} of{" "}
                   {sortedUsers.length} records
@@ -609,8 +608,8 @@ const UserManagement: React.FC = () => {
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
                     disabled={currentPage === 1}
-                    className="px-3 py-1 border rounded-lg hover:bg-gray-200 
-                  disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="px-3 py-1 border border-input rounded-lg hover:bg-accent/50 
+                  disabled:opacity-50 disabled:cursor-not-allowed flex items-center text-foreground"
                   >
                     <ArrowLeft className="w-4 h-4 mr-1" /> Previous
                   </button>
@@ -622,8 +621,8 @@ const UserManagement: React.FC = () => {
                         onClick={() => setCurrentPage(page)}
                         className={`px-3 py-1 rounded-lg ${
                           currentPage === page
-                            ? "bg-blue-600 text-white"
-                            : "border hover:bg-gray-200"
+                            ? "bg-primary text-primary-foreground"
+                            : "border border-input hover:bg-accent/50 text-foreground"
                         }`}
                       >
                         {page}
@@ -635,8 +634,8 @@ const UserManagement: React.FC = () => {
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 border rounded-lg hover:bg-gray-200 
-                  disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="px-3 py-1 border border-input rounded-lg hover:bg-accent/50 
+                  disabled:opacity-50 disabled:cursor-not-allowed flex items-center text-foreground"
                   >
                     Next <ArrowRight className="w-4 h-4 ml-1" />
                   </button>
@@ -650,7 +649,6 @@ const UserManagement: React.FC = () => {
             onClose={() => setCurrentView("list")}
             onSave={handleSaveUser}
             onDelete={handleDeleteUser}
-
             initialEditMode={false}
           />
         ) : null}
@@ -659,21 +657,21 @@ const UserManagement: React.FC = () => {
       {selectedUsers.length > 0 && (
         <button
           onClick={handleBulkDelete}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center"
+          className="bg-destructive text-destructive-foreground px-4 py-2 rounded hover:bg-destructive/90 flex items-center"
         >
           <Trash2 className="mr-2" /> Delete {selectedUsers.length} Users
         </button>
       )}
 
-       {/* Add SMS Dialog */}
-       <SMSDialog
+      {/* Add SMS Dialog */}
+      <SMSDialog
         isOpen={isSMSDialogOpen}
         onClose={() => setIsSMSDialogOpen(false)}
         users={users}
       />
 
-       {/* ExportDialog component */}
-       <ExportDialog
+      {/* ExportDialog component */}
+      <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
         users={users}

@@ -1,18 +1,22 @@
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
-import { 
-  FilterIcon, 
-  ChevronDownIcon, 
-  ImportIcon, 
-  SearchIcon, 
-  UserIcon 
+import {
+  FilterIcon,
+  ChevronDownIcon,
+  ImportIcon,
+  SearchIcon,
+  UserIcon,
 } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/base/dropdown-menu";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/base/button";
+import { Checkbox } from "@/components/ui/base/checkbox";
+import { cn } from "@/lib/utils";
 
 interface UserAvatarProps {
   name: string;
@@ -71,26 +75,25 @@ const SuspensionHistory = () => {
       reason: "Payment fraud",
       status: "Suspended",
       image: null,
-    }
+    },
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   // Filtering and search logic
   const filteredSuspensions = useMemo(() => {
-    return suspensions.filter(suspension => 
-      (statusFilter === "All" || suspension.status === statusFilter) &&
-      (searchTerm === "" || 
-        suspension.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        suspension.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        suspension.reason.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    return suspensions.filter(
+      (suspension) =>
+        (statusFilter === "All" || suspension.status === statusFilter) &&
+        (searchTerm === "" ||
+          suspension.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          suspension.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          suspension.reason.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [suspensions, searchTerm, statusFilter]);
 
@@ -113,9 +116,9 @@ const SuspensionHistory = () => {
         />
       );
     }
-    
+
     return (
-      <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
         {name.charAt(0).toUpperCase()}
       </div>
     );
@@ -127,33 +130,36 @@ const SuspensionHistory = () => {
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
   };
-  
 
   // Select all items
   const toggleSelectAll = () => {
     setSelectedItems(
-      selectedItems.length === paginatedSuspensions.length 
-        ? [] 
-        : paginatedSuspensions.map(item => item.id)
+      selectedItems.length === paginatedSuspensions.length
+        ? []
+        : paginatedSuspensions.map((item) => item.id)
     );
   };
 
   // Export functionality (mock)
   const handleExport = () => {
-    const dataToExport = selectedItems.length > 0 
-      ? suspensions.filter(item => selectedItems.includes(item.id))
-      : suspensions;
-    
-    const csvContent = dataToExport.map(item => 
-      `${item.name},${item.email},${item.phone},${item.reason},${item.status}`
-    ).join('\n');
+    const dataToExport =
+      selectedItems.length > 0
+        ? suspensions.filter((item) => selectedItems.includes(item.id))
+        : suspensions;
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const csvContent = dataToExport
+      .map(
+        (item) =>
+          `${item.name},${item.email},${item.phone},${item.reason},${item.status}`
+      )
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
     link.setAttribute("download", "suspension_history.csv");
-    link.style.visibility = 'hidden';
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -163,13 +169,17 @@ const SuspensionHistory = () => {
   const totalPages = Math.ceil(filteredSuspensions.length / itemsPerPage);
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6 -m-4 -mt-8">
+    <div className="bg-background min-h-screen p-6 -m-4 -mt-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">Suspension History</h1>
-            <p className="text-sm text-gray-500">All suspended users in the system</p>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Suspension History
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              All suspended users in the system
+            </p>
           </div>
         </div>
 
@@ -177,51 +187,58 @@ const SuspensionHistory = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
           <div className="relative w-full lg:w-auto">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-4 h-4 text-gray-400" />
+              <SearchIcon className="w-4 h-4 text-muted-foreground" />
             </div>
-            <input
+            <Input
               type="text"
+              id="search-suspensions"
               placeholder="Search users"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full pl-10"
             />
           </div>
 
           <div className="flex space-x-2">
-            <button 
-              onClick={handleExport}
-              className="flex items-center space-x-2 bg-blue-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 shadow"
-            >
+            <Button onClick={handleExport} variant="default" className="gap-2">
               <ImportIcon className="w-4 h-4" />
               <span>Export</span>
-            </button>
-            
+            </Button>
+
             {/* Dropdown Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center space-x-2 bg-gray-200 rounded-md px-4 py-2 hover:bg-gray-300 shadow">
+                <Button variant="outline" className="gap-2">
                   <FilterIcon className="w-4 h-4" />
                   <span>{statusFilter}</span>
-                  <ChevronDownIcon className="w-4 h-4 ml-1" />
-                </button>
+                  <ChevronDownIcon className="w-4 h-4" />
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuItem 
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem
                   onClick={() => setStatusFilter("All")}
-                  className={statusFilter === "All" ? "bg-blue-50" : ""}
+                  className={cn(
+                    "cursor-pointer",
+                    statusFilter === "All" ? "bg-accent" : ""
+                  )}
                 >
                   All
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => setStatusFilter("Suspended")}
-                  className={statusFilter === "Suspended" ? "bg-blue-50" : ""}
+                  className={cn(
+                    "cursor-pointer",
+                    statusFilter === "Suspended" ? "bg-accent" : ""
+                  )}
                 >
                   Suspended
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => setStatusFilter("Unsuspended")}
-                  className={statusFilter === "Unsuspended" ? "bg-blue-50" : ""}
+                  className={cn(
+                    "cursor-pointer",
+                    statusFilter === "Unsuspended" ? "bg-accent" : ""
+                  )}
                 >
                   Unsuspended
                 </DropdownMenuItem>
@@ -231,16 +248,17 @@ const SuspensionHistory = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-card shadow-sm rounded-lg overflow-hidden border border-border">
           <table className="w-full table-auto">
-            <thead className="bg-gray-100">
-              <tr className="text-sm text-gray-600">
+            <thead className="bg-muted/50">
+              <tr className="text-sm text-muted-foreground">
                 <th className="p-4 text-center font-medium">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedItems.length === paginatedSuspensions.length && paginatedSuspensions.length > 0}
-                    onChange={toggleSelectAll}
-                    className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500" 
+                  <Checkbox
+                    checked={
+                      selectedItems.length === paginatedSuspensions.length &&
+                      paginatedSuspensions.length > 0
+                    }
+                    onCheckedChange={toggleSelectAll}
                   />
                 </th>
                 <th className="p-4 text-left font-medium">User Name</th>
@@ -251,36 +269,49 @@ const SuspensionHistory = () => {
                 <th className="p-4 text-left font-medium">Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border">
               {paginatedSuspensions.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-50 border-b">
+                <tr key={record.id} className="hover:bg-accent/5">
                   <td className="p-4 text-center">
-                    <input 
-                      type="checkbox" 
+                    <Checkbox
                       checked={selectedItems.includes(record.id)}
-                      onChange={() => toggleItemSelection(record.id)}
-                      className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500" 
+                      onCheckedChange={() => toggleItemSelection(record.id)}
                     />
                   </td>
                   <td className="p-4 flex items-center space-x-3">
-                  <UserAvatar name={record.name} image={record.image} />
-                    <span className="text-sm font-medium text-gray-700">{record.name}</span>
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      {record.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-medium text-foreground">
+                      {record.name}
+                    </span>
                   </td>
-                  <td className="p-4 text-sm text-gray-600">{record.date}</td>
-                  <td className="p-4 text-sm text-gray-600">{record.email}</td>
-                  <td className="p-4 text-sm text-gray-600">{record.phone}</td>
-                  <td className="p-4 text-sm text-gray-600 truncate max-w-xs">{record.reason}</td>
+                  <td className="p-4 text-sm text-muted-foreground">
+                    {record.date}
+                  </td>
+                  <td className="p-4 text-sm text-muted-foreground">
+                    {record.email}
+                  </td>
+                  <td className="p-4 text-sm text-muted-foreground">
+                    {record.phone}
+                  </td>
+                  <td className="p-4 text-sm text-muted-foreground truncate max-w-xs">
+                    {record.reason}
+                  </td>
                   <td className="p-4 flex items-center space-x-2">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium tracking-wide inline-block ${
+                      className={cn(
+                        "px-3 py-1 rounded-full text-xs font-medium tracking-wide inline-block",
                         record.status === "Suspended"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-green-100 text-green-600"
-                      }`}
+                          ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                          : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                      )}
                     >
                       {record.status}
                     </span>
-                    <ChevronDownIcon className="w-4 h-4 text-gray-400 cursor-pointer" />
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -290,22 +321,27 @@ const SuspensionHistory = () => {
 
         {/* Pagination */}
         <div className="flex justify-between items-center mt-6">
-          <p className="text-sm text-gray-500">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredSuspensions.length)} 
-            {" "}out of {filteredSuspensions.length} records
+          <p className="text-sm text-muted-foreground">
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+            {Math.min(currentPage * itemsPerPage, filteredSuspensions.length)}{" "}
+            out of {filteredSuspensions.length} records
           </p>
           <div className="flex items-center space-x-2">
             {[...Array(totalPages)].map((_, index) => (
-              <button 
-                key={index} 
+              <Button
+                key={index}
                 onClick={() => setCurrentPage(index + 1)}
-                className={`px-3 py-1 text-sm border rounded-md 
-                  ${currentPage === index + 1 
-                    ? 'bg-blue-500 text-white' 
-                    : 'text-gray-700 hover:bg-gray-100'}`}
+                variant={currentPage === index + 1 ? "default" : "outline"}
+                size="sm"
+                className={cn(
+                  "min-w-[32px] h-8",
+                  currentPage === index + 1
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "hover:bg-accent"
+                )}
               >
                 {index + 1}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

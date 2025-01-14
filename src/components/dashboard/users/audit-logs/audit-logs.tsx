@@ -198,47 +198,103 @@ const AuditLogs = () => {
   };
 
   return (
-    <div className=" space-y-6 bg-gray-50 min-h-screen p-6 -m-4 -mt-8">
+    <div className="space-y-6 bg-background min-h-screen p-6 -m-4 -mt-8">
       {/* Header with Search and Actions */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-800">Audit Logs</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Audit Logs</h1>
         <div className="flex items-center space-x-4">
           <div className="relative w-full lg:w-auto">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-4 h-4 text-gray-400" />
+              <SearchIcon className="w-4 h-4 text-muted-foreground" />
             </div>
-            <input
+            <Input
               type="text"
+              id="search-logs"
               placeholder="Search logs..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+              className="w-full pl-10"
             />
           </div>
           <Button
             onClick={handleExport}
             disabled={selectedRows.length === 0}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 disabled:opacity-50"
+            variant="default"
+            className="disabled:opacity-50"
           >
             Export {selectedRows.length > 0 ? `(${selectedRows.length})` : ""}
           </Button>
           <Button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow hover:bg-gray-300"
+            variant="outline"
           >
             Filter
           </Button>
         </div>
       </div>
 
+      {/* Filter Panel */}
+      {isFilterOpen && (
+        <div className="p-4 bg-card border border-border rounded-lg shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Date From
+              </label>
+              <Input
+                type="date"
+                id="date-from-filter"
+                name="dateFrom"
+                value={filters.dateFrom}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Date To
+              </label>
+              <Input
+                type="date"
+                id="date-to-filter"
+                name="dateTo"
+                value={filters.dateTo}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Status
+              </label>
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                <option value="">All</option>
+                <option value="success">Success</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end space-x-2">
+            <Button variant="outline" onClick={clearFilters}>
+              Clear
+            </Button>
+            <Button onClick={applyFilters}>Apply Filters</Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
-      <div className="overflow-x-auto border rounded-lg bg-white shadow">
-        <Table className="w-full">
+      <div className="overflow-x-auto border border-border rounded-lg bg-card shadow">
+        <Table>
           <TableHeader>
-            <TableRow className="bg-gray-100 text-gray-600">
+            <TableRow className="bg-muted/50">
               <TableCell className="w-12 text-center">
                 <Checkbox
                   checked={
@@ -248,54 +304,41 @@ const AuditLogs = () => {
                   onCheckedChange={toggleSelectAll}
                 />
               </TableCell>
-              <TableCell className="py-3 px-4 font-medium">User Name</TableCell>
-              <TableCell className="py-3 px-4 font-medium">
-                Applied Date
-              </TableCell>
-              <TableCell className="py-3 px-4 font-medium">
-                Time Stamp
-              </TableCell>
-              <TableCell className="py-3 px-4 font-medium">
-                Email Address
-              </TableCell>
-              <TableCell className="py-3 px-4 font-medium">
-                Description
-              </TableCell>
-              <TableCell className="py-3 px-4 font-medium">Status</TableCell>
+              <TableCell className="font-medium">Name</TableCell>
+              <TableCell className="font-medium">Date</TableCell>
+              <TableCell className="font-medium">Timestamp</TableCell>
+              <TableCell className="font-medium">Email</TableCell>
+              <TableCell className="font-medium">Phone</TableCell>
+              <TableCell className="font-medium">Description</TableCell>
+              <TableCell className="font-medium">Status</TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.map((item) => (
-              <TableRow key={item.id} className="hover:bg-gray-50">
+              <TableRow
+                key={item.id}
+                className="hover:bg-accent/5 transition-colors"
+              >
                 <TableCell className="text-center">
                   <Checkbox
                     checked={selectedRows.includes(item.id)}
                     onCheckedChange={() => toggleRowSelection(item.id)}
                   />
                 </TableCell>
-                <TableCell className="py-3 px-4 text-gray-800">
-                  {item.name}
-                </TableCell>
-                <TableCell className="py-3 px-4 text-gray-600">
-                  {item.date}
-                </TableCell>
-                <TableCell className="py-3 px-4 text-gray-600">
-                  {item.timestamp}
-                </TableCell>
-                <TableCell className="py-3 px-4 text-gray-600">
-                  {item.email}
-                </TableCell>
-                <TableCell className="py-3 px-4 text-gray-600">
-                  {item.description}
-                </TableCell>
-                <TableCell className="py-3 px-4 text-gray-600">
+                <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell>{item.date}</TableCell>
+                <TableCell>{item.timestamp}</TableCell>
+                <TableCell>{item.email}</TableCell>
+                <TableCell>{item.phone}</TableCell>
+                <TableCell>{item.description}</TableCell>
+                <TableCell>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs ${
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
                       item.status === "Success"
-                        ? "bg-green-100 text-green-800"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                         : item.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                        : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
                     }`}
                   >
                     {item.status}
@@ -304,106 +347,79 @@ const AuditLogs = () => {
               </TableRow>
             ))}
           </TableBody>
-          <TableCaption className="py-2 px-4 text-sm text-gray-500">
-            Showing {paginatedData.length} of {filteredData.length} records
-          </TableCaption>
         </Table>
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center pt-4">
-        <span className="text-sm text-gray-600">
-          Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
-          {Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)} of{" "}
-          {filteredData.length} records
-        </span>
-        <nav>
-          <Pagination className="mt-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(1, prev - 1))
-                  }
-                />
-              </PaginationItem>
-              {/* Add page numbers here if needed */}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </nav>
-      </div>
-
-      {/* Filter Modal */}
-      {isFilterOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-            <h2 className="text-xl font-semibold mb-4">Filters</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Date From
-                </label>
-                <Input
-                  type="date"
-                  name="dateFrom"
-                  value={filters.dateFrom}
-                  onChange={handleFilterChange}
-                  className="mt-1 block w-full"
-                  id={""}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Date To
-                </label>
-                <Input
-                  type="date"
-                  name="dateTo"
-                  value={filters.dateTo}
-                  onChange={handleFilterChange}
-                  className="mt-1 block w-full"
-                  id="dateTo"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={filters.status}
-                  onChange={handleFilterChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Showing{" "}
+          {Math.min(
+            (currentPage - 1) * ITEMS_PER_PAGE + 1,
+            filteredData.length
+          )}{" "}
+          to {Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)} of{" "}
+          {filteredData.length} entries
+        </p>
+        <Pagination>
+          <PaginationContent>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage((prev) => Math.max(prev - 1, 1));
+              }}
+              aria-disabled={currentPage === 1}
+              className={
+                currentPage === 1 ? "pointer-events-none opacity-50" : ""
+              }
+            />
+            {Array.from(
+              { length: Math.ceil(filteredData.length / ITEMS_PER_PAGE) },
+              (_, i) => i + 1
+            ).map((page) => (
+              <PaginationItem
+                key={page}
+                className={`${
+                  currentPage === page
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-accent/50"
+                } cursor-pointer px-3 py-1 rounded-md`}
+              >
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(page);
+                  }}
                 >
-                  <option value="">All Statuses</option>
-                  <option value="Success">Success</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Failed">Failed</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 mt-6">
-              <Button
-                onClick={clearFilters}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
-              >
-                Clear
-              </Button>
-              <Button
-                onClick={applyFilters}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md"
-              >
-                Apply
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+                  {page}
+                </a>
+              </PaginationItem>
+            ))}
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage((prev) =>
+                  Math.min(
+                    prev + 1,
+                    Math.ceil(filteredData.length / ITEMS_PER_PAGE)
+                  )
+                );
+              }}
+              aria-disabled={
+                currentPage === Math.ceil(filteredData.length / ITEMS_PER_PAGE)
+              }
+              className={
+                currentPage === Math.ceil(filteredData.length / ITEMS_PER_PAGE)
+                  ? "pointer-events-none opacity-50"
+                  : ""
+              }
+            />
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 };

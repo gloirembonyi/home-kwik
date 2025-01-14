@@ -1,15 +1,17 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Search, 
-  Download, 
-  Filter, 
-  Eye, 
-  ChevronLeft, 
-  ChevronRight 
-} from 'lucide-react';
-import TransactionDetailsPage from './transaction-detail';
-import { DateRange } from 'react-day-picker';
-import ExportFilterModal from './export-filter-transactions';
+import React, { useState, useMemo } from "react";
+import {
+  Search,
+  Download,
+  Filter,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import TransactionDetailsPage from "./transaction-detail";
+import { DateRange } from "react-day-picker";
+import ExportFilterModal from "./export-filter-transactions";
+import { Button } from "@/components/ui/base/button";
+import { Input } from "@/components/ui/Input";
 
 type Transaction = {
   transactionId: string;
@@ -26,28 +28,43 @@ type ExportData = {
   [key: string]: string; // Generic object with string keys and values
 };
 
-
 // Mock data generator
 const generateMockTransactions = () => {
-  const statuses = ['Successful', 'Pending', 'Failed'];
-  const drivers = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Emily Brown', 'David Lee'];
-  const payees = ['Darlene Robertson', 'Alice Cooper', 'Bob Martin', 'Sarah Connor', 'Tom Hardy'];
+  const statuses = ["Successful", "Pending", "Failed"];
+  const drivers = [
+    "John Doe",
+    "Jane Smith",
+    "Mike Johnson",
+    "Emily Brown",
+    "David Lee",
+  ];
+  const payees = [
+    "Darlene Robertson",
+    "Alice Cooper",
+    "Bob Martin",
+    "Sarah Connor",
+    "Tom Hardy",
+  ];
 
   return Array.from({ length: 60 }, (_, index) => ({
-    id: `TXN-${String(index + 1).padStart(6, '0')}`,
-    transactionId: `TXN-${String(index + 1).padStart(6, '0')}`,
+    id: `TXN-${String(index + 1).padStart(6, "0")}`,
+    transactionId: `TXN-${String(index + 1).padStart(6, "0")}`,
     phoneNumber: `078${Math.floor(10000000 + Math.random() * 90000000)}`,
     payeeName: payees[Math.floor(Math.random() * payees.length)],
     driverName: drivers[Math.floor(Math.random() * drivers.length)],
-    date: new Date(2024, 0, Math.floor(Math.random() * 30) + 1).toLocaleDateString('en-GB'),
+    date: new Date(
+      2024,
+      0,
+      Math.floor(Math.random() * 30) + 1
+    ).toLocaleDateString("en-GB"),
     status: statuses[Math.floor(Math.random() * statuses.length)],
     amount: (Math.random() * 1000).toFixed(2),
-    description: 'Payment for ride services'
+    description: "Payment for ride services",
   }));
 };
 
 const TransactionsPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
@@ -72,8 +89,8 @@ const TransactionsPage: React.FC = () => {
   }, []);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(transaction =>
-      Object.values(transaction).some(value =>
+    return transactions.filter((transaction) =>
+      Object.values(transaction).some((value) =>
         value.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
@@ -88,10 +105,14 @@ const TransactionsPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Successful': return 'bg-green-100 text-green-700';
-      case 'Pending': return 'bg-yellow-100 text-yellow-700';
-      case 'Failed': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case "Successful":
+        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300";
+      case "Failed":
+        return "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300";
+      default:
+        return "bg-muted text-muted-foreground";
     }
   };
 
@@ -103,66 +124,79 @@ const TransactionsPage: React.FC = () => {
     setSelectedTransaction(null);
   };
 
-  
-
   const filterTransactionsByDate = (
     transactions: Transaction[],
     range: DateRange | undefined
   ) => {
     if (!range?.from || !range?.to) return transactions;
-  
+
     return transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.date.split('/').reverse().join('-'));
-      return (
-        transactionDate >= range.from! &&
-        transactionDate <= range.to!
+      const transactionDate = new Date(
+        transaction.date.split("/").reverse().join("-")
       );
+      return transactionDate >= range.from! && transactionDate <= range.to!;
     });
   };
 
-  const handleExport = async (dateRange: DateRange | undefined, timezone: string) => {
-    const filteredTransactions = filterTransactionsByDate(transactions, dateRange);
-  
-    const exportData: ExportData[] = filteredTransactions.map(transaction => ({
-      'Transaction ID': transaction.transactionId,
-      'Phone Number': transaction.phoneNumber,
-      'Payee Name': transaction.payeeName,
-      'Driver Name': transaction.driverName,
-      'Date': convertToTimezone(
-        new Date(transaction.date.split('/').reverse().join('-')),
-        timezone
-      ).toISOString().replace('T', ' ').split('.')[0],
-      'Amount': `£${transaction.amount}`,
-      'Status': transaction.status
-    }));
-  
+  const handleExport = async (
+    dateRange: DateRange | undefined,
+    timezone: string
+  ) => {
+    const filteredTransactions = filterTransactionsByDate(
+      transactions,
+      dateRange
+    );
+
+    const exportData: ExportData[] = filteredTransactions.map(
+      (transaction) => ({
+        "Transaction ID": transaction.transactionId,
+        "Phone Number": transaction.phoneNumber,
+        "Payee Name": transaction.payeeName,
+        "Driver Name": transaction.driverName,
+        Date: convertToTimezone(
+          new Date(transaction.date.split("/").reverse().join("-")),
+          timezone
+        )
+          .toISOString()
+          .replace("T", " ")
+          .split(".")[0],
+        Amount: `£${transaction.amount}`,
+        Status: transaction.status,
+      })
+    );
+
     const headers = Object.keys(exportData[0]);
     const csvContent = [
-      headers.join(','),
-      ...exportData.map(row =>
-        headers.map(header => JSON.stringify(row[header as keyof ExportData] || '')).join(',')
-      )
-    ].join('\n');
-  
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+      headers.join(","),
+      ...exportData.map((row) =>
+        headers
+          .map((header) =>
+            JSON.stringify(row[header as keyof ExportData] || "")
+          )
+          .join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    const filename = `transactions_export_${new Date().toISOString().split('T')[0]}.csv`;
-  
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
+    const filename = `transactions_export_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-  
 
   // If a transaction is selected, show its details
   if (selectedTransaction) {
     return (
-      <TransactionDetailsPage 
-        transaction={selectedTransaction} 
-        onBack={handleBack} 
+      <TransactionDetailsPage
+        transaction={selectedTransaction}
+        onBack={handleBack}
       />
     );
   }
@@ -170,49 +204,49 @@ const TransactionsPage: React.FC = () => {
   // Skeleton Placeholder
   if (isLoading) {
     return (
-      <div className="bg-gray-50 min-h-screen p-6">
-
+      <div className="bg-background min-h-screen p-6">
         <div className="animate-pulse">
           {/* Header Skeleton */}
           <div className="mb-8">
-            <div className="h-10 bg-gray-200 rounded w-1/2 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-10 bg-muted rounded w-1/2 mb-2"></div>
+            <div className="h-4 bg-muted rounded w-1/3"></div>
           </div>
 
           {/* Toolbar Skeleton */}
           <div className="flex justify-between items-center mb-6">
-            <div className="relative w-1/3 h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 w-24 bg-gray-200 rounded"></div>
+            <div className="relative w-1/3 h-10 bg-muted rounded"></div>
+            <div className="h-10 w-24 bg-muted rounded"></div>
           </div>
 
           {/* Table Skeleton */}
-          <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-            <div className="bg-gray-100 border-b h-14"></div>
-            <div className="divide-y divide-gray-200">
-              {Array(10).fill(null).map((_, index) => (
-                <div key={index} className="flex items-center p-6">
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((col) => (
-                    <div 
-                      key={col} 
-                      className="flex-1 h-4 bg-gray-200 rounded mr-4"
-                      style={{ width: `${Math.random() * 50 + 50}%` }}
-                    ></div>
-                  ))}
-                </div>
-              ))}
+          <div className="bg-card shadow-lg rounded-xl overflow-hidden border border-border">
+            <div className="bg-muted/50 border-b h-14"></div>
+            <div className="divide-y divide-border">
+              {Array(10)
+                .fill(null)
+                .map((_, index) => (
+                  <div key={index} className="flex items-center p-6">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((col) => (
+                      <div
+                        key={col}
+                        className="flex-1 h-4 bg-muted rounded mr-4"
+                        style={{ width: `${Math.random() * 50 + 50}%` }}
+                      ></div>
+                    ))}
+                  </div>
+                ))}
             </div>
           </div>
 
           {/* Pagination Skeleton */}
           <div className="flex justify-between items-center mt-6">
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-4 bg-muted rounded w-1/4"></div>
             <div className="flex space-x-2">
-              {Array(5).fill(null).map((_, index) => (
-                <div 
-                  key={index} 
-                  className="w-8 h-8 bg-gray-200 rounded"
-                ></div>
-              ))}
+              {Array(5)
+                .fill(null)
+                .map((_, index) => (
+                  <div key={index} className="w-8 h-8 bg-muted rounded"></div>
+                ))}
             </div>
           </div>
         </div>
@@ -221,114 +255,155 @@ const TransactionsPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6 -m-4 -mt-8">
+    <div className="bg-background min-h-screen p-6 -m-4 -mt-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Transaction History</h1>
-        <p className="text-gray-600">Overview of all payment transactions</p>
+        <h1 className="text-3xl font-extrabold text-foreground mb-2">
+          Transaction History
+        </h1>
+        <p className="text-muted-foreground">
+          Overview of all payment transactions
+        </p>
       </div>
 
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-1/3">
-          <input
+          <Input
             type="text"
+            id="search-transactions"
             placeholder="Search transactions..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10"
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         </div>
         <div className="flex items-center space-x-4">
-          <button 
+          <Button
             onClick={() => setIsExportModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md"
+            variant="default"
+            className="gap-2"
           >
             <Download className="h-5 w-5" />
             Export
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+      <div className="bg-card shadow-lg rounded-xl overflow-hidden border border-border">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 border-b">
+          <thead className="bg-muted/50 border-b border-border">
             <tr>
-              {['Transaction ID', 'Phone Number', 'Payee Name', 'Driver Name', 'Date', 'Amount', 'Status', 'Actions'].map((header) => (
-                <th key={header} className="px-6 py-4 text-left text-gray-600 font-semibold uppercase">
+              {[
+                "Transaction ID",
+                "Phone Number",
+                "Payee Name",
+                "Driver Name",
+                "Date",
+                "Amount",
+                "Status",
+                "Actions",
+              ].map((header) => (
+                <th
+                  key={header}
+                  className="px-6 py-4 text-left text-muted-foreground font-semibold uppercase"
+                >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-border">
             {paginatedTransactions.map((transaction, index) => (
-              <tr
-                key={transaction.transactionId}
-                className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100`}
-              >
-                <td className="px-6 py-4 font-medium text-gray-900">{transaction.transactionId}</td>
-                <td className="px-6 py-4">{transaction.phoneNumber}</td>
-                <td className="px-6 py-4">{transaction.payeeName}</td>
-                <td className="px-6 py-4">{transaction.driverName}</td>
-                <td className="px-6 py-4">{transaction.date}</td>
-                <td className="px-6 py-4 font-semibold">£{transaction.amount}</td>
+              <tr key={transaction.transactionId} className="hover:bg-accent/5">
+                <td className="px-6 py-4 font-medium text-foreground">
+                  {transaction.transactionId}
+                </td>
+                <td className="px-6 py-4 text-muted-foreground">
+                  {transaction.phoneNumber}
+                </td>
+                <td className="px-6 py-4 text-muted-foreground">
+                  {transaction.payeeName}
+                </td>
+                <td className="px-6 py-4 text-muted-foreground">
+                  {transaction.driverName}
+                </td>
+                <td className="px-6 py-4 text-muted-foreground">
+                  {transaction.date}
+                </td>
+                <td className="px-6 py-4 font-semibold text-foreground">
+                  £{transaction.amount}
+                </td>
                 <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(transaction.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      transaction.status
+                    )}`}
+                  >
                     {transaction.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 flex items-center space-x-3">
-                  <button 
-                    className="text-blue-500 hover:text-blue-700"
+                <td className="px-6 py-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleView(transaction)}
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <Eye className="h-5 w-5" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         {paginatedTransactions.length === 0 && (
-          <div className="text-center py-10 text-gray-500">No transactions found.</div>
+          <div className="text-center py-10 text-muted-foreground">
+            No transactions found.
+          </div>
         )}
       </div>
 
       <div className="flex justify-between items-center mt-6">
-        <p className="text-gray-600">
-          Showing {((currentPage - 1) * itemsPerPage) + 1} to{' '}
-          {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} 
+        <p className="text-muted-foreground">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredTransactions.length)}
           of {filteredTransactions.length} records
         </p>
         <div className="flex items-center space-x-2">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50"
+            className="p-2"
           >
-            <ChevronLeft />
-          </button>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
+            <Button
               key={page}
+              variant={page === currentPage ? "default" : "outline"}
+              size="sm"
               onClick={() => setCurrentPage(page)}
-              className={`w-8 h-8 rounded-md ${
-                page === currentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-200'
-              }`}
+              className="min-w-[32px] h-8"
             >
               {page}
-            </button>
+            </Button>
           ))}
-          <button
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              setCurrentPage(Math.min(totalPages, currentPage + 1))
+            }
             disabled={currentPage === totalPages}
-            className="p-2 rounded-md hover:bg-gray-200 disabled:opacity-50"
+            className="p-2"
           >
-            <ChevronRight />
-          </button>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       <ExportFilterModal

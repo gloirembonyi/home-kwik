@@ -6,14 +6,12 @@ import {
   CardTitle,
 } from "@/components/ui/base/card";
 import PaymentMethod from "./PaymentMethod";
-import GradientLineChart from "./GradientLineChart";
 import {
   EyeIcon,
   PencilIcon,
   TrashIcon,
   ArrowUpIcon,
   ArrowDownIcon,
-  WalletIcon,
 } from "lucide-react";
 import {
   Select,
@@ -22,11 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/base/select";
+import GradientLineChart from "./GradientLineChart";
 
 const PaymentDashboard = () => {
   const statsCards = [
     {
-      title: "Total Balance",
+      title: "Total Income",
       value: "682.5K RWF",
       change: "+2.45%",
       trend: "up",
@@ -40,7 +39,7 @@ const PaymentDashboard = () => {
       chart: "wave",
     },
     {
-      title: "Total Saved",
+      title: "Total Savings",
       value: "250.4K RWF",
       change: "+1.10%",
       trend: "up",
@@ -67,10 +66,7 @@ const PaymentDashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statsCards.map((card, index) => (
-          <Card
-            key={index}
-            className="bg-card hover:bg-accent/10 transition-colors"
-          >
+          <Card key={index} className="bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {card.title}
@@ -92,49 +88,55 @@ const PaymentDashboard = () => {
               <div className="text-2xl font-bold">{card.value}</div>
               {card.chart === "wave" && (
                 <div className="mt-4 h-[80px]">
-                  <svg className="w-full h-full" viewBox="0 0 100 40">
-                    <defs>
-                      <linearGradient
-                        id={`gradient-${index}`}
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="var(--chart-1)"
-                          stopOpacity="0.2"
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="var(--chart-1)"
-                          stopOpacity="0"
-                        />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M0 20 Q25 5, 50 25 T100 20"
-                      fill="none"
-                      stroke="var(--chart-1)"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M0 20 Q25 5, 50 25 T100 20 V40 H0 Z"
-                      fill={`url(#gradient-${index})`}
-                    />
+                  <svg
+                    className="w-full h-full text-primary/20"
+                    viewBox="0 0 100 40"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path d="M0 20 Q25 5, 50 25 T100 20" strokeWidth="2" />
                   </svg>
                 </div>
               )}
               {card.chart === "bars" && (
-                <div className="mt-4 h-[80px] flex items-end justify-between gap-2">
-                  {[0.4, 0.6, 0.8, 0.6, 0.4].map((height, i) => (
-                    <div
-                      key={i}
-                      className="w-full bg-primary/20 rounded-t"
-                      style={{ height: `${height * 100}%` }}
+                <div className="mt-4 h-[80px]">
+                  <svg
+                    className="w-full h-full text-primary"
+                    viewBox="0 0 100 40"
+                  >
+                    <rect
+                      x="10"
+                      y="20"
+                      width="15"
+                      height="20"
+                      fill="currentColor"
+                      opacity="0.2"
                     />
-                  ))}
+                    <rect
+                      x="30"
+                      y="10"
+                      width="15"
+                      height="30"
+                      fill="currentColor"
+                      opacity="0.4"
+                    />
+                    <rect
+                      x="50"
+                      y="5"
+                      width="15"
+                      height="35"
+                      fill="currentColor"
+                      opacity="0.6"
+                    />
+                    <rect
+                      x="70"
+                      y="15"
+                      width="15"
+                      height="25"
+                      fill="currentColor"
+                      opacity="0.8"
+                    />
+                  </svg>
                 </div>
               )}
             </CardContent>
@@ -216,18 +218,8 @@ const PaymentDashboard = () => {
               </thead>
               <tbody>
                 {distanceData.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border hover:bg-accent/5"
-                  >
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <WalletIcon className="h-5 w-5 text-primary" />
-                        </div>
-                        <span>{item.distance}</span>
-                      </div>
-                    </td>
+                  <tr key={index} className="border-b border-border">
+                    <td className="py-4">{item.distance}</td>
                     <td className="py-4">{item.priceRange}</td>
                     <td className="py-4">{item.duration} min</td>
                     <td className="py-4">

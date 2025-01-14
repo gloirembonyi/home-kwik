@@ -1,6 +1,16 @@
 import { Filter, Check } from "lucide-react";
 import React, { useState, useMemo } from "react";
-
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/base/button";
+import { Checkbox } from "@/components/ui/base/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/base/select";
+import { cn } from "@/lib/utils";
 
 type RowType = {
   name: string;
@@ -12,7 +22,7 @@ type RowType = {
 };
 
 const TablePage = () => {
-   const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   // Initial data
   const initialData = [
     {
@@ -117,8 +127,6 @@ const TablePage = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  
-
 
   // Styling for status
   const statuses: { [key: string]: string } = {
@@ -159,13 +167,12 @@ const TablePage = () => {
       result.sort((a, b) => {
         const valueA = a[sortColumn as keyof RowType] ?? "";
         const valueB = b[sortColumn as keyof RowType] ?? "";
-    
+
         if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
         if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
         return 0;
       });
     }
-    
 
     return result;
   }, [filters, sortColumn, sortDirection]);
@@ -179,25 +186,29 @@ const TablePage = () => {
   );
 
   // Handler to update filters
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+    name?: string
+  ) => {
+    const value = typeof e === "string" ? e : e.target.value;
+    const filterName = typeof e === "string" ? name! : e.target.name;
+
     setFilters((prev) => ({
       ...prev,
-      [name]: value,
+      [filterName]: value,
     }));
     setCurrentPage(1);
   };
-  
 
   // Sorting handler
   const handleSort = (column: string) => {
-  if (sortColumn === column) {
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-  } else {
-    setSortColumn(column); 
-    setSortDirection("asc");
-  }
-};
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
 
   // Row selection handler
   const handleRowSelect = (rowIndex: number) => {
@@ -215,11 +226,11 @@ const TablePage = () => {
     const currentPageIndexes = paginatedData.map((_, index) =>
       filteredAndSortedData.indexOf(paginatedData[index])
     );
-  
+
     const allSelected = currentPageIndexes.every((index) =>
       selectedRows.includes(index)
     );
-  
+
     if (allSelected) {
       setSelectedRows((prev) =>
         prev.filter((index) => !currentPageIndexes.includes(index))
@@ -270,65 +281,62 @@ const TablePage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen -mt-6 -ml-4 -mr-4">
-        <div className="bg-white p-6">
+        <div className="bg-background p-6">
           {/* Header Skeleton */}
           <div className="mb-6">
-            <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-            <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-8 bg-muted rounded w-1/2 mb-2"></div>
+            <div className="h-5 bg-muted rounded w-1/3"></div>
           </div>
 
           {/* Filtering Section Skeleton */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div className="flex items-center space-x-4 w-full md:w-auto">
-              <div className="h-10 bg-gray-200 rounded-md w-full md:w-80"></div>
+              <div className="h-10 bg-muted rounded-md w-full md:w-80"></div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="h-10 w-24 bg-gray-200 rounded-md"></div>
-              <div className="h-10 w-24 bg-gray-200 rounded-md"></div>
+              <div className="h-10 w-24 bg-muted rounded-md"></div>
+              <div className="h-10 w-24 bg-muted rounded-md"></div>
             </div>
           </div>
 
           {/* Table Skeleton */}
-          <div className="w-full border border-gray-200">
+          <div className="w-full border border-border bg-card rounded-lg">
             {/* Header Skeleton */}
-            <div className="bg-gray-100 grid grid-cols-7 border-b">
+            <div className="bg-muted/50 grid grid-cols-7 border-b border-border">
               {[...Array(7)].map((_, index) => (
-                <div 
-                  key={index} 
-                  className="px-4 py-2 border-r last:border-r-0 h-10 bg-gray-200"
+                <div
+                  key={index}
+                  className="px-4 py-2 border-r last:border-r-0 h-10 bg-muted"
                 ></div>
               ))}
             </div>
 
             {/* Rows Skeleton */}
             {[...Array(8)].map((_, rowIndex) => (
-              <div 
-                key={rowIndex} 
-                className="grid grid-cols-7 border-b last:border-b-0 hover:bg-gray-50"
+              <div
+                key={rowIndex}
+                className="grid grid-cols-7 border-b border-border last:border-b-0 hover:bg-accent/5"
               >
                 {[...Array(7)].map((_, colIndex) => (
-                  <div 
-                    key={colIndex} 
-                    className={`px-4 py-4 border-r last:border-r-0 flex items-center 
-                      ${colIndex === 0 ? 'justify-center' : ''}
-                      ${colIndex === 1 ? 'space-x-2' : ''}`}
-                  >
-                    {/* Checkbox for first column */}
-                    {colIndex === 0 && (
-                      <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                  <div
+                    key={colIndex}
+                    className={cn(
+                      "px-4 py-4 border-r border-border last:border-r-0 flex items-center",
+                      colIndex === 0 ? "justify-center" : "",
+                      colIndex === 1 ? "space-x-2" : ""
                     )}
-
-                    {/* Name column with avatar */}
+                  >
+                    {colIndex === 0 && (
+                      <div className="h-4 w-4 bg-muted rounded"></div>
+                    )}
                     {colIndex === 1 && (
                       <>
-                        <div className="h-8 w-8 rounded-full bg-gray-200"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                        <div className="h-8 w-8 rounded-full bg-muted"></div>
+                        <div className="h-4 bg-muted rounded w-1/2"></div>
                       </>
                     )}
-
-                    {/* Other columns */}
                     {colIndex !== 0 && colIndex !== 1 && (
-                      <div className="h-4 bg-gray-200 rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
                     )}
                   </div>
                 ))}
@@ -338,13 +346,10 @@ const TablePage = () => {
 
           {/* Pagination Skeleton */}
           <div className="flex justify-between items-center mt-4">
-            <div className="h-5 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-5 bg-muted rounded w-1/4"></div>
             <div className="flex space-x-2">
               {[...Array(3)].map((_, index) => (
-                <div 
-                  key={index} 
-                  className="h-8 w-8 bg-gray-200 rounded-md"
-                ></div>
+                <div key={index} className="h-8 w-8 bg-muted rounded-md"></div>
               ))}
             </div>
           </div>
@@ -353,172 +358,183 @@ const TablePage = () => {
     );
   }
 
-
   return (
     <div className="min-h-screen -mt-6 -ml-4 -mr-4">
-      <div className="bg-white p-6">
-      <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-800">All Driver Requests</h1>
-            <p className="text-sm text-gray-500">All Driver requests progress</p>
-          </div>
+      <div className="bg-background p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-foreground">
+            All Driver Requests
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            All Driver requests progress
+          </p>
+        </div>
+
         {/* Filtering Section */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div className="flex items-center space-x-4 w-full md:w-auto">
-            <input
+            <Input
               type="text"
               name="search"
+              id="search-drivers"
               placeholder="Search users..."
               value={filters.search}
               onChange={handleFilterChange}
-              className="border border-gray-300 rounded-md px-4 py-2 w-full md:w-80"
+              className="w-full md:w-80"
             />
           </div>
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 flex items-center px-2 text-gray-700">
-                <Filter className="h-5 w-5" />
-              </div>
-              <select
-                name="status"
-                value={filters.status}
-                onChange={handleFilterChange}
-                className="border border-gray-300 rounded-md items-center pl-7 px-4 py-2"
-              >
-                <option value="All">
-                  <span className="flex items-center">
-                    <Filter className="mr-2 h-4 w-4" /> Filter
-                  </span>
-                </option>
-                <option value="Approved">Approved</option>
-                <option value="In Process">In Process</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            </div>
+            <Select
+              value={filters.status}
+              onValueChange={(value) => handleFilterChange(value, "status")}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="Approved">Approved</SelectItem>
+                <SelectItem value="In Process">In Process</SelectItem>
+                <SelectItem value="Rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
 
             {/* Export Button */}
-            <button
-              onClick={handleExport}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-            >
+            <Button onClick={handleExport} variant="default" className="gap-2">
               Export
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Table */}
-        <table className="w-full text-sm border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              {/* Checkbox Column */}
-              <th className="px-4 py-2 border border-gray-200 w-12">
-                <input
-                  type="checkbox"
-                  checked={paginatedData.length > 0 && 
-                    paginatedData.every((_, index) => 
-                      selectedRows.includes(filteredAndSortedData.indexOf(paginatedData[index]))
-                    )
-                  }
-                  onChange={handleSelectAll}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-              </th>
-              {[
-                { key: "name", label: "User Name" },
-                { key: "appliedDate", label: "Applied Date" },
-                { key: "answeredDate", label: "Answered Date" },
-                { key: "email", label: "Email Address" },
-                { key: "phone", label: "Mobile Number" },
-                { key: "status", label: "Status" },
-              ].map((column) => (
-                <th
-                  key={column.key}
-                  onClick={() => handleSort(column.key)}
-                  className="px-4 py-2 border border-gray-200 cursor-pointer hover:bg-gray-200"
-                >
-                  {column.label}
-                  {sortColumn === column.key && (
-                    <span className="ml-2">
-                      {sortDirection === "asc" ? "▲" : "▼"}
-                    </span>
-                  )}
+        <div className="bg-card rounded-lg shadow-sm overflow-hidden border border-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-muted/50 border-b border-border">
+                {/* Checkbox Column */}
+                <th className="px-4 py-2 w-12">
+                  <Checkbox
+                    checked={
+                      paginatedData.length > 0 &&
+                      paginatedData.every((_, index) =>
+                        selectedRows.includes(
+                          filteredAndSortedData.indexOf(paginatedData[index])
+                        )
+                      )
+                    }
+                    onCheckedChange={handleSelectAll}
+                  />
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((row, index) => {
-              const globalIndex = filteredAndSortedData.indexOf(row);
-              const isSelected = selectedRows.includes(globalIndex);
-              
-              return (
-                <tr
-                  key={index}
-                  className={`hover:bg-gray-50 ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                  } ${isSelected ? "bg-blue-50" : ""}`}
-                >
-                  {/* Checkbox Cell */}
-                  <td className="px-4 py-2 border border-gray-200">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleRowSelect(globalIndex)}
-                      className="form-checkbox h-4 w-4 text-blue-600"
-                    />
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200 flex items-center space-x-2">
-                    <div className="h-8 w-8 rounded-full bg-gray-200"></div>
-                    <span>{row.name}</span>
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {row.appliedDate}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {row.answeredDate}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {row.email}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {row.phone}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        statuses[row.status]
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                {[
+                  { key: "name", label: "User Name" },
+                  { key: "appliedDate", label: "Applied Date" },
+                  { key: "answeredDate", label: "Answered Date" },
+                  { key: "email", label: "Email Address" },
+                  { key: "phone", label: "Mobile Number" },
+                  { key: "status", label: "Status" },
+                ].map((column) => (
+                  <th
+                    key={column.key}
+                    onClick={() => handleSort(column.key)}
+                    className="px-4 py-2 text-left text-muted-foreground font-medium cursor-pointer hover:bg-accent/50"
+                  >
+                    {column.label}
+                    {sortColumn === column.key && (
+                      <span className="ml-2">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {paginatedData.map((row, index) => {
+                const globalIndex = filteredAndSortedData.indexOf(row);
+                const isSelected = selectedRows.includes(globalIndex);
+
+                return (
+                  <tr
+                    key={index}
+                    className={cn(
+                      "hover:bg-accent/5",
+                      isSelected && "bg-accent/10"
+                    )}
+                  >
+                    {/* Checkbox Cell */}
+                    <td className="px-4 py-2">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => handleRowSelect(globalIndex)}
+                      />
+                    </td>
+                    <td className="px-4 py-2 flex items-center space-x-2">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        {row.name.charAt(0)}
+                      </div>
+                      <span className="text-foreground">{row.name}</span>
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {row.appliedDate}
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {row.answeredDate}
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {row.email}
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {row.phone}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={cn(
+                          "px-3 py-1 rounded-full text-xs font-medium",
+                          {
+                            "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300":
+                              row.status === "Approved",
+                            "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300":
+                              row.status === "In Process",
+                            "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300":
+                              row.status === "Rejected",
+                          }
+                        )}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
         {/* Pagination */}
         <div className="flex justify-between items-center mt-4">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted-foreground">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
             {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)}{" "}
             out of {filteredAndSortedData.length} records
           </span>
           <div className="flex space-x-2">
             {[...Array(totalPages)].map((_, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => setCurrentPage(index + 1)}
-                className={`px-3 py-1 border border-gray-300 rounded-md text-sm ${
+                variant={currentPage === index + 1 ? "default" : "outline"}
+                size="sm"
+                className={cn(
+                  "min-w-[32px] h-8",
                   currentPage === index + 1
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-100"
-                }`}
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "hover:bg-accent"
+                )}
               >
                 {index + 1}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

@@ -10,6 +10,7 @@ import {
 import RidesOverviewChart from "./rides/RidesOverview";
 import StatsDashboard from "./rides/charts/StatsDashboard";
 import { cn } from "@/components/lib/utils";
+import axios from "axios";
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
@@ -25,8 +26,32 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [currentPath, setCurrentPath] = useState("/dashboard");
   const [users, setUsers] = useState<any[]>([]);
+
+  const getFrequentUsers = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authorization token is missing.");
+      }
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/all?page=0&limit=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setUsers(response.data.data.users);
+    } catch (error) {
+      console.error("Fetching error:", error);
+    } finally {
+      console.log("Fetching users completed.");
+    }
+  };
 
   return (
     <div className="flex">
@@ -89,7 +114,7 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                             <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold shadow-md">
                               {user.name
                                 .split(" ")
-                                .map((n) => n[0])
+                                .map((n: string) => n[0])
                                 .join("")}
                             </div>
                             <span className="font-medium text-foreground">
@@ -141,36 +166,5 @@ interface StatsCardProps {
 }
 
 // Helper functions
-
-
-  
-   
-  
-  
-      const getFrequentUsers = async() => {
-        try {
-          const token = localStorage.getItem('token'); 
-          if (!token) {
-            throw new Error('Authorization token is missing.');
-          }
-  
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/all?page=0&limit=5`, {
-            headers: {
-              Authorization: `Bearer ${token}`, 
-              'Content-Type': 'application/json',
-            },
-          });
-  
-          setUsers(response.data.data.users); 
-        } catch (error) {
-          console.error('Fetching error:', error);
-        } finally {
-          console.log('Fetching users completed.');
-        }
-
-      };
-  
-     
-
 
 export default OverviewDashboard;

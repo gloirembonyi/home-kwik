@@ -34,15 +34,20 @@ import {
 } from "@/components/ui/base/dropdown-menu";
 import { ScrollArea } from "@/components/ui/base/scroll-area";
 import { Input } from "@/components/ui/Input";
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from "jsonwebtoken";
 import axios from "axios";
-import { any } from "prop-types";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 // import SearchBar from "@/components/search-bar/page";
 
 // Types
 type TimeRange = "day" | "week" | "month" | "quarter";
-
 type NotificationType = "success" | "info" | "warning";
+
+interface CustomJwtPayload extends JwtPayload {
+  userId: string;
+}
 
 interface Notification {
   id: number;
@@ -72,10 +77,6 @@ interface DashboardHeaderProps {
   refreshData: () => void;
 }
 
-
-
-
-
 // Constants
 const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   day: "24h",
@@ -84,10 +85,12 @@ const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   quarter: "3m",
 };
 //get user by decomposing the token
-const token= localStorage.getItem('token')
-const payload = jwt.decode(token, { complete: true });
-
-
+const token = localStorage.getItem("token");
+const payload = token ? jwt.decode(token, { complete: true }) : null;
+const userId =
+  typeof payload?.payload === "object"
+    ? (payload.payload as CustomJwtPayload).userId
+    : "";
 
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
@@ -116,34 +119,107 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   },
 ];
 
+const SearchBar: React.FC<SearchBarProps> = ({
+  searchFocused,
+  setSearchFocused,
+}) => (
+  <div className="relative flex items-center">
+    <Search className="absolute left-3 text-muted-foreground w-4 h-4 pointer-events-none" />
+    <input
+      type="text"
+      placeholder="Search..."
+      onFocus={() => setSearchFocused(true)}
+      onBlur={() => setSearchFocused(false)}
+      className={cn(
+        "h-9 w-[200px] sm:w-[300px] pl-9 pr-3 text-sm rounded-md",
+        "bg-background border border-input",
+        "ring-offset-background placeholder:text-muted-foreground",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "transition-all duration-200"
+      )}
+    />
+  </div>
+);
 
-
+const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
+  <div className="flex items-center gap-4">
+    <div className="flex items-center gap-3 relative group">
+      <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
+      {/* <motion.div
+        whileHover={{ scale: 1.05 }}
+        className="bg-primary text-primary-foreground w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg shadow-sm"
+      >
+        K
+      </motion.div> */}
+      <div className="hidden md:block">
+        <h2 className="text-lg font-semibold text-foreground">Hello John!</h2>
+        <p className="text-sm text-muted-foreground">
+          {new Date().toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+      </div>
+    </div>
+    {/* <div className="flex items-center gap-2 ml-4">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+      >
+        <RefreshCcw size={15} />
+      </Button>
+      <Select defaultValue={timeRange}>
+        <SelectTrigger className="h-8 w-[130px] text-sm bg-background border-input">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="day">Today</SelectItem>
+          <SelectItem value="week">This Week</SelectItem>
+          <SelectItem value="month">This Month</SelectItem>
+          <SelectItem value="quarter">This Quarter</SelectItem>
+        </SelectContent>
+      </Select>
+    </div> */}
+  </div>
+);
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
-}) => (
-  <div className="mb-3 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer group">
-    <div className="flex items-start space-x-4">
-      <div
-        className={`h-10 w-10 rounded-xl bg-gradient-to-br flex items-center justify-center
-        ${notification.type === "success" ? "from-green-500 to-green-600" : ""}
-        ${notification.type === "info" ? "from-blue-500 to-blue-600" : ""}
-        ${
-          notification.type === "warning" ? "from-amber-500 to-amber-600" : ""
-        }`}
-      >
-        <notification.icon className="h-5 w-5 text-white" />
+}) => {
+  const { icon: Icon } = notification;
+  const typeStyles = {
+    success: "text-green-500 bg-green-500/10 dark:bg-green-500/20",
+    info: "text-blue-500 bg-blue-500/10 dark:bg-blue-500/20",
+    warning: "text-yellow-500 bg-yellow-500/10 dark:bg-yellow-500/20",
+  };
+
+  return (
+    <motion.div
+      whileHover={{ x: 2 }}
+      className={cn(
+        "flex items-start gap-3 p-3 rounded-lg",
+        "hover:bg-accent/50 transition-colors cursor-pointer"
+      )}
+    >
+      <div className={cn("p-2 rounded-lg", typeStyles[notification.type])}>
+        <Icon size={16} />
       </div>
-      <div className="flex-1">
-        <p className="font-semibold group-hover:text-primary transition-colors">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-foreground">
           {notification.title}
         </p>
-        <p className="text-sm text-gray-500 mt-1">{notification.message}</p>
-        <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {notification.message}
+        </p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {notification.time}
+        </p>
       </div>
-    </div>
-  </div>
-);
+    </motion.div>
+  );
+};
 
 // Custom Hooks
 const useScrollEffect = () => {
@@ -169,249 +245,219 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [searchFocused, setSearchFocused] = React.useState(false);
   const [notifications] = React.useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [user,setUser] = useState<any>()
-
+  const [user, setUser] = useState<any>();
 
   useEffect(() => {
-
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('token'); 
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error('Authorization token is missing.');
+          throw new Error("Authorization token is missing.");
         }
-    
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/${payload.payload.userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-            'Content-Type': 'application/json',
-          },
-         
-        },);
-        console.log(response.data)
-        setUser(response.data.data.user); 
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(response.data);
+        setUser(response.data.data.user);
       } catch (error) {
-        console.error('Fetching error:', error);
-      } 
+        console.error("Fetching error:", error);
+      }
     };
-    
-    
-  
+
     fetchUser();
-  
+
     // Cleanup function (optional)
     return () => {
       // Clean up if necessary
     };
-  }, [token]); // 
- 
-  console.log(user)
+  }, [token]); //
+
+  console.log(user);
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
-    <div className="flex items-center space-x-6">
-      <div className="flex items-center space-x-3">
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
-          <h1 className="relative text-2xl font-bold">
-            Hello {user?.name.split(' ')[0] as string}
-          </h1>
-          <p className="text-slate-500 text-sm">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-        </div>  
-        
-        {/* <div className="hidden lg:flex items-center space-x-2">
-          <Badge
-            variant="secondary"
-            className="text-xs font-medium animate-fade-in bg-primary/10 text-primary"
-          >
-            {TIME_RANGE_LABELS[timeRange]}
-          </Badge>
-        </div> */}
-      </div>
-    </div>
-  );
-
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ease-in-out
-        ${
-          scrolled
-            ? "bg-white/80 dark:bg-gray-900/90 backdrop-blur-xl shadow-lg"
-            : "bg-white dark:bg-gray-900"
-        }`}
+      className={cn(
+        "sticky top-0 z-30 w-full h-16",
+        "border-b border-border",
+        "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      )}
     >
-      <div className="max-w-screen-2xl mx-auto">
-        <div className="px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <BrandingSection timeRange={timeRange} />
+      <div className="container h-full flex items-center justify-between px-4">
+        <BrandingSection timeRange={timeRange} />
 
-            <div className="flex items-center space-x-6">
-              {/* <SearchBar
-                searchFocused={searchFocused}
-                setSearchFocused={setSearchFocused}
-              /> */}
+        <div className="flex items-center gap-3">
+          <SearchBar
+            searchFocused={searchFocused}
+            setSearchFocused={setSearchFocused}
+          />
 
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search anything..."
-                value={searchQuery}
-                onChange={handleSearch}
-                className="pl-10 pr-4 py-2.5 w-72 rounded-xl border-2 border-slate-100 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
-              />
-            </div>
-
-              {/* <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-48 bg-gray-50 hover:bg-white dark:bg-gray-800/50 dark:hover:bg-gray-800 transition-all duration-200 rounded-xl border-2 border-gray-200 hover:border-primary/30">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-primary" />
-                    <SelectValue placeholder="Select time range" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-2 border-gray-200">
-                  {(Object.keys(TIME_RANGE_LABELS) as TimeRange[]).map(
-                    (range) => (
-                      <SelectItem key={range} value={range}>
-                        Last {TIME_RANGE_LABELS[range]}
-                      </SelectItem>
-                    )
+          {/* Notification Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "relative h-9 w-9 rounded-lg",
+                  "bg-background hover:bg-accent/50",
+                  "border border-border",
+                  "transition-colors duration-200"
+                )}
+              >
+                <Bell className="h-4 w-4 text-muted-foreground" />
+                <span
+                  className={cn(
+                    "absolute -top-1 -right-1",
+                    "h-4 w-4 rounded-full",
+                    "bg-destructive text-[10px] font-medium text-destructive-foreground",
+                    "flex items-center justify-center",
+                    "animate-pulse ring-2 ring-background"
                   )}
-                </SelectContent>
-              </Select> */}
-
-
-              <div className="flex items-center space-x-3">
-                {/* <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={refreshData}
-                  className="relative group rounded-xl border-2 border-gray-200 hover:border-primary/30"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
-                  <RefreshCcw className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />
-                </Button> */}
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleTheme}
-                  className="relative group rounded-xl border-2 border-gray-200 hover:border-primary/30"
+                  3
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className={cn(
+                "w-[380px] p-2",
+                "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+                "border border-border"
+              )}
+            >
+              <div className="flex items-center justify-between px-2 py-2 mb-2">
+                <h3 className="text-sm font-medium text-foreground">
+                  Notifications
+                </h3>
+                <Badge
+                  variant="secondary"
+                  className="text-xs font-normal bg-primary/10 text-primary hover:bg-primary/20"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
-                  {theme === "light" ? (
-                    <Moon className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />
-                  ) : (
-                    <Sun className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />
-                  )}
-                </Button>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="relative group rounded-xl border-2 border-gray-200 hover:border-primary/30"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-200" />
-                      <Bell className="h-4 w-4 text-gray-600 group-hover:text-primary transition-colors" />
-                      <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                        {notifications.length}
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-96 p-4 rounded-xl border-2"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                        Notifications
-                      </h3>
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 text-primary"
-                      >
-                        {notifications.length} new
-                      </Badge>
-                    </div>
-                    <ScrollArea className="h-[400px] pr-4">
-                      {notifications.map((notification) => (
-                        <NotificationItem
-                          key={notification.id}
-                          notification={notification}
-                        />
-                      ))}
-                    </ScrollArea>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative p-4  "
-                    >
-                      {/* <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-10  transition-opacity duration-200" /> */}
-                      <div className="flex items-center space-x-3 ">
-                        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary to-purple-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-white">
-                            {user?.name.split(' ')[0].split('')[0] + user?.name.split(' ')[1].split('')[0]}
-                          </span>
-                        </div>
-                        <div className="hidden md:block text-left">
-                          <p className="text-sm font-medium">{user?.name}</p>
-                          <p className="text-xs text-gray-500">{user?.currentRole?.name}</p>
-                        </div>
-                        <ChevronDown className="h-4 w-4 text-gray-500" />
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-64 p-4 rounded-xl border-2"
-                  >
-                    <div className="mb-4 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-purple-600/10">
-                      <p className="font-medium">{user?.name}</p>
-                      <p className="text-sm text-gray-500">{user?.email}</p>
-                      <Badge className="mt-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0">
-                        {user?.currentRole?.name} Account
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      {[
-                        { icon: User, label: "Profile" },
-                        { icon: Activity, label: "Activity" },
-                        { icon: Map, label: "Ride History" },
-                        { icon: Settings, label: "Settings" },
-                      ].map(({ icon: Icon, label }) => (
-                        <DropdownMenuItem
-                          key={label}
-                          className="rounded-lg cursor-pointer hover:bg-primary/10"
-                        >
-                          <Icon className="w-4 h-4 mr-2" /> {label}
-                        </DropdownMenuItem>
-                      ))}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="rounded-lg cursor-pointer text-red-500 hover:text-red-600 hover:bg-red-50">
-                        <LogOut className="w-4 h-4 mr-2" /> Logout
-                      </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  3 new
+                </Badge>
               </div>
-            </div>
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-1">
+                  {notifications.map((notification) => (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                    />
+                  ))}
+                </div>
+              </ScrollArea>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Theme Toggle Button */}
+          <div className="relative">
+            <ThemeToggle />
           </div>
+
+          {/* Profile Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "relative h-10 flex items-center gap-2 px-3",
+                  "bg-background/50 hover:bg-accent/50",
+                  "border border-border/50",
+                  "rounded-lg transition-colors duration-200"
+                )}
+              >
+                <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-primary to-primary-foreground flex items-center justify-center">
+                  <span className="text-sm font-semibold text-white">
+                    {user?.name.split(" ")[0].split("")[0] +
+                      user?.name.split(" ")[1].split("")[0]}
+                  </span>
+                </div>
+
+                <div className="hidden md:flex flex-col items-start">
+                  <p className="text-sm font-medium leading-none">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {user?.currentRole?.name}
+                  </p>
+                </div>
+
+                <ChevronDown className="h-4 w-4 text-muted-foreground ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className={cn(
+                "w-56 p-2",
+                "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+                "border border-border"
+              )}
+            >
+              <div className="flex items-center gap-2 p-2 mb-2">
+                <div
+                  className={cn(
+                    "h-9 w-9 rounded-lg",
+                    "bg-primary/10 border border-primary/20",
+                    "flex items-center justify-center"
+                  )}
+                >
+                  <span className="text-sm font-medium text-primary">
+                    {user?.name.split(" ")[0].split("")[0]}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user?.email || "admin@kwikride.com"}
+                  </p>
+                </div>
+              </div>
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+                <User size={16} className="text-muted-foreground" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+                <Activity size={16} className="text-muted-foreground" />
+                <span>Activity</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+                <Map size={16} className="text-muted-foreground" />
+                <span>Routes</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+                <TrendingUp size={16} className="text-muted-foreground" />
+                <span>Analytics</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+                <Shield size={16} className="text-muted-foreground" />
+                <span>Security</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+                <Settings size={16} className="text-muted-foreground" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2 rounded-md text-destructive hover:bg-destructive/10">
+                <LogOut size={16} />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

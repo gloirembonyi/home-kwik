@@ -48,6 +48,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/base/dialog";
 import { TooltipProps } from "recharts";
+import { cn } from "@/lib/utils";
 
 // interface
 
@@ -209,12 +210,12 @@ const VehicleManagement = () => {
     if (payload && payload.length > 0) {
       const data = payload[0].payload as TooltipPayload;
       return (
-        <div className="bg-white p-4 shadow-lg rounded-lg border">
+        <div className="bg-card p-4 shadow-lg rounded-lg border border-border">
           <div className="flex items-center space-x-2">
-            <span className="font-bold">{data.rating}</span>
+            <span className="font-bold text-foreground">{data.rating}</span>
             <Badge variant="secondary">{data.count} Ratings</Badge>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Percentage: {data.percentage}%
           </p>
         </div>
@@ -224,7 +225,7 @@ const VehicleManagement = () => {
   };
 
   return (
-    <div className=" space-y-6 bg-gray-50">
+    <div className="space-y-6 bg-background">
       {/* Statistics Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {mockData.stats.map((stat) => (
@@ -233,15 +234,19 @@ const VehicleManagement = () => {
             className="flex items-center p-4 space-x-4 hover:shadow-md transition-shadow"
           >
             <div
-              className={`w-12 h-12 flex items-center  justify-center rounded-full ${stat.bgColor}`}
+              className={cn(
+                "w-12 h-12 flex items-center justify-center rounded-full",
+                stat.bgColor,
+                "dark:bg-opacity-10"
+              )}
             >
               {stat.icon}
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">
+              <h3 className="text-sm font-medium text-muted-foreground">
                 {stat.label}
               </h3>
-              <p className={`text-xl font-bold ${stat.textColor}`}>
+              <p className={cn("text-xl font-bold", stat.textColor)}>
                 {stat.value}
               </p>
             </div>
@@ -250,14 +255,14 @@ const VehicleManagement = () => {
       </div>
 
       {/* Rating Distribution Chart*/}
-      <Card className="bg-gradient-to-r from-blue-50 to-blue-50 hover:shadow-lg transition-shadow">
+      <Card className="bg-card hover:shadow-lg transition-shadow border border-border">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="text-2xl font-extrabold text-blue-900 tracking-tight">
+              <CardTitle className="text-2xl font-extrabold text-foreground tracking-tight">
                 Rating Distribution
               </CardTitle>
-              <CardDescription className="text-blue-700 mt-2 font-medium">
+              <CardDescription className="text-muted-foreground mt-2 font-medium">
                 Comprehensive breakdown of driver ratings
               </CardDescription>
             </div>
@@ -265,7 +270,7 @@ const VehicleManagement = () => {
               {filterRating && (
                 <Badge
                   variant="outline"
-                  className="cursor-pointer hover:bg-gray-100"
+                  className="cursor-pointer hover:bg-accent"
                   onClick={() => setFilterRating(null)}
                 >
                   {filterRating}★
@@ -278,8 +283,17 @@ const VehicleManagement = () => {
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
             <ComposedChart data={mockData.ratingDistribution}>
-              <XAxis dataKey="rating" tickLine={false} axisLine={false} />
-              <YAxis tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="rating"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "var(--foreground)" }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "var(--foreground)" }}
+              />
               <Tooltip
                 content={renderRatingDistributionTooltip}
                 cursor={{ fill: "transparent" }}
@@ -305,21 +319,21 @@ const VehicleManagement = () => {
               </Bar>
             </ComposedChart>
           </ResponsiveContainer>
-          <div className="text-center text-sm text-gray-500 mt-2">
+          <div className="text-center text-sm text-muted-foreground mt-2">
             Click on a bar to filter drivers by rating
           </div>
         </CardContent>
       </Card>
 
       {/* Top Rated Drivers Section */}
-      <Card className="shadow-2xl border-2 border-blue-50 hover:border-blue-50 transition-all duration-300">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-50 p-6">
+      <Card className="shadow-lg border border-border hover:shadow-xl transition-all duration-300">
+        <CardHeader className="bg-card/50 p-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
             <div>
-              <CardTitle className="text-2xl font-extrabold text-blue-900 tracking-tight">
+              <CardTitle className="text-2xl font-extrabold text-foreground tracking-tight">
                 Top Rated Drivers
               </CardTitle>
-              <CardDescription className="text-blue-700 mt-2 font-medium">
+              <CardDescription className="text-muted-foreground mt-2 font-medium">
                 Driver who consistently deliver outstanding service
               </CardDescription>
             </div>
@@ -329,17 +343,14 @@ const VehicleManagement = () => {
                   placeholder="Search drivers by name or route..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-full shadow-md focus:ring-2 focus:ring-blue-300 transition-all duration-300 group-hover:shadow-lg"
+                  className="pl-10 w-full"
                   id="driver-search"
                 />
-                <Search className="absolute -left-2 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5 group-hover:text-blue-600 transition" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full md:w-auto bg-white shadow-md hover:bg-blue-50 hover:shadow-lg transition-all duration-300 group"
-                  >
+                  <Button variant="outline" className="w-full md:w-auto group">
                     <Filter className="mr-2 w-4 h-4 group-hover:rotate-6 transition" />
                     Filter
                     {filterRating && (
@@ -349,18 +360,17 @@ const VehicleManagement = () => {
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white shadow-xl rounded-xl border-2 border-blue-100">
-                  <DropdownMenuLabel className="font-bold text-blue-900">
-                    Filter by Rating
-                  </DropdownMenuLabel>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Filter by Rating</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {[5, 4, 3, 2, 1].map((rating) => (
                     <DropdownMenuItem
                       key={rating}
                       onClick={() => setFilterRating(rating)}
-                      className={`cursor-pointer hover:bg-blue-50 transition 
-                  ${filterRating === rating ? "bg-blue-100 text-blue-900" : ""}
-                `}
+                      className={cn(
+                        "cursor-pointer",
+                        filterRating === rating && "bg-accent"
+                      )}
                     >
                       {rating}★ and above
                     </DropdownMenuItem>
@@ -368,7 +378,7 @@ const VehicleManagement = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => setFilterRating(null)}
-                    className="hover:bg-red-50 hover:text-red-700 transition"
+                    className="text-destructive hover:text-destructive"
                   >
                     Clear Filter
                   </DropdownMenuItem>
@@ -380,7 +390,7 @@ const VehicleManagement = () => {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-blue-50 sticky top-0 z-10">
+              <thead className="bg-muted/50 sticky top-0 z-10">
                 <tr>
                   {[
                     { key: "name", label: "Driver" },
@@ -391,61 +401,63 @@ const VehicleManagement = () => {
                   ].map((header) => (
                     <th
                       key={header.label}
-                      className={`py-4 px-6 text-blue-800 font-bold cursor-pointer 
-                  ${header.key ? "hover:bg-blue-100 transition group" : ""}`}
+                      className={cn(
+                        "py-4 px-6 text-muted-foreground font-bold",
+                        header.key &&
+                          "cursor-pointer hover:bg-accent/50 transition group"
+                      )}
                       onClick={() => header.key && handleSort(header.key)}
                     >
                       <div className="flex items-center">
                         {header.label}
                         {header.key && (
-                          <ArrowUpDown className="ml-2 w-4 h-4 opacity-0 group-hover:opacity-100 transition text-blue-500" />
+                          <ArrowUpDown className="ml-2 w-4 h-4 opacity-0 group-hover:opacity-100 transition" />
                         )}
                       </div>
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-blue-100">
+              <tbody className="divide-y divide-border">
                 {sortedUsers.map((user) => (
                   <tr
                     key={user.id}
-                    className={`
-                hover:bg-blue-50 transition duration-200 
-                ${selectedDriver === user.id ? "bg-blue-100 shadow-inner" : ""}
-                group cursor-pointer
-              `}
+                    className={cn(
+                      "hover:bg-accent/5 transition duration-200 group cursor-pointer",
+                      selectedDriver === user.id && "bg-accent/10"
+                    )}
                     onClick={() => setSelectedDriver(user.id)}
                   >
                     <td className="py-4 px-6 flex items-center space-x-4">
                       <div className="relative">
                         <img
                           src={user.avatar}
-                          // alt={`${user.name}'s Avatar`}
-                          className="w-12 h-12 rounded-full border-2 border-blue-100 shadow-sm"
+                          alt={`${user.name}'s Avatar`}
+                          className="w-12 h-12 rounded-full border-2 border-border"
                         />
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
                       </div>
                       <div>
-                        <span className="text-sm font-semibold text-gray-800">
+                        <span className="text-sm font-semibold text-foreground">
                           {user.name}
                         </span>
-                        <div className="text-xs text-gray-500 flex items-center">
+                        <div className="text-xs text-muted-foreground flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
                           Joined {new Date(user.joinDate).toLocaleDateString()}
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-sm text-gray-700">
+                    <td className="py-4 px-6 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-2">
                         <span className="font-medium">{user.startRoute}</span>
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4" />
                         <span className="font-medium">{user.endRoute}</span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center">
                         <Star className="w-5 h-5 text-yellow-400 mr-1" />
-                        <span className="text-sm font-bold text-gray-800">
+                        <span className="text-sm font-bold text-foreground">
                           {user.rating}
                         </span>
                       </div>
@@ -471,9 +483,9 @@ const VehicleManagement = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="hover:bg-gray-100"
+                              className="hover:bg-accent"
                             >
-                              <MoreHorizontal className="w-5 h-5 text-gray-600" />
+                              <MoreHorizontal className="w-5 h-5" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
@@ -501,26 +513,30 @@ const VehicleManagement = () => {
                                 className="w-20 h-20 rounded-full"
                               />
                               <div>
-                                <p className="text-xl font-bold">{user.name}</p>
-                                <p className="text-gray-500">
+                                <p className="text-xl font-bold text-foreground">
+                                  {user.name}
+                                </p>
+                                <p className="text-muted-foreground">
                                   Total Trips: {user.trips}
                                 </p>
                               </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-muted-foreground">
                                   Route Expertise
                                 </p>
-                                <p>
+                                <p className="text-foreground">
                                   {user.startRoute} → {user.endRoute}
                                 </p>
                               </div>
                               <div>
-                                <p className="text-sm text-gray-600">Rating</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Rating
+                                </p>
                                 <div className="flex items-center">
                                   <Star className="w-5 h-5 text-yellow-400 mr-1" />
-                                  <span className="font-bold">
+                                  <span className="font-bold text-foreground">
                                     {user.rating}
                                   </span>
                                 </div>
@@ -535,11 +551,11 @@ const VehicleManagement = () => {
               </tbody>
             </table>
             {sortedUsers.length === 0 && (
-              <div className="text-center py-12 bg-blue-50">
-                <div className="text-blue-600 font-semibold text-lg">
+              <div className="text-center py-12 bg-muted/50">
+                <div className="text-foreground font-semibold text-lg">
                   No drivers match your search or filter criteria
                 </div>
-                <p className="text-blue-400 mt-2">
+                <p className="text-muted-foreground mt-2">
                   Try adjusting your search or filters
                 </p>
               </div>

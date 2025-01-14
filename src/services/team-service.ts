@@ -30,4 +30,4 @@ export const teamService = {
     const response = await apiClient.delete(`/team/members/${memberId}`);
     return response.data;
   },
-}; 
+};

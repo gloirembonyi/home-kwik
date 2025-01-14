@@ -1,36 +1,33 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
-} from 'recharts';
-import { 
-  BarChart, 
-  Bar, 
-  Cell 
-} from 'recharts';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/base/card';
-import { 
-  CreditCard, 
-  TrendingUp, 
-  Users, 
-  Star, 
-  Calendar, 
-  ArrowUpRight 
-} from 'lucide-react';
-import axios from 'axios';
+"use client";
 
-
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  LineChart as RechartsLineChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { BarChart, Bar, Cell } from "recharts";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/base/card";
+import {
+  CreditCard,
+  TrendingUp,
+  Users,
+  Star,
+  Calendar,
+  ArrowUpRight,
+} from "lucide-react";
+import axios from "axios";
+import { LineChart as CustomLineChart } from "./charts/Line";
+import { ProfitBarChart } from "./charts/bar";
 
 // data generation function
 const generateChartData = (period: string) => {
@@ -45,9 +42,9 @@ const generateChartData = (period: string) => {
         { name: "9pm", rides: 18, revenue: 12.6 },
       ],
       barData: [
-        { name: 'Rides', value: 0 },
-        { name: 'Profit', value: 0 }
-      ]
+        { name: "Rides", value: 0 },
+        { name: "Profit", value: 0 },
+      ],
     },
     "This Week": {
       lineData: [
@@ -60,44 +57,44 @@ const generateChartData = (period: string) => {
         { name: "Sun", rides: 32, revenue: 22.4 },
       ],
       barData: [
-        { name: 'Gross', value: 0 },
-        { name: 'Net', value: 0 }
-      ]
+        { name: "Gross", value: 0 },
+        { name: "Net", value: 0 },
+      ],
     },
     "This Month": {
       lineData: [
-        { name: 'Jan', rides: 0, revenue: 0 },
-        { name: 'Feb', rides: 0, revenue: 0 },
-        { name: 'Mar', rides: 0, revenue: 0 },
-        { name: 'Apr', rides: 0, revenue: 0 },
-        { name: 'May', rides: 0, revenue: 0 },
-        { name: 'Jun', rides: 0, revenue: 0 },
-        { name: 'Jul', rides: 0, revenue: 0 },
-        { name: 'Aug', rides: 0, revenue: 0 },
-        { name: 'Sep', rides: 0, revenue: 0 },
-        { name: 'Oct', rides: 0, revenue: 0 },
-        { name: 'Nov', rides: 0, revenue: 0 },
-        { name: 'Dec', rides: 0, revenue: 0 }
+        { name: "Jan", rides: 0, revenue: 0 },
+        { name: "Feb", rides: 0, revenue: 0 },
+        { name: "Mar", rides: 0, revenue: 0 },
+        { name: "Apr", rides: 0, revenue: 0 },
+        { name: "May", rides: 0, revenue: 0 },
+        { name: "Jun", rides: 0, revenue: 0 },
+        { name: "Jul", rides: 0, revenue: 0 },
+        { name: "Aug", rides: 0, revenue: 0 },
+        { name: "Sep", rides: 0, revenue: 0 },
+        { name: "Oct", rides: 0, revenue: 0 },
+        { name: "Nov", rides: 0, revenue: 0 },
+        { name: "Dec", rides: 0, revenue: 0 },
       ],
       barData: [
-        { name: 'Rides', value: 0 },
-        { name: 'Profit', value: 0 }
-      ]
+        { name: "Rides", value: 0 },
+        { name: "Profit", value: 0 },
+      ],
     },
     "This Year": {
       lineData: [
-        { name: 'Q1', rides: 0, revenue: 0 },
-        { name: 'Q2', rides: 0, revenue: 0 },
-        { name: 'Q3', rides: 0, revenue: 0 },
-        { name: 'Q4', rides: 0, revenue: 0 },
-        { name: 'Q5', rides: 0, revenue: 0 },
-        { name: 'Q6', rides: 0, revenue: 0 }
+        { name: "Q1", rides: 0, revenue: 0 },
+        { name: "Q2", rides: 0, revenue: 0 },
+        { name: "Q3", rides: 0, revenue: 0 },
+        { name: "Q4", rides: 0, revenue: 0 },
+        { name: "Q5", rides: 0, revenue: 0 },
+        { name: "Q6", rides: 0, revenue: 0 },
       ],
       barData: [
-        { name: 'Annual Rides', value: 0 },
-        { name: 'Annual Profit', value: 0 }
-      ]
-    }
+        { name: "Annual Rides", value: 0 },
+        { name: "Annual Profit", value: 0 },
+      ],
+    },
   };
 
   return baseData[period as keyof typeof baseData] || baseData["This Month"];
@@ -152,26 +149,29 @@ const StatCard = ({
 export const AnalyticsPageRide = () => {
   const [timePeriod, setTimePeriod] = useState<string>("This Month");
 
-const [rides, setRides] = useState<any[]>();
-const [loading,setLoading]= useState(false)
+  const [rides, setRides] = useState<any[]>();
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchRides = async () => {
       try {
-        const token = localStorage.getItem('token'); 
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error('Authorization token is missing.');
+          throw new Error("Authorization token is missing.");
         }
 
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/analytics/ride/rides`, {
-          headers: {
-            Authorization: `Bearer ${token}`, 
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/analytics/ride/rides`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        setRides(response.data.data); 
+        setRides(response.data.data);
       } catch (error) {
-        console.error('Fetching error:', error);
+        console.error("Fetching error:", error);
       } finally {
         setLoading(false);
       }
@@ -183,9 +183,9 @@ const [loading,setLoading]= useState(false)
     return () => {
       // Clean up if necessary
     };
-  }, []); // 
-console.log(rides)
-  
+  }, []); //
+  console.log(rides);
+
   // Memoized chart data to prevent unnecessary re-renders
   const { lineData, barData } = useMemo(
     () => generateChartData(timePeriod),
@@ -200,25 +200,25 @@ console.log(rides)
           icon={CreditCard}
           title="Total Revenue"
           value="0 RWF"
-          trend={{ percentage: 0, direction: 'up' }}
+          trend={{ percentage: 0, direction: "up" }}
         />
         <StatCard
           icon={TrendingUp}
           title="Total Rides"
-          value={rides?.length as string}
-          trend={{ percentage: 0, direction: 'up' }}
+          value={(rides?.length ?? 0).toString()}
+          trend={{ percentage: 0, direction: "up" }}
         />
         <StatCard
           icon={Users}
           title="Active Drivers"
           value="0"
-          trend={{ percentage: 0, direction: 'up' }}
+          trend={{ percentage: 0, direction: "up" }}
         />
         <StatCard
           icon={Star}
           title="Avg. Satisfaction"
           value="0"
-          trend={{ percentage: 0, direction: 'up' }}
+          trend={{ percentage: 0, direction: "up" }}
         />
       </div>
 
@@ -247,51 +247,9 @@ console.log(rides)
             </select>
           </div>
         </CardHeader>
-        {/* <CardContent className="p-6 pt-4">
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={lineData}>
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="#f0f0f0" 
-                className="opacity-50" 
-              />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false} 
-                className="text-sm" 
-              />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false} 
-                className="text-sm" 
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
-                  borderRadius: '10px', 
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
-                }} 
-              />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="rides" 
-                stroke="#3B82F6" 
-                strokeWidth={3} 
-                activeDot={{ r: 8 }} 
-              />
-              <Line 
-                type="monotone" 
-                dataKey="revenue" 
-                stroke="#10B981" 
-                strokeWidth={3} 
-                activeDot={{ r: 8 }} 
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent> */}
-        <LineChart timePeriod={"This Month"} />
+        <CardContent className="p-6 pt-4">
+          <CustomLineChart timePeriod={timePeriod} />
+        </CardContent>
       </Card>
 
       {/* Bar Chart Section */}
@@ -308,43 +266,9 @@ console.log(rides)
             +25.3% Growth
           </div>
         </CardHeader>
-        {/* <CardContent className="p-6 pt-4">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barData}>
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="#f0f0f0" 
-                className="opacity-50" 
-              />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false} 
-              />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false} 
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
-                  borderRadius: '10px', 
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
-                }} 
-              />
-              <Bar dataKey="value" radius={[10, 10, 0, 0]}>
-                {barData.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={index === 0 ? '#3B82F6' : '#10B981'}
-                    className="hover:opacity-80 transition-opacity"
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent> */}
-        <ProfitBarChart timePeriod={"This Month"} />
+        <CardContent className="p-6 pt-4">
+          <ProfitBarChart timePeriod={"This Month"} />
+        </CardContent>
       </Card>
     </div>
   );
