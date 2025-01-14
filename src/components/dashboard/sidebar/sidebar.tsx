@@ -241,7 +241,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed && item.subItems && (
           <motion.span
             animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-            className="ml-auto text-muted-foreground"
+            className="ml-auto text-muted-foreground group-hover:text-accent-foreground"
           >
             <ChevronDown size={16} />
           </motion.span>
@@ -347,8 +347,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={cn(
                       "flex items-center rounded-lg cursor-pointer transition-all duration-200 ease-in-out px-4 py-2 gap-3 text-sm",
                       currentPath === subItem.path
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
                     )}
                   >
                     {subItem.label}

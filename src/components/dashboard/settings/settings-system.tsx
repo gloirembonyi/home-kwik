@@ -437,7 +437,7 @@ const SettingSystem = () => {
   const renderGeneral = () => (
     <div className="space-y-6">
       <Card className="border border-border">
-        <div className="relative h-32 bg-gradient-to-r from-primary to-primary/60">
+        <div className="relative h-32 bg-gradient-to-r from-primary/20 to-primary/40">
           <div className="absolute -bottom-12 left-6">
             <Avatar className="h-24 w-24 ring-4 ring-background">
               <AvatarImage src={settings.profileImage} alt="Profile" />
