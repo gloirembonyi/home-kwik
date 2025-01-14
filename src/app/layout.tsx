@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TooltipProvider } from "@/components/ui/base/tooltip";
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
@@ -77,6 +78,7 @@ export default function RootLayout({
           </AuthProvider>
           <Toaster />
           <Analytics />
+          <SpeedInsights />
         </AnalyticsProvider>
       </body>
     </html>

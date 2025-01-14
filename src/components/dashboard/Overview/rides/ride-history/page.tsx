@@ -393,10 +393,7 @@ const RideHistory = () => {
                     </PaginationItem>
 
                     {/* Generate page numbers */}
-          
-          
-          
-          
+
                     {Array.from(
                       {
                         length: Math.min(
