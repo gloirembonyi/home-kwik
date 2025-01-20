@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/base/card";
-import RidesOverviewChart from "./rides/RidesOverview";
-import StatsDashboard from "./rides/charts/StatsDashboard";
+import RidesOverviewChart from "./chart/RidesOverview";
+import StatsDashboard from "./card/StatsDashboard";
 import { cn } from "@/components/lib/utils";
 import axios from "axios";
 

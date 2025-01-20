@@ -7,7 +7,8 @@ type TimeRange = "day" | "week" | "month" | "quarter";
 
 // Dynamically import components with ssr: false
 const OverviewDashboard = dynamic(
-  () => import("@/components/dashboard/Overview/OverviewDashboard"),
+  () =>
+    import("@/components/dashboard/Overview/home-dashboard/OverviewDashboard"),
   { ssr: false }
 );
 const Sidebar = dynamic(
@@ -20,12 +21,9 @@ const DashboardHeader = dynamic(
   () => import("@/components/dashboard/DashboardHeader/Header"),
   { ssr: false }
 );
-const Revenue = dynamic(
-  () => import("@/components/dashboard/Revenue/Revenue"),
-  {
-    ssr: false,
-  }
-);
+const Revenue = dynamic(() => import("@/components/dashboard/Revenue/page"), {
+  ssr: false,
+});
 const VehicleManagement = dynamic(
   () => import("@/components/dashboard/vehicles/vehicles"),
   { ssr: false }

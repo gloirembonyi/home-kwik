@@ -198,25 +198,24 @@ const RideHistory = () => {
     }
   };
 
-  // Status color mapping
+  // Update status color mapping for dark mode
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Successful":
-        return "bg-green-100 text-green-800";
+        return "bg-green-500/20 text-green-500";
       case "Cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-500/20 text-red-500";
       case "Pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-500/20 text-yellow-500";
       case "In Progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-500/20 text-blue-500";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-muted-foreground";
     }
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      {/* Ride Details Modal */}
+    <div className="min-h-screen bg-background">
       {selectedRide && (
         <RideDetails
           ride={selectedRide}
@@ -224,7 +223,6 @@ const RideHistory = () => {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
       {rideToDelete && (
         <DeleteConfirmationModal
           ride={rideToDelete}
@@ -233,11 +231,11 @@ const RideHistory = () => {
         />
       )}
 
-      <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
+      <div className="max-w-7xl mx-auto bg-background border border-border shadow-lg rounded-xl overflow-hidden">
         {/* Header Section */}
-        <div className="bg-white border-b border-gray-200 p-6">
+        <div className="border-b border-border p-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-800">Ride History</h1>
+            <h1 className="text-3xl font-bold text-foreground">Ride History</h1>
             <div className="flex items-center space-x-4">
               {/* Search Input */}
               <div className="relative flex-grow">
@@ -246,10 +244,10 @@ const RideHistory = () => {
                   placeholder="Search ride..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-1 border-2 border-gray-300 rounded-lg 
-                  focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full pl-12 pr-4 py-1 bg-background border-2 border-border rounded-lg 
+                  focus:ring-2 focus:ring-ring focus:outline-none text-foreground placeholder:text-muted-foreground"
                 />
-                <Search className="absolute left-4 top-2 text-gray-400" />
+                <Search className="absolute left-4 top-2 text-muted-foreground" />
               </div>
 
               {/* Filter Dropdown */}
@@ -329,13 +327,13 @@ const RideHistory = () => {
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => setSelectedRide(ride)}
-                        className="text-blue-500 hover:text-blue-700 transition-colors"
+                        className="text-blue-500 hover:text-blue-400 transition-colors"
                       >
                         <Eye size={18} />
                       </button>
                       <button
                         onClick={() => setRideToDelete(ride)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
+                        className="text-red-500 hover:text-red-400 transition-colors"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -349,7 +347,9 @@ const RideHistory = () => {
           {/* Pagination and Page Size Selection */}
           <div className="mt-6 flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Rows per page:</span>
+              <span className="text-sm text-muted-foreground">
+                Rows per page:
+              </span>
               <Select
                 value={ridesPerPage.toString()}
                 onValueChange={(value) => setRidesPerPage(Number(value))}
@@ -368,7 +368,7 @@ const RideHistory = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 {`${(currentPage - 1) * ridesPerPage + 1}-${Math.min(
                   currentPage * ridesPerPage,
                   filteredRides.length
@@ -391,8 +391,6 @@ const RideHistory = () => {
                         }
                       />
                     </PaginationItem>
-
-                    {/* Generate page numbers */}
 
                     {Array.from(
                       {

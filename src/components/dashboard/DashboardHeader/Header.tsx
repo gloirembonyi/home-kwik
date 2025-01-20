@@ -15,6 +15,7 @@ import {
   Shield,
   Sun,
   Moon,
+  Link,
 } from "lucide-react";
 import { Badge } from "@/components/ui/base/badge";
 import { Button } from "@/components/ui/base/button";
@@ -39,6 +40,8 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useRouter } from "next/navigation";
+import type { Route } from "next";
 // import SearchBar from "@/components/search-bar/page";
 
 // Types
@@ -240,6 +243,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   setTimeRange,
   refreshData,
 }) => {
+  const router = useRouter();
   const scrolled = useScrollEffect();
   const [theme, setTheme] = React.useState<"light" | "dark">("light");
   const [searchFocused, setSearchFocused] = React.useState(false);
@@ -284,6 +288,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  // Add handleNavigation function
+  const handleNavigation = (path: Route) => {
+    router.push(path);
   };
 
   return (
@@ -448,7 +457,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <span>Security</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="my-2" />
-              <DropdownMenuItem className="flex items-center gap-2 rounded-md hover:bg-accent/50">
+              <DropdownMenuItem
+                className="flex items-center gap-2 rounded-md hover:bg-accent/50"
+                onClick={() => router.push("/dashboard/settings")}
+              >
                 <Settings size={16} className="text-muted-foreground" />
                 <span>Settings</span>
               </DropdownMenuItem>

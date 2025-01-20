@@ -1,255 +1,182 @@
 import React from "react";
+import { Card, CardContent } from "@/components/ui/base/card";
+import { Input } from "@/components/ui/Input";
+import { Bell } from "lucide-react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/base/card";
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/base/avatar";
 import PaymentMethod from "./PaymentMethod";
 import GradientLineChart from "./GradientLineChart";
-import {
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-  WalletIcon,
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/base/select";
+import TopEarningUsers from "./TopEarningUsers";
+import PriceDistanceForm from "./PriceDistanceForm";
+
+interface StatsCardProps {
+  description: string;
+  value: string;
+  icon: React.ReactNode;
+  chart?: React.ReactNode;
+}
+
+const StatsCard: React.FC<StatsCardProps> = ({
+  description,
+  value,
+  icon,
+  chart,
+}) => {
+  return (
+    <div className="flex flex-col items-start bg-background p-5 rounded-2xl shadow-sm w-full border border-border/50">
+      <div className="flex items-center w-full justify-between mb-4">
+        <p className="text-sm text-muted-foreground font-medium">
+          {description}
+        </p>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/5">
+          {icon}
+        </div>
+      </div>
+      <div className="flex items-center justify-between w-full">
+        <h3 className="text-2xl font-bold text-foreground">{value}</h3>
+        {chart && <div className="w-24 h-10">{chart}</div>}
+      </div>
+    </div>
+  );
+};
 
 const PaymentDashboard = () => {
-  const statsCards = [
-    {
-      title: "Total Balance",
-      value: "682.5K RWF",
-      change: "+2.45%",
-      trend: "up",
-      chart: "wave",
-    },
-    {
-      title: "Total Spending",
-      value: "432.1K RWF",
-      change: "-1.35%",
-      trend: "down",
-      chart: "wave",
-    },
-    {
-      title: "Total Saved",
-      value: "250.4K RWF",
-      change: "+1.10%",
-      trend: "up",
-      chart: "bars",
-    },
-    {
-      title: "Total Investment",
-      value: "145.2K RWF",
-      change: "+3.20%",
-      trend: "up",
-      chart: "bars",
-    },
-  ];
-
-  const distanceData = [
-    { distance: "1 KM", priceRange: "2000 RWF - 5000 RWF", duration: "5.0" },
-    { distance: "5 KM", priceRange: "2000 RWF - 5000 RWF", duration: "3.0" },
-    { distance: "10 KM", priceRange: "2000 RWF - 5000 RWF", duration: "1.0" },
-    { distance: "15 KM", priceRange: "2000 RWF - 5000 RWF", duration: "5.0" },
-  ];
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsCards.map((card, index) => (
-          <Card
-            key={index}
-            className="bg-card hover:bg-accent/10 transition-colors"
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {card.title}
-              </CardTitle>
-              <div
-                className={`flex items-center gap-1 ${
-                  card.trend === "up" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {card.trend === "up" ? (
-                  <ArrowUpIcon className="h-4 w-4" />
-                ) : (
-                  <ArrowDownIcon className="h-4 w-4" />
-                )}
-                <span className="text-sm">{card.change}</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-              {card.chart === "wave" && (
-                <div className="mt-4 h-[80px]">
-                  <svg className="w-full h-full" viewBox="0 0 100 40">
-                    <defs>
-                      <linearGradient
-                        id={`gradient-${index}`}
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="var(--chart-1)"
-                          stopOpacity="0.2"
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="var(--chart-1)"
-                          stopOpacity="0"
-                        />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M0 20 Q25 5, 50 25 T100 20"
-                      fill="none"
-                      stroke="var(--chart-1)"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M0 20 Q25 5, 50 25 T100 20 V40 H0 Z"
-                      fill={`url(#gradient-${index})`}
-                    />
-                  </svg>
-                </div>
-              )}
-              {card.chart === "bars" && (
-                <div className="mt-4 h-[80px] flex items-end justify-between gap-2">
-                  {[0.4, 0.6, 0.8, 0.6, 0.4].map((height, i) => (
-                    <div
-                      key={i}
-                      className="w-full bg-primary/20 rounded-t"
-                      style={{ height: `${height * 100}%` }}
-                    />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatsCard
+          description="Description"
+          value="682.5 RWF"
+          icon={
+            <svg
+              className="w-5 h-5 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L19 21H5L12 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
+          chart={
+            <svg className="w-full h-full text-primary/20" viewBox="0 0 100 40">
+              <path
+                d="M0 20 Q25 5, 50 25 T100 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            </svg>
+          }
+        />
+        <StatsCard
+          description="Description"
+          value="32.1 RWF"
+          icon={
+            <svg
+              className="w-5 h-5 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L19 21H5L12 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
+        />
+        <StatsCard
+          description="Description"
+          value="682.5 RWF"
+          icon={
+            <svg
+              className="w-5 h-5 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L19 21H5L12 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
+          chart={
+            <svg className="w-full h-full" viewBox="0 0 100 40">
+              <path
+                d="M0 30 L20 25 L40 35 L60 20 L80 30 L100 25"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            </svg>
+          }
+        />
+        <StatsCard
+          description="Description"
+          value="32.1 RWF"
+          icon={
+            <svg
+              className="w-5 h-5 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L19 21H5L12 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          }
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Line Chart */}
-        <Card className="bg-card">
-          <CardHeader className="flex flex-row items-center justify-between p-6">
-            <div>
-              <CardTitle className="text-xl font-bold">Statistics</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Monthly Income Overview
-              </p>
-            </div>
-            <Select defaultValue="monthly">
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardHeader>
-          <CardContent className="p-6">
+      {/* First Row: Chart Card (4/6) and Top Earning Users (2/6) */}
+      <div className="grid grid-cols-6 gap-6">
+        {/* Chart Card */}
+        <Card className="bg-background col-span-4 rounded-2xl">
+          <CardContent className="p-5">
             <GradientLineChart />
           </CardContent>
         </Card>
 
-        {/* Payment Methods */}
-        <PaymentMethod />
+        {/* Top Earning Users */}
+        <div className="col-span-2">
+          <TopEarningUsers />
+        </div>
       </div>
 
-      {/* Distance and Price Table */}
-      <Card className="bg-card">
-        <CardHeader className="flex flex-row items-center justify-between p-6">
-          <div>
-            <CardTitle className="text-xl font-bold">
-              Distance & Price
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Overview of distance and price ranges
-            </p>
-          </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="short">Short</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="long">Long</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="relative overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left pb-4 font-medium text-muted-foreground">
-                    Distance
-                  </th>
-                  <th className="text-left pb-4 font-medium text-muted-foreground">
-                    Price Range
-                  </th>
-                  <th className="text-left pb-4 font-medium text-muted-foreground">
-                    Duration
-                  </th>
-                  <th className="text-right pb-4 font-medium text-muted-foreground">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {distanceData.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border hover:bg-accent/5"
-                  >
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <WalletIcon className="h-5 w-5 text-primary" />
-                        </div>
-                        <span>{item.distance}</span>
-                      </div>
-                    </td>
-                    <td className="py-4">{item.priceRange}</td>
-                    <td className="py-4">{item.duration} min</td>
-                    <td className="py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 rounded-lg hover:bg-accent/50">
-                          <EyeIcon className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                        <button className="p-2 rounded-lg hover:bg-accent/50">
-                          <PencilIcon className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                        <button className="p-2 rounded-lg hover:bg-accent/50">
-                          <TrashIcon className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Second Row: Payment Methods (2/6) and Price Distance Form (4/6) */}
+      <div className="grid grid-cols-6 gap-5">
+        {/* Payment Methods */}
+        <div className="col-span-2">
+          <PaymentMethod />
+        </div>
+
+        {/* Price Distance Form */}
+        <div className="col-span-4">
+          <PriceDistanceForm />
+        </div>
+      </div>
     </div>
   );
 };

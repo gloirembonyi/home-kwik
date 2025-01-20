@@ -75,61 +75,61 @@ const COLORS = {
 const statsData: StatsCardProps[] = [
   {
     title: "Total Users",
-    value: 6,
+    value: "560",
     icon: Users,
-    change: 0,
+    change: 12,
     trend: "up",
-    lastUpdate: "Nov 14",
+    lastUpdate: "November 14, 2024",
     color: COLORS.primary,
     description: "Total registered platform users",
     chartData: [
-      { month: "Jan", users: 0 },
-      { month: "Feb", users: 0 },
-      { month: "Mar", users: 0 },
+      { month: "Jan", users: 420 },
+      { month: "Feb", users: 480 },
+      { month: "Mar", users: 560 },
     ],
   },
   {
     title: "User Experience",
-    value: 0,
+    value: "470",
     icon: Users,
-    change: 0,
+    change: 8,
     trend: "down",
-    lastUpdate: "Nov 14",
+    lastUpdate: "November 14, 2024",
     color: COLORS.tertiary,
     description: "Average user satisfaction score",
     chartData: [
-      { month: "Jan", score: 0 },
-      { month: "Feb", score: 0 },
-      { month: "Mar", score: 0 },
+      { month: "Jan", score: 510 },
+      { month: "Feb", score: 490 },
+      { month: "Mar", score: 470 },
     ],
   },
   {
     title: "Payment Methods",
     value: "5",
     icon: CreditCard,
-    lastUpdate: "Nov 14",
+    lastUpdate: "November 14, 2024",
     color: COLORS.secondary,
     description: "Available payment options",
     chartData: [
-      { method: "Credit", value: 0 },
-      { method: "Debit", value: 0 },
-      { method: "PayPal", value: 0 },
-      { method: "Others", value: 0 },
+      { method: "Credit", value: 2 },
+      { method: "Debit", value: 1 },
+      { method: "PayPal", value: 1 },
+      { method: "Others", value: 1 },
     ],
   },
   {
     title: "Total Vehicles",
-    value: 0,
+    value: "250",
     icon: Car,
-    change: 0,
+    change: 12,
     trend: "up",
-    lastUpdate: "Nov 14",
+    lastUpdate: "November 14, 2024",
     color: COLORS.quaternary,
     description: "Registered vehicles on platform",
     chartData: [
-      { month: "Jan", vehicles: 0 },
-      { month: "Feb", vehicles: 0 },
-      { month: "Mar", vehicles: 0 },
+      { month: "Jan", vehicles: 180 },
+      { month: "Feb", vehicles: 220 },
+      { month: "Mar", vehicles: 250 },
     ],
   },
 ];
@@ -186,7 +186,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
           >
             <Info className="w-5 h-5 text-muted-foreground" />
           </button>
-          <div className="p-2 bg-accent rounded-full">
+          <div className="p-2 bg-accent/50 rounded-full">
             <Icon className={`w-6 h-6 text-foreground`} />
           </div>
         </div>
@@ -198,12 +198,11 @@ const StatsCard: React.FC<StatsCardProps> = ({
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground font-medium mt-2 tracking-wide"></p>
               <div className="text-3xl font-bold text-foreground leading-tight">
                 {value}
               </div>
             </div>
-            {change && (
+            {change !== undefined && (
               <div className="flex items-center gap-1 text-sm">
                 {trend === "up" ? (
                   <TrendingUp className="text-green-600 dark:text-green-400 w-5 h-5" />
@@ -321,10 +320,10 @@ const RoleDistributionChart = () => {
             <div
               key={entry.name}
               className={`
-                flex items-center gap-2 p-2 rounded-lg 
-                transition-all duration-300 
+              flex items-center gap-2 p-2 rounded-lg 
+              transition-all duration-300 
                 ${activeSegment === entry.name ? "bg-accent shadow-md" : ""}
-              `}
+            `}
             >
               <div
                 className="w-4 h-4 rounded-full shadow-md"
