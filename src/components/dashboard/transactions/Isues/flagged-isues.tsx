@@ -106,7 +106,9 @@ const FlaggedIssuesPage: React.FC = () => {
               All issues provided by users
             </p>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+          <div className="flex items-center space-x-6">
+            {/* Search Bar */}
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
               <div className="relative flex items-center">
                 <input
                   type="search"
@@ -121,18 +123,19 @@ const FlaggedIssuesPage: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               </div>
 
-            {/* Filter Dropdown */}
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter issues" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Issues</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
+              {/* Filter Dropdown */}
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter issues" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Issues</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 

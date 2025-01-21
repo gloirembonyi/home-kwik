@@ -125,6 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         path: "/ratings",
         subItems: [
           { label: "All Transactions", path: "/transactions" },
+          { label: "Topup History", path: "/topup-history" },
           { label: "Issues", path: "/issues" },
         ],
       },

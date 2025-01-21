@@ -663,15 +663,15 @@ const UserManagement: React.FC = () => {
         </button>
       )}
 
-      {/* Add SMS Dialog */}
-      <SMSDialog
+       {/* Add SMS Dialog */}
+       <SMSDialog
         isOpen={isSMSDialogOpen}
         onClose={() => setIsSMSDialogOpen(false)}
         users={users}
       />
 
-      {/* ExportDialog component */}
-      <ExportDialog
+       {/* ExportDialog component */}
+       <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
         users={users}

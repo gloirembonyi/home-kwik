@@ -200,40 +200,45 @@ const AuditLogs = () => {
   return (
     <div className="space-y-6 bg-background min-h-screen p-6 -m-4 -mt-8">
       {/* Header with Search and Actions */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-foreground">Audit Logs</h1>
-        <div className="flex items-center space-x-4">
-          <div className="relative w-full lg:w-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-4 h-4 text-muted-foreground" />
+      <div className=" items-center">
+        <h1 className="text-2xl font-semibold text-foreground mb-4">
+          Audit Logs
+        </h1>
+          <div className="flex justify-between items-center space-x-4">
+            <div className="relative flex items-center">
+              <input
+                type="search"
+                placeholder="Search logs..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-80 pl-10 pr-4 py-2.5 bg-background border border-input rounded-md
+                  text-sm placeholder:text-muted-foreground
+                  focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
+                  transition-colors duration-200"
+              />
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <Input
-              type="text"
-              id="search-logs"
-              placeholder="Search logs..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full pl-10"
-            />
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={handleExport}
+                disabled={selectedRows.length === 0}
+                variant="default"
+                className="disabled:opacity-50"
+              >
+                Export {selectedRows.length > 0 ? `(${selectedRows.length})` : ""}
+              </Button>
+              <Button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                variant="outline"
+              >
+                Filter
+              </Button>
+            </div>
+            
           </div>
-          <Button
-            onClick={handleExport}
-            disabled={selectedRows.length === 0}
-            variant="default"
-            className="disabled:opacity-50"
-          >
-            Export {selectedRows.length > 0 ? `(${selectedRows.length})` : ""}
-          </Button>
-          <Button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            variant="outline"
-          >
-            Filter
-          </Button>
-        </div>
       </div>
 
       {/* Filter Panel */}

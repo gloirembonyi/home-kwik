@@ -268,8 +268,8 @@ const Login = () => {
                     type={showPassword ? "text" : "password"}
                     required
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                             focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             transition-all duration-200 pr-10"
+                           focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                           transition-all duration-200"
                   />
                 </div>
               </div>

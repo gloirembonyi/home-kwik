@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/base/dialog";
 import { Calendar } from "@/components/ui/base/calendar";
 import ExportFilterModal from "./ExportFilterModal";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 // Define types
 export interface RefundRequest {
@@ -331,46 +332,50 @@ const RefundRequestsPage: React.FC = () => {
   return (
     <div className="p-6 -m-4 -mt-8 bg-background min-h-screen">
       {/* Header section */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="items-center mb-6">
         <div className="flex flex-col">
           <h1 className="text-2xl font-bold text-foreground">
             Refund Requests
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-4">
             {filteredRequests.length} refund requests found
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative w-full lg:w-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-4 h-4 text-muted-foreground" />
+
+          <div className="flex items-center justify-between">
+            <div className="relative flex items-center">
+              <input
+                type="search"
+                placeholder="Search rides, riders, or drivers"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-80 pl-10 pr-4 py-2.5 bg-background border border-input rounded-md
+                  text-sm placeholder:text-muted-foreground
+                  focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
+                  transition-colors duration-200"
+              />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <Input
-              type="text"
-              id="search-refunds"
-              placeholder="Search rides, riders, or drivers"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10"
-            />
+            <div className="flex items-center gap-3 justify-end">
+              <Button
+                onClick={() => setIsExportModalOpen(true)}
+                variant="default"
+                size="sm"
+                className="gap-2"
+              >
+                <Download className="w-4 h-4" /> Export
+              </Button>
+              <Button
+                onClick={() => setIsFilterDialogOpen(true)}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <FilterIcon className="w-4 h-4" /> Filter
+              </Button>
+            </div>
           </div>
-          <Button
-            onClick={() => setIsExportModalOpen(true)}
-            variant="default"
-            size="sm"
-            className="gap-2"
-          >
-            <Download className="w-4 h-4" /> Export
-          </Button>
-          <Button
-            onClick={() => setIsFilterDialogOpen(true)}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <FilterIcon className="w-4 h-4" /> Filter
-          </Button>
-        </div>
+
       </div>
 
       {/* the ExportFilterModal here */}

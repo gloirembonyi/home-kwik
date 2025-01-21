@@ -613,17 +613,24 @@ const SettingSystem = () => {
               You currently have for 2 admin seats.
             </p>
             <div className="flex gap-4 mt-4">
-              <div className="flex-1 relative">
+            <div className="flex-1 relative">
+              <div className="relative w-full">
                 <Input
                   placeholder="Email address"
-                  className="pl-10 w-full bg-background border border-input hover:border-primary/50 focus:border-primary transition-colors"
-                  id={"invite-email"}
+                  className="w-full bg-white border border-gray-200 rounded-lg py-2 pr-10 px-4 
+                    hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 
+                    focus:border-blue-500 transition-all duration-200 disabled:opacity-50 
+                    disabled:cursor-not-allowed"
+                  id="invite-email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   disabled={isLoading}
                 />
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Mail 
+                  className="absolute right-96 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" 
+                />
               </div>
+            </div>
               <Button
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
                 onClick={() => {
@@ -914,17 +921,7 @@ const SettingSystem = () => {
                   placeholder="Enter current password"
                   id="current-password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
-                </button>
+              
               </div>
             </div>
 
@@ -1005,17 +1002,7 @@ const SettingSystem = () => {
                   placeholder="Confirm new password"
                   id="confirm-password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
-                </button>
+         
               </div>
             </div>
 

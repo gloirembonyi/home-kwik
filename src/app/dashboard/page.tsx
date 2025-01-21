@@ -44,6 +44,10 @@ const TransactionsPage = dynamic(
   () => import("@/components/dashboard/transactions/page"),
   { ssr: false }
 );
+const TopupHistory = dynamic(
+  () => import("@/components/dashboard/transactions/Topup-History/topup"),
+  { ssr: false }
+);
 const TablePage = dynamic(
   () => import("@/components/dashboard/users/all-drivers/driver-request"),
   { ssr: false }
@@ -132,6 +136,8 @@ const Dashboard = () => {
         return <SettingSystem />;
       case "/transactions":
         return <TransactionsPage />;
+      case "/topup-history":
+        return <TopupHistory />;
       case "/issues":
         return <FlaggedIssuesPage />;
       case "/performance":

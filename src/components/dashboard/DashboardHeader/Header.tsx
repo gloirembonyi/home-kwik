@@ -165,26 +165,6 @@ const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
         </p>
       </div>
     </div>
-    {/* <div className="flex items-center gap-2 ml-4">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-foreground"
-      >
-        <RefreshCcw size={15} />
-      </Button>
-      <Select defaultValue={timeRange}>
-        <SelectTrigger className="h-8 w-[130px] text-sm bg-background border-input">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="day">Today</SelectItem>
-          <SelectItem value="week">This Week</SelectItem>
-          <SelectItem value="month">This Month</SelectItem>
-          <SelectItem value="quarter">This Quarter</SelectItem>
-        </SelectContent>
-      </Select>
-    </div> */}
   </div>
 );
 

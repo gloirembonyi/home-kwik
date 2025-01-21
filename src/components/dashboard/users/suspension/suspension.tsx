@@ -186,17 +186,19 @@ const SuspensionHistory = () => {
         {/* Action Buttons */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
           <div className="relative w-full lg:w-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-4 h-4 text-muted-foreground" />
+            <div className="relative flex items-center">
+              <input
+                type="search"
+                placeholder="Search users"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-80 pl-10 pr-4 py-2.5 bg-background border border-input rounded-md
+                  text-sm placeholder:text-muted-foreground
+                  focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
+                  transition-colors duration-200"
+              />
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <Input
-              type="text"
-              id="search-suspensions"
-              placeholder="Search users"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10"
-            />
           </div>
 
           <div className="flex space-x-2">

@@ -266,19 +266,21 @@ const TransactionsPage: React.FC = () => {
       </div>
 
       <div className="flex justify-between items-center mb-6">
-        <div className="relative w-1/3">
-          <Input
-            type="text"
-            id="search-transactions"
+        <div className="relative flex items-center">
+          <input
+            type="search"
             placeholder="Search transactions..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10"
+            className="w-80 pl-10 pr-4 py-2.5 bg-background border border-input rounded-md
+              text-sm placeholder:text-muted-foreground
+              focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
+              transition-colors duration-200"
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
         <div className="flex items-center space-x-4">
           <Button
