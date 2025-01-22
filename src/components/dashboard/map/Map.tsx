@@ -20,56 +20,16 @@
 // } from "@/components/ui/base/dropdown-menu";
 // import { Button } from "@/components/ui/base/button";
 // import { Badge } from "@/components/ui/base/badge";
+// import { Ride } from "@/types/map";
 
 
 
-// // Enhanced TypeScript Interfaces
-// export interface Driver {
-//   id: string;
-//   name: string;
-//   phone: string;
-//   rating: number;
-//   vehicle: {
-//     type: string;
-//     model: string;
-//     licensePlate: string;
-//   };
-// }
-
-// export interface Ride {
-//   id: string;
-//   userId: string;
-//   driverId: string;
-//   driver?: Driver;
-//   status: "active" | "completed" | "scheduled" | "delayed" | "emergency";
-//   pickupLocation: {
-//     address: string;
-//     coordinates: [number, number];
-//   };
-//   dropoffLocation: {
-//     address: string;
-//     coordinates: [number, number];
-//   };
-//   passengers: number;
-//   estimatedArrival?: string;
-//   actualArrivalTime?: string;
-//   route?: [number, number][];
-//   distance?: number;
-//   emergencyDetails?: {
-//     type: string;
-//     description: string;
-//     reportedAt: string;
-//   };
-//   createdAt: string;
-//   updatedAt: string;
-// }
-
-// interface RideTrackingMapProps {
-//   apiKey: string;
-//   fetchRidesEndpoint: string;
-//   realTimeUpdatesEndpoint?: string;
-//   onRideSelect?: (ride: Ride) => void;
-// }
+// export interface RideTrackingMapProps {
+//     apiKey: string;
+//     fetchRidesEndpoint: string;
+//     realTimeUpdatesEndpoint?: string;
+//     onRideSelect?: (ride: Ride) => void;
+//   }
 
 // // Advanced Utility Functions
 // const getMarkerDetails = (status: Ride['status']) => {
@@ -520,3 +480,7 @@
 // };
 
 // export default RideTrackingMap;
+
+
+
+

@@ -1,44 +1,38 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, ChevronDown, Check } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/base/dialog";
-import { User } from "./all-users";
+import { Transaction } from "./topup";
 
-interface ExportDialogProps {
+interface ExportTopupDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  users: User[]; // Using the User interface from all-users.tsx
-  selectedUsers: number[];
+  transactions: Transaction[];
+  selectedTransactions?: string[];
 }
 
-const ExportDialog: React.FC<ExportDialogProps> = ({
+const ExportTopupDialog: React.FC<ExportTopupDialogProps> = ({
   isOpen,
   onClose,
-  users,
-  selectedUsers,
+  transactions,
+  selectedTransactions = [],
 }) => {
   const [selectedFields, setSelectedFields] = useState([
-    "Status",
-    "Email",
-    "Issue",
+    "Date stamp",
+    "Mobile Number",
+    "Amount",
   ]);
   const [isFieldDropdownOpen, setIsFieldDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const fieldButtonRef = useRef<HTMLDivElement | null>(null);
 
   const availableFields = [
-    "Name",
-    "Email",
+    "Date stamp",
+    "Mobile Number",
+    "User",
+    "Amount",
     "Status",
-    "Phone Number",
-    "Role",
-    "Gender",
-    "Issue",
-    "User ID",
-    "Join Date",
-    "Department",
   ];
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -62,18 +56,27 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
   };
 
   const handleExport = () => {
-    const usersToExport =
-      selectedUsers.length > 0
-        ? users.filter((user) => selectedUsers.includes(user.id))
-        : users;
+    const transactionsToExport =
+      selectedTransactions.length > 0
+        ? transactions.filter((transaction) =>
+            selectedTransactions.includes(transaction.id)
+          )
+        : transactions;
+
+    const fieldMapping: { [key: string]: keyof Transaction } = {
+      "Date stamp": "timestamp",
+      "Mobile Number": "mobileNumber",
+      User: "user",
+      Amount: "amount",
+      Status: "status",
+    };
 
     const headers = selectedFields.join(",");
-    const rows = usersToExport.map((user) =>
+    const rows = transactionsToExport.map((transaction) =>
       selectedFields
         .map((field) => {
-          const value =
-            user[field.toLowerCase().replace(" ", "") as keyof User] || "";
-          return `"${value}"`;
+          const key = fieldMapping[field];
+          return `"${transaction[key]}"`;
         })
         .join(",")
     );
@@ -83,7 +86,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "users_export.csv";
+    link.download = "topup_transactions.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -99,10 +102,10 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
             <Check className="w-8 h-8 text-primary" />
           </div>
           <h2 className="text-3xl font-bold text-foreground mb-4">
-            Export as CSV
+            Export Transactions
           </h2>
           <p className="text-muted-foreground text-lg">
-            Do you want to export all the selected data to a .csv file?
+            Do you want to export the selected transactions to a .csv file?
           </p>
         </div>
 
@@ -184,7 +187,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
             className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl 
             hover:bg-primary/90 font-medium transition-colors"
           >
-            Sure, export
+            Export Now
           </button>
         </div>
       </DialogContent>
@@ -192,4 +195,4 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
   );
 };
 
-export default ExportDialog;
+export default ExportTopupDialog;

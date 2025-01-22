@@ -19,6 +19,7 @@ export interface Driver {
       plateNumber: string;
       type: 'standard' | 'premium';
     };
+    phone?: string;
   }
   
   export interface MapState {
@@ -51,3 +52,34 @@ export interface Driver {
       vehicleType: ('standard' | 'premium')[];
     };
   }
+
+
+// Enhanced TypeScript Interfaces
+export interface Ride {
+  id: string;
+  userId: string;
+  driverId: string;
+  driver?: Driver;
+  status: "active" | "completed" | "scheduled" | "delayed" | "emergency";
+  pickupLocation: {
+    address: string;
+    coordinates: [number, number];
+  };
+  dropoffLocation: {
+    address: string;
+    coordinates: [number, number];
+  };
+  passengers: number;
+  estimatedArrival?: string;
+  actualArrivalTime?: string;
+  route?: [number, number][];
+  distance?: number;
+  emergencyDetails?: {
+    type: string;
+    description: string;
+    reportedAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+

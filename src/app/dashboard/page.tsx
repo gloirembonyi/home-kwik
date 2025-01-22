@@ -1,5 +1,6 @@
 "use client";
 
+import FleetPage from "@/components/dashboard/map/fleet";
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
 
@@ -129,7 +130,7 @@ const Dashboard = () => {
       case "/refunds":
         return <RefundRequestsPage />;
       case "/rides/fleet":
-        return <RidesManagement />;
+        return <FleetPage />;
       case "/revenue":
         return <Revenue />;
       case "/dash":

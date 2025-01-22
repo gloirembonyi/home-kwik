@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/base/button";
 import { Separator } from "@/components/ui/base/separator";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
-interface Transaction {
+export interface Transaction {
   id: string;
   timestamp: string;
   mobileNumber: string;
@@ -76,7 +76,7 @@ const TopupHistory = () => {
   };
 
   return (
-    <div className="p-4 space-y-6 bg-background min-h-screen text-foreground">
+    <div className="space-y-6 bg-background min-h-screen text-foreground">
       {/* Header with Search and Actions */}
       <div className="bg-card shadow-lg rounded-xl p-6 border border-border">
         <div className="flex justify-between items-center">
@@ -100,9 +100,7 @@ const TopupHistory = () => {
               <Filter className="h-5 w-5" />
               Filter
             </Button>
-            <Button
-              className="bg-primary hover:bg-primary/90 h-10 flex gap-2 text-primary-foreground"
-            >
+            <Button className="bg-primary hover:bg-primary/90 h-10 flex gap-2 text-primary-foreground">
               <Download className="h-5 w-5" />
               Export
             </Button>
@@ -137,7 +135,9 @@ const TopupHistory = () => {
                 </div>
                 <span className="text-sm text-foreground">{stat.title}</span>
               </div>
-              <div className="text-2xl font-semibold mb-3 text-foreground">{stat.value}</div>
+              <div className="text-2xl font-semibold mb-3 text-foreground">
+                {stat.value}
+              </div>
               <Separator className="mb-3" />
               <div className="text-sm text-muted-foreground">
                 Last Update: November 14, 2024
@@ -153,17 +153,32 @@ const TopupHistory = () => {
           <table className="w-full">
             <thead>
               <tr className="text-left border-b border-border bg-muted">
-                <th className="px-6 py-4 font-medium text-muted-foreground">Date stamp</th>
-                <th className="px-6 py-4 font-medium text-muted-foreground">Mobile Number</th>
-                <th className="px-6 py-4 font-medium text-muted-foreground">User</th>
-                <th className="px-6 py-4 font-medium text-muted-foreground">Amount</th>
-                <th className="px-6 py-4 font-medium text-muted-foreground">Status</th>
-                <th className="px-6 py-4 font-medium text-muted-foreground">Action</th>
+                <th className="px-6 py-4 font-medium text-muted-foreground">
+                  Date stamp
+                </th>
+                <th className="px-6 py-4 font-medium text-muted-foreground">
+                  Mobile Number
+                </th>
+                <th className="px-6 py-4 font-medium text-muted-foreground">
+                  User
+                </th>
+                <th className="px-6 py-4 font-medium text-muted-foreground">
+                  Amount
+                </th>
+                <th className="px-6 py-4 font-medium text-muted-foreground">
+                  Status
+                </th>
+                <th className="px-6 py-4 font-medium text-muted-foreground">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
               {currentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="border-b border-border hover:bg-accent/5">
+                <tr
+                  key={transaction.id}
+                  className="border-b border-border hover:bg-accent/5"
+                >
                   <td className="px-6 py-4 text-foreground">
                     {transaction.timestamp}
                   </td>
@@ -255,7 +270,9 @@ const TopupHistory = () => {
                     key={page}
                     variant={currentPage === page ? "default" : "outline"}
                     className={`h-8 w-8 ${
-                      currentPage === page ? "bg-primary text-primary-foreground" : ""
+                      currentPage === page
+                        ? "bg-primary text-primary-foreground"
+                        : ""
                     }`}
                     onClick={() => handlePageChange(page)}
                   >

@@ -7,9 +7,10 @@ import {
   MapPinIcon, 
   ClockIcon 
 } from "@heroicons/react/24/solid";
+// import RideTrackingMap from "../../map/Map";
 
 
-const Map = dynamic(() => import("../dashboard/will-used/map/StarticMap"), { ssr: false });
+const Map = dynamic(() => import("../dashboard/map/StarticMap"), { ssr: false });
 
 // Define a more comprehensive Ride interface
 interface Ride {
@@ -74,7 +75,7 @@ export default function RidesManagement() {
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Content */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto">
+      <main className="flex-1 max-w-7xl mx-auto">
         <header className="flex justify-between items-center pb-6 border-b border-gray-200">
           <h1 className="text-3xl font-extrabold text-gray-800">Rides Management</h1>
           
@@ -164,7 +165,7 @@ export default function RidesManagement() {
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden">
 
           {/* <RideTrackingMap 
-            apiKey="YOUR_GOOGLE_MAPS_API_KEY" 
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} 
             fetchRidesEndpoint="/api/rides"
             realTimeUpdatesEndpoint="wss://your-websocket-endpoint"
             onRideSelect={(ride) => console.log('Selected ride:', ride)}
