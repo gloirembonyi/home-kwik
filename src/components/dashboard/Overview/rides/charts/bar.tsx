@@ -101,16 +101,20 @@ export const ProfitBarChart = ({ timePeriod }: { timePeriod: string }) => {
       {
         label: "Rides",
         data: getChartData(timePeriod),
-        backgroundColor: "#4B7BE5",
+        backgroundColor: "rgba(75, 123, 229, 0.9)",
         barThickness: 20,
         borderRadius: 5,
+        borderColor: "rgba(75, 123, 229, 0.1)",
+        borderWidth: 1,
       },
       {
         label: "Profit",
         data: getChartData(timePeriod).map((val) => val * 0.7),
-        backgroundColor: "#10B981",
+        backgroundColor: "rgba(16, 185, 129, 0.9)",
         barThickness: 20,
         borderRadius: 5,
+        borderColor: "rgba(16, 185, 129, 0.1)",
+        borderWidth: 1,
       },
     ],
   };
@@ -120,7 +124,6 @@ export const ProfitBarChart = ({ timePeriod }: { timePeriod: string }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: true,
         position: "top" as const,
         align: "end" as const,
         labels: {
@@ -137,12 +140,14 @@ export const ProfitBarChart = ({ timePeriod }: { timePeriod: string }) => {
         },
       },
       tooltip: {
-        backgroundColor: "#111827",
-        titleColor: "#F3F4F6",
-        bodyColor: "#F3F4F6",
+        backgroundColor: "#1F2937",
+        titleColor: "#F9FAFB",
+        bodyColor: "#F9FAFB",
         padding: 12,
         displayColors: true,
         usePointStyle: true,
+        borderColor: "#374151",
+        borderWidth: 1,
         callbacks: {
           title: function (context: any) {
             return context[0].label;
@@ -158,6 +163,7 @@ export const ProfitBarChart = ({ timePeriod }: { timePeriod: string }) => {
       x: {
         grid: {
           display: false,
+          drawOnChartArea: false,
         },
         ticks: {
           color: "#9CA3AF",
@@ -174,8 +180,9 @@ export const ProfitBarChart = ({ timePeriod }: { timePeriod: string }) => {
       },
       y: {
         grid: {
-          color: "rgba(243, 244, 246, 0.6)",
+          color: "rgba(75, 85, 99, 0.15)",
           lineWidth: 1,
+          drawOnChartArea: true,
         },
         ticks: {
           color: "#9CA3AF",

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Eye, Pencil, Trash2, Filter, Download } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/base/card";
 import {
@@ -11,6 +11,9 @@ import {
 import { Button } from "@/components/ui/base/button";
 import { Separator } from "@/components/ui/base/separator";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import ExportTopupDialog from "./export-topup";
+import FilterTopupDialog from "./filter-topup";
+import { FilterOptions } from "./filter-topup";
 
 export interface Transaction {
   id: string;
@@ -22,30 +25,47 @@ export interface Transaction {
 }
 
 const TopupHistory = () => {
+  // Initialize states
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState("10");
-  const [isFiltering, setIsFiltering] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterOptions | null>(
+    null
+  );
 
-  // Sample data
+  // Update the sample data with proper date format
   const allTransactions: Transaction[] = Array(60)
     .fill(null)
     .map((_, index) => ({
       id: `${index + 1}`,
-      timestamp: "15/01/2024 20:40 PM",
+      timestamp: new Date(2024, 0, 15, 20, 40).toISOString(), // Use ISO string for dates
       mobileNumber: "07820 242 525",
       user: "Darlene Robertson",
-      amount: "29,00 RWF",
-      status: "Successful",
+      amount: "29000", // Store amount as number string without currency
+      status:
+        Math.random() > 0.7
+          ? "Failed"
+          : Math.random() > 0.3
+          ? "Successful"
+          : "Pending", // Add some variety to status
     }));
 
-  // Search functionality
-  const filteredTransactions = allTransactions.filter(
-    (transaction) =>
-      transaction.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transaction.mobileNumber.includes(searchQuery) ||
-      transaction.amount.includes(searchQuery)
-  );
+  // Initialize filteredTransactions with allTransactions
+  const [filteredTransactions, setFilteredTransactions] =
+    useState<Transaction[]>(allTransactions);
+
+  // Update search functionality
+  useEffect(() => {
+    const filtered = allTransactions.filter(
+      (transaction) =>
+        transaction.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        transaction.mobileNumber.includes(searchQuery) ||
+        transaction.amount.includes(searchQuery)
+    );
+    setFilteredTransactions(filtered);
+  }, [searchQuery]); // Remove allTransactions from dependencies
 
   // Pagination logic
   const totalItems = filteredTransactions.length;
@@ -56,9 +76,11 @@ const TopupHistory = () => {
 
   // Stats calculations
   const stats = {
-    totalTransactions: allTransactions.length,
-    totalAmount: `${(allTransactions.length * 29000).toLocaleString()} RWF`,
-    totalUsers: new Set(allTransactions.map((t) => t.user)).size,
+    totalTransactions: filteredTransactions.length,
+    totalAmount: `${filteredTransactions
+      .reduce((sum, t) => sum + parseInt(t.amount, 10), 0)
+      .toLocaleString()} RWF`,
+    totalUsers: new Set(filteredTransactions.map((t) => t.user)).size,
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,10 +97,78 @@ const TopupHistory = () => {
     setCurrentPage(1);
   };
 
+  const handleApplyFilters = (filters: FilterOptions) => {
+    setActiveFilters(filters);
+    let filtered = [...allTransactions];
+
+    // Date range filter
+    if (filters.dateRange.from || filters.dateRange.to) {
+      filtered = filtered.filter((transaction) => {
+        const transactionDate = new Date(transaction.timestamp);
+        if (filters.dateRange.from) {
+          const fromDate = new Date(filters.dateRange.from);
+          fromDate.setHours(0, 0, 0, 0);
+          if (transactionDate < fromDate) return false;
+        }
+        if (filters.dateRange.to) {
+          const toDate = new Date(filters.dateRange.to);
+          toDate.setHours(23, 59, 59, 999);
+          if (transactionDate > toDate) return false;
+        }
+        return true;
+      });
+    }
+
+    // Status filter
+    if (filters.status && filters.status !== "all") {
+      filtered = filtered.filter(
+        (transaction) => transaction.status === filters.status
+      );
+    }
+
+    // Amount range filter
+    if (filters.amountRange.min || filters.amountRange.max) {
+      filtered = filtered.filter((transaction) => {
+        const amount = parseInt(transaction.amount, 10);
+        const min = filters.amountRange.min
+          ? parseInt(filters.amountRange.min, 10)
+          : 0;
+        const max = filters.amountRange.max
+          ? parseInt(filters.amountRange.max, 10)
+          : Infinity;
+        return amount >= min && amount <= max;
+      });
+    }
+
+    setFilteredTransactions(filtered);
+    setCurrentPage(1);
+  };
+
+  // Add clearFilters function
+  const clearFilters = () => {
+    setActiveFilters(null);
+    setFilteredTransactions(allTransactions);
+  };
+
+  // Update the display formatting
+  const formatAmount = (amount: string) => {
+    return `${parseInt(amount, 10).toLocaleString()} RWF`;
+  };
+
+  const formatDate = (timestamp: string) => {
+    return new Date(timestamp).toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div className="space-y-6 bg-background min-h-screen text-foreground">
       {/* Header with Search and Actions */}
-      <div className="bg-card shadow-lg rounded-xl p-6 border border-border">
+      <div className="bg-card shadow-lg rounded-xl p-4 border border-border">
         <div className="flex justify-between items-center">
           <div className="relative">
             <input
@@ -89,18 +179,36 @@ const TopupHistory = () => {
               className="w-72 pl-10 pr-4 py-3 bg-background border-2 border-input rounded-lg 
                        focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none"
             />
-            <MagnifyingGlassIcon className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <MagnifyingGlassIcon className="absolute items-center left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           </div>
           <div className="flex gap-3">
+            <div className="relative">
+              <Button
+                variant="outline"
+                className="flex gap-2 h-10"
+                onClick={() => setIsFilterDialogOpen(true)}
+              >
+                <Filter className="h-5 w-5" />
+                Filter
+                {activeFilters && (
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                )}
+              </Button>
+              {activeFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 p-0"
+                >
+                  ×
+                </Button>
+              )}
+            </div>
             <Button
-              variant="outline"
-              className="flex gap-2 h-10"
-              onClick={() => setIsFiltering(!isFiltering)}
+              className="bg-primary hover:bg-primary/90 h-10 flex gap-2 text-primary-foreground"
+              onClick={() => setIsExportDialogOpen(true)}
             >
-              <Filter className="h-5 w-5" />
-              Filter
-            </Button>
-            <Button className="bg-primary hover:bg-primary/90 h-10 flex gap-2 text-primary-foreground">
               <Download className="h-5 w-5" />
               Export
             </Button>
@@ -180,7 +288,7 @@ const TopupHistory = () => {
                   className="border-b border-border hover:bg-accent/5"
                 >
                   <td className="px-6 py-4 text-foreground">
-                    {transaction.timestamp}
+                    {formatDate(transaction.timestamp)}
                   </td>
                   <td className="px-6 py-4 text-foreground">
                     {transaction.mobileNumber}
@@ -189,7 +297,7 @@ const TopupHistory = () => {
                     {transaction.user}
                   </td>
                   <td className="px-6 py-4 text-foreground">
-                    {transaction.amount}
+                    {formatAmount(transaction.amount)}
                   </td>
                   <td className="px-6 py-4">
                     <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-sm">
@@ -292,6 +400,18 @@ const TopupHistory = () => {
           </div>
         </div>
       </div>
+
+      <ExportTopupDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        transactions={filteredTransactions}
+      />
+
+      <FilterTopupDialog
+        isOpen={isFilterDialogOpen}
+        onClose={() => setIsFilterDialogOpen(false)}
+        onApplyFilters={handleApplyFilters}
+      />
     </div>
   );
 };

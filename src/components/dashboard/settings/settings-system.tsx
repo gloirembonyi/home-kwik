@@ -36,6 +36,8 @@ import { deviceService } from "@/services/device-service";
 import { notificationService } from "@/services/notification-service";
 import { toast } from "react-hot-toast";
 
+
+
 interface UserSettings {
   id: string;
   fullName: string;
@@ -613,24 +615,22 @@ const SettingSystem = () => {
               You currently have for 2 admin seats.
             </p>
             <div className="flex gap-4 mt-4">
-            <div className="flex-1 relative">
-              <div className="relative w-full">
-                <Input
-                  placeholder="Email address"
-                  className="w-full bg-white border border-gray-200 rounded-lg py-2 pr-10 px-4 
+              <div className="flex-1 relative">
+                <div className="relative w-full">
+                  <Input
+                    placeholder="Email address"
+                    className="w-full bg-white border border-gray-200 rounded-lg py-2 pr-10 px-4 
                     hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 
                     focus:border-blue-500 transition-all duration-200 disabled:opacity-50 
                     disabled:cursor-not-allowed"
-                  id="invite-email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  disabled={isLoading}
-                />
-                <Mail 
-                  className="absolute right-96 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" 
-                />
+                    id="invite-email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  <Mail className="absolute right-96 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                </div>
               </div>
-            </div>
               <Button
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
                 onClick={() => {
@@ -921,7 +921,6 @@ const SettingSystem = () => {
                   placeholder="Enter current password"
                   id="current-password"
                 />
-              
               </div>
             </div>
 
@@ -1002,7 +1001,6 @@ const SettingSystem = () => {
                   placeholder="Confirm new password"
                   id="confirm-password"
                 />
-         
               </div>
             </div>
 
@@ -1214,7 +1212,7 @@ const SettingSystem = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
+    <div className="w-full max-w-6xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
         <Settings className="h-8 w-8 text-primary" />
         <h1 className="text-2xl font-bold text-foreground">Account Settings</h1>

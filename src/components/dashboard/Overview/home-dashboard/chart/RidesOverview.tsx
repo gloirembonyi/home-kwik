@@ -148,7 +148,7 @@ const RidesOverviewChart = () => {
   );
 
   return (
-    <Card className="shadow-2xl rounded-3xl overflow-hidden border-none">
+    <Card className="shadow-2xl rounded-3xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between bg-card p-6 border-b border-border">
         <div>
           <CardTitle className="text-2xl font-bold text-foreground">
@@ -194,13 +194,21 @@ const RidesOverviewChart = () => {
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                tick={{
+                  fill: "currentColor",
+                  fontSize: 12,
+                  opacity: 1,
+                }}
                 dy={10}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                tick={{
+                  fill: "currentColor",
+                  fontSize: 12,
+                  opacity: 1,
+                }}
                 domain={[0, 100]}
                 tickFormatter={(value) => `${value}%`}
                 dx={-10}

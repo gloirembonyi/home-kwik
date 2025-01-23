@@ -1,14 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { 
-  ChevronRightIcon, 
-  MagnifyingGlassIcon, 
-  MapPinIcon, 
-  ClockIcon 
+import {
+  ChevronRightIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  ClockIcon
 } from "@heroicons/react/24/solid";
 // import RideTrackingMap from "../../map/Map";
-
 
 const Map = dynamic(() => import("../dashboard/map/StarticMap"), { ssr: false });
 
@@ -66,7 +65,7 @@ export default function RidesManagement() {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filter rides based on search term
-  const filteredRides = rides.filter(ride => 
+  const filteredRides = rides.filter(ride =>
     ride.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     ride.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
     ride.driver?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -78,7 +77,7 @@ export default function RidesManagement() {
       <main className="flex-1 max-w-7xl mx-auto">
         <header className="flex justify-between items-center pb-6 border-b border-gray-200">
           <h1 className="text-3xl font-extrabold text-gray-800">Rides Management</h1>
-          
+
           {/* Search Input */}
           <div className="relative">
             <input
@@ -86,8 +85,8 @@ export default function RidesManagement() {
               placeholder="Search rides, locations, drivers"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 w-72 border-2 border-gray-300 rounded-lg 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="pl-10 pr-4 py-2 w-72 border-2 border-gray-300 rounded-lg
+                         focus:outline-none focus:ring-2 focus:ring-blue-500
                          transition duration-300 ease-in-out"
             />
             <MagnifyingGlassIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -103,7 +102,7 @@ export default function RidesManagement() {
                 {filteredRides.length} rides
               </span>
             </div>
-            
+
             {filteredRides.length === 0 ? (
               <div className="text-center text-gray-500 py-10">
                 No rides found
@@ -111,11 +110,11 @@ export default function RidesManagement() {
             ) : (
               <ul className="space-y-4">
                 {filteredRides.map((ride, idx) => (
-                  <li 
-                    key={idx} 
-                    className={`p-4 rounded-lg shadow-md transition-all duration-300 
-                      ${ride.status === 'Ongoing' ? 'bg-green-50 border-l-4 border-green-500' : 
-                        ride.status === 'Scheduled' ? 'bg-yellow-50 border-l-4 border-yellow-500' : 
+                  <li
+                    key={idx}
+                    className={`p-4 rounded-lg shadow-md transition-all duration-300
+                      ${ride.status === 'Ongoing' ? 'bg-green-50 border-l-4 border-green-500' :
+                        ride.status === 'Scheduled' ? 'bg-yellow-50 border-l-4 border-yellow-500' :
                         'bg-gray-50 border-l-4 border-gray-300'}`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -128,7 +127,7 @@ export default function RidesManagement() {
                       </div>
                       <ChevronRightIcon className="h-6 w-6 text-gray-500" />
                     </div>
-                    
+
                     <div className="flex justify-between text-sm text-gray-700">
                       <div className="flex items-center space-x-2">
                         <ClockIcon className="h-4 w-4" />
@@ -136,7 +135,7 @@ export default function RidesManagement() {
                       </div>
                       {ride.passengers && (
                         <span>
-                          {ride.passengers} 
+                          {ride.passengers}
                           {ride.passengers === 1 ? ' Passenger' : ' Passengers'}
                         </span>
                       )}
@@ -145,8 +144,8 @@ export default function RidesManagement() {
                     {ride.events && (
                       <ul className="mt-3 text-xs text-gray-500 space-y-1">
                         {ride.events.map((event, idx) => (
-                          <li 
-                            key={idx} 
+                          <li
+                            key={idx}
                             className="flex justify-between bg-white p-2 rounded"
                           >
                             <span>{event.status}</span>
@@ -164,18 +163,18 @@ export default function RidesManagement() {
           {/* Map */}
           <div className="flex-1 bg-white rounded-xl shadow-lg overflow-hidden">
 
-          {/* <RideTrackingMap 
-            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} 
+          {/* <RideTrackingMap
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
             fetchRidesEndpoint="/api/rides"
             realTimeUpdatesEndpoint="wss://your-websocket-endpoint"
             onRideSelect={(ride) => console.log('Selected ride:', ride)}
           /> */}
 
-          <Map 
-              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} 
+          <Map
+              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
               onLocationSelect={(location) => {
                 console.log('Selected Location:', location);
-              }} 
+              }}
             />
           </div>
         </div>

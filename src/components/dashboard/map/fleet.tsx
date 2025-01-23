@@ -29,6 +29,9 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/base/alert";
 import Draggable from "react-draggable";
+import { ScrollArea } from "@/components/ui/base/scroll-area";
+import { vehicleService } from "@/services/api/vehicles";
+import { FleetSocket } from "@/services/socket/fleet";
 
 // Enhanced Types
 interface LatLngLiteral {
@@ -234,7 +237,7 @@ const initialVehicles: Vehicle[] = [
 ];
 
 const FleetPage = () => {
-  const [mockVehicles, setMockVehicles] = useState<Vehicle[]>(initialVehicles);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle>(
     initialVehicles[0]
   );
@@ -269,7 +272,51 @@ const FleetPage = () => {
     width: "100%",
   };
 
-  // Enhanced vehicle selection with map interaction
+  // Initialize socket connection
+  useEffect(() => {
+    const socket = FleetSocket.getInstance();
+    socket.connect();
+
+    // Subscribe to vehicle updates
+    socket.subscribeToVehicleUpdates((updatedVehicle) => {
+      setVehicles((prev) =>
+        prev.map((vehicle) =>
+          vehicle.id === updatedVehicle.id ? updatedVehicle : vehicle
+        )
+      );
+    });
+
+    // Subscribe to new vehicles
+    socket.subscribeToNewVehicles((newVehicle) => {
+      setVehicles((prev) => [...prev, newVehicle]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  // Fetch initial vehicles
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const data = await vehicleService.getAllVehicles();
+        setVehicles(data);
+        setFilteredVehicles(data);
+
+        if (data.length > 0) {
+          setSelectedVehicle(data[0]);
+          setMapCenter(data[0].coordinates);
+        }
+      } catch (error) {
+        console.error("Failed to fetch vehicles:", error);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+  // vehicle selection with map interaction
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
     setMapCenter(vehicle.coordinates);
@@ -282,7 +329,7 @@ const FleetPage = () => {
     }
   };
 
-  // Enhanced marker icon with status indication
+  // marker icon with status indication
   const getMarkerIcon = useCallback(
     (vehicle: Vehicle) => {
       if (!googleLoaded) return undefined;
@@ -346,19 +393,19 @@ const FleetPage = () => {
 
   // Search and filter functionality
   useEffect(() => {
-    const filtered = mockVehicles.filter(
+    const filtered = vehicles.filter(
       (vehicle) =>
         vehicle.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         vehicle.driverName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         vehicle.location.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredVehicles(filtered);
-  }, [searchQuery, mockVehicles]);
+  }, [searchQuery, vehicles]);
 
   // Enhanced vehicle movement simulation
   useEffect(() => {
     const updateVehiclePositions = () => {
-      setMockVehicles((prevVehicles) =>
+      setVehicles((prevVehicles) =>
         prevVehicles.map((vehicle) => {
           if (
             vehicle.status === "on_trip" &&
@@ -412,7 +459,7 @@ const FleetPage = () => {
   }, [replayMode, playbackSpeed, googleLoaded]);
 
   const getHeatmapData = () => {
-    return mockVehicles.map((vehicle) => ({
+    return vehicles.map((vehicle) => ({
       location: new google.maps.LatLng(
         vehicle.coordinates.lat,
         vehicle.coordinates.lng
@@ -451,7 +498,7 @@ const FleetPage = () => {
     </div>
   );
 
-  // Update the vehicle card in the list
+  // the vehicle card in the list
   const renderVehicleCard = (vehicle: Vehicle) => (
     <Card
       key={vehicle.id}
@@ -490,133 +537,148 @@ const FleetPage = () => {
   );
 
   return (
-    <div className="grid grid-cols-12 gap-6 h-screen bg-background">
+    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-16rem)] bg-background">
       {/* Left Panel */}
-      <div className="col-span-3 bg-card border-r border-border pr-4 overflow-y-auto">
-        <div className="sticky top-0 bg-card z-10 pb-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-foreground">Fleet</h2>
-            {/* Playback Controls */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setReplayMode(!replayMode)}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-              >
-                {replayMode ? "Live Mode" : "Replay Mode"}
-              </button>
-              {replayMode && (
-                <select
-                  value={playbackSpeed}
-                  onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-                  className="px-2 py-1 border border-border rounded-md bg-background"
-                >
-                  <option value={1}>1x</option>
-                  <option value={2}>2x</option>
-                  <option value={4}>4x</option>
-                </select>
-              )}
-            </div>
-          </div>
-
-          {/* Search Bar */}
+      <div className="col-span-3 bg-card border-r border-border">
+        <div className="sticky top-0 bg-card z-10 p-4 border-b border-border">
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <input
-              type="text"
+              type="search"
               placeholder="Search vehicles..."
-              className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-sm bg-background border border-input rounded-md"
             />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
-        </div>
+          {/* Selected Vehicle Details Card */}
+          {selectedVehicle && (
+            <Card className="p-3 mb-4 bg-background">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Car className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-sm">{selectedVehicle.id}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedVehicle.driverName}
+                  </p>
+                </div>
+              </div>
 
-        {/* Active Vehicle Details */}
-        {selectedVehicle && (
-          <Card className="p-6 bg-card border border-border mb-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Car className="w-6 h-6 text-primary" />
+              {/* Vehicle Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-muted-foreground">
+                    {selectedVehicle.location}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-muted-foreground">
+                    {new Date(
+                      selectedVehicle.lastUpdated || ""
+                    ).toLocaleTimeString()}
+                  </span>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-foreground">
-                  {selectedVehicle.id}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {selectedVehicle.driverName || selectedVehicle.location}
-                </p>
-              </div>
-            </div>
 
-            {/* Vehicle Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm text-muted-foreground">
-                  {selectedVehicle.location}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-primary" />
-                <span className="text-sm text-muted-foreground">
-                  {new Date(
-                    selectedVehicle.lastUpdated || ""
-                  ).toLocaleTimeString()}
-                </span>
-              </div>
-            </div>
+              {/* Current Ride Details */}
+              {selectedVehicle.currentRide && (
+                <div className="border-t border-border pt-3">
+                  <h4 className="text-xs font-medium mb-2">Current Ride</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Passenger</span>
+                      <span>{selectedVehicle.currentRide.passengerName}</span>
+                    </div>
 
-            {/* Current Ride Details */}
-            {selectedVehicle.currentRide && (
-              <>
-                <div className="mb-4">
-                  <h4 className="font-medium mb-2">Current Ride</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Passenger</p>
-                      <p>{selectedVehicle.currentRide.passengerName}</p>
+                    {/* Timeline */}
+                    <div className="relative mt-3">
+                      {selectedVehicle.currentRide.timeline.map(
+                        (event, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-2 mb-2"
+                          >
+                            <div className="flex flex-col items-center">
+                              <div className="w-2 h-2 bg-primary rounded-full" />
+                              {index <
+                                selectedVehicle.currentRide!.timeline.length -
+                                  1 && (
+                                <div className="w-0.5 h-8 bg-border mt-1" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium">
+                                {event.status}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {event.time}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
-
-                {/* Timeline */}
-                <div className="relative">
-                  {selectedVehicle.currentRide.timeline.map((event, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 mb-4 relative"
-                    >
-                      <div className="flex flex-col items-center">
-                        <div className="w-2.5 h-2.5 bg-primary rounded-full" />
-                        {index <
-                          selectedVehicle.currentRide!.timeline.length - 1 && (
-                          <div className="w-0.5 h-12 bg-border mt-1" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {event.status}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {event.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </Card>
-        )}
-
-        {/* Vehicle List */}
-        <div className="space-y-3">
-          {filteredVehicles.map((vehicle) => renderVehicleCard(vehicle))}
+              )}
+            </Card>
+          )}
         </div>
+
+        {/* Vehicle List - Wrapped in ScrollArea */}
+        <ScrollArea className="h-[calc(100vh-24rem)]">
+          <div className="p-4 space-y-2">
+            {filteredVehicles.map((vehicle) => (
+              <Card
+                key={vehicle.id}
+                className={`p-3 cursor-pointer transition-colors border ${
+                  selectedVehicle.id === vehicle.id
+                    ? "bg-accent border-primary/50"
+                    : "hover:bg-accent/50"
+                }`}
+                onClick={() => handleVehicleSelect(vehicle)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Car className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <h3 className="text-sm font-medium truncate">
+                      {vehicle.id}
+                    </h3>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {vehicle.location}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        vehicle.status === "on_trip"
+                          ? "bg-blue-500"
+                          : vehicle.status === "available"
+                          ? "bg-green-500"
+                          : "bg-gray-500"
+                      }`}
+                    />
+                    {vehicle.currentRide && (
+                      <span className="text-[10px] text-muted-foreground mt-1">
+                        On Trip
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
 
-      {/* Map Panel */}
-      <div className="col-span-9 h-full relative">
+      {/* Map Panel - Updated */}
+      <div className="col-span-9 relative bg-card rounded-lg border border-border overflow-hidden">
         {/* Draggable Map Controls */}
         <Draggable
           handle=".drag-handle"
@@ -721,7 +783,7 @@ const FleetPage = () => {
 
         <LoadScript
           googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-          libraries={["drawing", "visualization", "geometry"]}
+          libraries={["places", "geometry", "visualization"]}
           onLoad={() => setGoogleLoaded(true)}
         >
           <GoogleMap
@@ -770,40 +832,9 @@ const FleetPage = () => {
 
               const traffic = new google.maps.TrafficLayer();
               setTrafficLayer(traffic);
-
-              const drawingManager = new google.maps.drawing.DrawingManager({
-                drawingMode: drawingMode
-                  ? google.maps.drawing.OverlayType.POLYGON
-                  : null,
-                drawingControl: true,
-                drawingControlOptions: {
-                  position: google.maps.ControlPosition.TOP_CENTER,
-                  drawingModes: [google.maps.drawing.OverlayType.POLYGON],
-                },
-                polygonOptions: {
-                  fillColor: "#FF0000",
-                  fillOpacity: 0.2,
-                  strokeWeight: 2,
-                  strokeColor: "#FF0000",
-                  editable: true,
-                },
-              });
-
-              drawingManager.setMap(map);
-
-              // Handle polygon complete
-              google.maps.event.addListener(
-                drawingManager,
-                "polygoncomplete",
-                (polygon: google.maps.Polygon) => {
-                  setGeofences((prev) => [...prev, polygon]);
-                  drawingManager.setDrawingMode(null);
-                  setDrawingMode(false);
-                }
-              );
             }}
           >
-            {mockVehicles.map((vehicle) => (
+            {vehicles.map((vehicle) => (
               <React.Fragment key={vehicle.id}>
                 <Marker
                   position={vehicle.coordinates}

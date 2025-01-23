@@ -1,6 +1,6 @@
 "use client";
 
-import FleetPage from "@/components/dashboard/map/fleet";
+
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
 
@@ -41,6 +41,10 @@ const AnalyticsPageRide = dynamic(
   () => import("@/components/dashboard/Overview/rides/RideAnalitics"),
   { ssr: false }
 );
+const FleetPage = dynamic(
+  () => import("@/components/dashboard/map/fleet"),
+  { ssr: false }
+);
 const TransactionsPage = dynamic(
   () => import("@/components/dashboard/transactions/page"),
   { ssr: false }
@@ -54,7 +58,7 @@ const TablePage = dynamic(
   { ssr: false }
 );
 const FlaggedIssuesPage = dynamic(
-  () => import("@/components/dashboard/transactions/flagged-isues"),
+  () => import("@/components/dashboard/transactions/Isues/flagged-isues"),
   { ssr: false }
 );
 const UserManagement = dynamic(
