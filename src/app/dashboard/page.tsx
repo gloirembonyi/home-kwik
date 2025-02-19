@@ -1,10 +1,10 @@
 "use client";
 
-
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
-
-type TimeRange = "day" | "week" | "month" | "quarter";
+import React from "react";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 
 // Dynamically import components with ssr: false
 const OverviewDashboard = dynamic(
@@ -12,21 +12,11 @@ const OverviewDashboard = dynamic(
     import("@/components/dashboard/Overview/home-dashboard/OverviewDashboard"),
   { ssr: false }
 );
-const Sidebar = dynamic(
-  () => import("@/components/dashboard/sidebar/sidebar"),
-  {
-    ssr: false,
-  }
-);
-const DashboardHeader = dynamic(
-  () => import("@/components/dashboard/DashboardHeader/Header"),
-  { ssr: false }
-);
 const Revenue = dynamic(() => import("@/components/dashboard/Revenue/page"), {
   ssr: false,
 });
 const VehicleManagement = dynamic(
-  () => import("@/components/dashboard/vehicles/vehicles"),
+  () => import("@/components/dashboard/vehicles-performance/vehicles"),
   { ssr: false }
 );
 const PaymentDashboard = dynamic(
@@ -38,13 +28,12 @@ const RidesManagement = dynamic(
   { ssr: false }
 );
 const AnalyticsPageRide = dynamic(
-  () => import("@/components/dashboard/Overview/rides/RideAnalitics"),
+  () => import("@/components/dashboard/Overview/rides/page"),
   { ssr: false }
 );
-const FleetPage = dynamic(
-  () => import("@/components/dashboard/map/fleet"),
-  { ssr: false }
-);
+const FleetPage = dynamic(() => import("@/components/dashboard/map/fleet"), {
+  ssr: false,
+});
 const TransactionsPage = dynamic(
   () => import("@/components/dashboard/transactions/page"),
   { ssr: false }
@@ -58,7 +47,7 @@ const TablePage = dynamic(
   { ssr: false }
 );
 const FlaggedIssuesPage = dynamic(
-  () => import("@/components/dashboard/transactions/Isues/flagged-isues"),
+  () => import("@/components/dashboard/transactions/Issues/flagged-issues"),
   { ssr: false }
 );
 const UserManagement = dynamic(
@@ -86,35 +75,30 @@ const SettingSystem = dynamic(
   { ssr: false }
 );
 
-// Main Dashboard Component
-const Dashboard = () => {
-  const [currentPath, setCurrentPath] = React.useState("/dashboard");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
-  const [timeRange, setTimeRange] = useState<TimeRange>("day");
+export default function DashboardPage() {
+  const { isAuthenticated, loading } = useAuth();
+  const pathname = usePathname() || "/dashboard";
+  const currentPath = pathname.split("/dashboard")[1] || "/";
 
-  const handleNavigation = (path: string) => {
-    setCurrentPath(path);
-  };
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-  };
-
-  const refreshData = () => {
-    console.log("Refreshing data...");
-  };
-
-  const handleSidebarCollapse = (collapsed: boolean) => {
-    setIsSidebarCollapsed(collapsed);
-  };
+  if (!isAuthenticated) {
+    return null; // ProtectedRoute in layout will handle redirect
+  }
 
   const renderContent = () => {
     switch (currentPath) {
-      case "/dashboard":
+      case "/":
         return (
           <OverviewDashboard
             currentPath={currentPath}
-            onNavigate={handleNavigation}
+            onNavigate={(path) => console.log(path)}
           />
         );
       case "/users":
@@ -157,43 +141,11 @@ const Dashboard = () => {
         return (
           <OverviewDashboard
             currentPath={currentPath}
-            onNavigate={handleNavigation}
+            onNavigate={(path) => console.log(path)}
           />
         );
     }
   };
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar
-        currentPath={currentPath}
-        onNavigate={handleNavigation}
-        onLogout={handleLogout}
-        onCollapseChange={handleSidebarCollapse}
-        notificationUpdateInterval={15000}
-      />
-
-      <div
-        className={`
-          flex-1 
-          overflow-y-auto 
-          transition-all 
-          duration-300 
-          ease-in-out 
-          ${isSidebarCollapsed ? "ml-20" : "ml-64"}
-        `}
-      >
-        <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-md">
-          <DashboardHeader
-            timeRange={timeRange}
-            setTimeRange={setTimeRange}
-            refreshData={refreshData}
-          />
-        </div>
-        <main className="px-4 py-6 space-y-6">{renderContent()}</main>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
+  return renderContent();
+}

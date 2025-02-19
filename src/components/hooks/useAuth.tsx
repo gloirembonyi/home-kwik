@@ -1,31 +1,55 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Cookies from "js-cookie";
-import { createContext, useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { login } from "./useApi";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { RecoilRoot } from "recoil";
+import tokenManager from "@/utils/tokenManager";
 import { getErrorMessage } from "../lib/utils";
+import { refreshToken } from "@/utils/api";
 
-interface IUser {
-  firstName: string;
-  lastName: string;
+export interface User {
+  userId: number;
+  roleId: number;
+  name: string;
   email: string;
-  username: string;
+  phoneNumber: string;
   gender: string;
-  national_id: string;
-  phonenumber: string;
+  profilePicture: string | null;
+  currentRole: {
+    roleId: number;
+    name: string;
+    description: string;
+  };
+  chatUid?: string;
+  verificationStatus?: string;
+  isEmailVerified?: boolean;
+  refreshToken?: string | null;
+  loginCodeMFA?: string;
 }
 
-interface IAuthContext {
-  user: IUser | null;
-  login: (email: string, password: string) => void;
-  logout: () => void;
+interface AuthContextType {
+  isAuthenticated: boolean;
+  user: User | null;
   loading: boolean;
-  isAuthenticated: boolean | null;
+  isAdmin: boolean;
+  logout: () => void;
+  login: (
+    token: string,
+    userData?: User,
+    rememberMe?: boolean
+  ) => Promise<void>;
 }
-const AuthContext = createContext<IAuthContext | undefined>(undefined);
+
+const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  user: null,
+  loading: true,
+  isAdmin: false,
+  logout: () => {},
+  login: async () => {},
+});
 
 // export const nonProtectedRoutes = [
 //   "/auth/login",
@@ -34,57 +58,120 @@ const AuthContext = createContext<IAuthContext | undefined>(undefined);
 // ];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<IUser | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
 
-  const authenticateUser = async (email: string, loginCodeMFA: string) => {
-    setLoading(true);
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
     try {
-      const { data: response } = await login(email, loginCodeMFA);
-      console.log(process.env.DEV && response);
-      Cookies.set("token", response.data.access);
-      localStorage.setItem("token", JSON.stringify(response.data.token));
-      setUser(response.data.token);
-      setIsAuthenticated(true);
-      toast.success("Login successful");
-      window.location.href = "/dashboard";
-    } catch (error: any) {
-      console.log(process.env.DEV && error);
-      toast.error(getErrorMessage(error));
+      console.log("Checking authentication...");
+      const token = tokenManager.getToken();
+      const storedUser = tokenManager.getUser();
+      console.log("Token exists:", !!token);
+      console.log("User exists:", !!storedUser);
+
+      if (token && storedUser) {
+        // Check if token needs refresh
+        try {
+          const refreshTokenValue = storedUser.refreshToken;
+          if (refreshTokenValue) {
+            const response = await refreshToken(refreshTokenValue);
+            if (response.success) {
+              tokenManager.setToken(response.data.token, true);
+            }
+          }
+        } catch (error) {
+          console.error("Token refresh failed:", error);
+        }
+
+        setIsAuthenticated(true);
+        setUser(storedUser);
+        setIsAdmin(storedUser?.currentRole?.name === "ADMIN");
+        console.log("Auth check: User is authenticated");
+        console.log("Is admin:", storedUser?.currentRole?.name === "ADMIN");
+      } else {
+        console.log("Auth check: Missing token or user data");
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsAdmin(false);
+        tokenManager.clearTokens();
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+      setIsAuthenticated(false);
+      setUser(null);
+      setIsAdmin(false);
     } finally {
       setLoading(false);
     }
   };
-  const logout = () => {
-    Cookies.remove("token");
-    localStorage.removeItem("token");
-    setUser(null);
-    setIsAuthenticated(false);
-    window.location.href = "/login";
+
+  const login = async (
+    token: string,
+    userData?: User,
+    rememberMe: boolean = false
+  ) => {
+    try {
+      console.log("Login started...", { token, userData });
+
+      // Store token and user data
+      tokenManager.setToken(token, rememberMe);
+
+      if (userData) {
+        tokenManager.setUser(userData, rememberMe);
+        console.log("User data stored:", userData);
+
+        // Update state
+        setUser(userData);
+        setIsAdmin(userData?.currentRole?.name === "ADMIN");
+      }
+
+      // Update authentication state
+      setIsAuthenticated(true);
+      console.log("Auth state updated");
+
+      // Show success message
+      toast.success("Login successful!");
+
+      // Wait for state updates to complete before navigation
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 0);
+    } catch (error) {
+      console.error("Login error:", error);
+      setIsAuthenticated(false);
+      setUser(null);
+      setIsAdmin(false);
+      toast.error("Login failed. Please try again.");
+      throw error;
+    }
   };
 
-  useEffect(() => {
-    const user = localStorage.getItem("token");
-    if (user) {
-      try {
-        setUser(JSON.parse(user));
-      } catch (error) {
-        console.log(process.env.DEV && error);
-      }
-    }
-    const token = Cookies.get("token");
-    setIsAuthenticated(Boolean(token));
-  }, []);
+  const logout = () => {
+    console.log("Logging out...");
+    tokenManager.clearTokens();
+    setIsAuthenticated(false);
+    setUser(null);
+    setIsAdmin(false);
+    toast.success("Logged out successfully");
+    router.push("/auth/login");
+  };
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        login: authenticateUser,
-        logout,
-        loading,
         isAuthenticated,
+        user,
+        loading,
+        isAdmin,
+        logout,
+        login,
       }}
     >
       <RecoilRoot>{children}</RecoilRoot>
@@ -92,10 +179,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}
+};

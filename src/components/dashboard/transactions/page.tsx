@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
 import {
   Search,
@@ -63,7 +65,7 @@ const generateMockTransactions = () => {
   }));
 };
 
-const TransactionsPage: React.FC = () => {
+const TransactionsList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -417,4 +419,4 @@ const TransactionsPage: React.FC = () => {
   );
 };
 
-export default TransactionsPage;
+export default TransactionsList;

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Card } from "@/components/ui/base/card";
 import { ChevronDown, MoreHorizontal } from "lucide-react";

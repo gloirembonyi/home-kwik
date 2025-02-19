@@ -11,6 +11,16 @@ import RidesOverviewChart from "./chart/RidesOverview";
 import StatsDashboard from "./card/StatsDashboard";
 import { cn } from "@/components/lib/utils";
 import axios from "axios";
+import {
+  Users,
+  Car,
+  DollarSign,
+  Activity,
+  TrendingUp,
+  Clock,
+  MapPin,
+  Star,
+} from "lucide-react";
 
 type TimeRange = "day" | "week" | "month" | "quarter";
 
@@ -52,6 +62,58 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       console.log("Fetching users completed.");
     }
   };
+
+  // In a real app, these would come from an API
+  const stats = [
+    {
+      title: "Total Users",
+      value: "2,856",
+      description: "+12% from last month",
+      icon: <Users className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Active Rides",
+      value: "145",
+      description: "Currently ongoing",
+      icon: <Car className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Revenue",
+      value: "$23,456",
+      description: "+8% from last week",
+      icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Driver Activity",
+      value: "78%",
+      description: "Average online time",
+      icon: <Activity className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Growth Rate",
+      value: "+15%",
+      description: "User acquisition",
+      icon: <TrendingUp className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Average Trip Time",
+      value: "24 min",
+      description: "Per ride",
+      icon: <Clock className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Popular Routes",
+      value: "156",
+      description: "Most frequent destinations",
+      icon: <MapPin className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Customer Rating",
+      value: "4.8",
+      description: "Average rating",
+      icon: <Star className="h-4 w-4 text-muted-foreground" />,
+    },
+  ];
 
   return (
     <div className="flex">
@@ -155,16 +217,30 @@ const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
     </div>
   );
 };
-// StatsCard Component
-interface StatsCardProps {
+
+interface StatCardProps {
   title: string;
-  value: string;
-  change?: number;
+  value: string | number;
+  description: string;
   icon: React.ReactNode;
-  trend?: "up" | "down";
-  lastUpdate: string;
 }
 
-// Helper functions
+const StatCard: React.FC<StatCardProps> = ({
+  title,
+  value,
+  description,
+  icon,
+}) => (
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      {icon}
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{value}</div>
+      <p className="text-xs text-muted-foreground">{description}</p>
+    </CardContent>
+  </Card>
+);
 
 export default OverviewDashboard;

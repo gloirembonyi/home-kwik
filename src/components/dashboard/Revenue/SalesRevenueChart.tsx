@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Line } from "react-chartjs-2";
 import {
@@ -11,7 +13,7 @@ import {
   Legend,
   ChartOptions,
 } from "chart.js";
-import { useTheme } from "next-themes";
+import { useTheme as useNextTheme } from "next-themes";
 
 ChartJS.register(
   CategoryScale,
@@ -24,7 +26,7 @@ ChartJS.register(
 );
 
 const SalesRevenueChart = () => {
-  const { theme } = useTheme();
+  const { theme } = useNextTheme();
   const isDark = theme === "dark";
 
   const labels = [

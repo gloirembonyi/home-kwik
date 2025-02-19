@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/base/card";
-import { Input } from "@/components/ui/base/input";
+import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/base/label";
 import { Button } from "@/components/ui/base/button";
 import { User, Mail } from "lucide-react";
@@ -21,12 +21,9 @@ const GeneralTab = () => {
             <div className="flex justify-between items-center mt-1">
               <Input
                 value={settings.fullName}
-                onChange={(e) =>
-                  handleUpdateProfile("fullName", e.target.value)
-                }
+                onChange={(e) => handleUpdateProfile("fullName", e.target.value)}
                 className="max-w-md bg-background"
-                disabled={isLoading}
-              />
+                disabled={isLoading} id={""}              />
               <Button variant="outline" size="sm" disabled={isLoading}>
                 Save
               </Button>
@@ -43,8 +40,7 @@ const GeneralTab = () => {
                 value={settings.email}
                 onChange={(e) => handleUpdateProfile("email", e.target.value)}
                 className="max-w-md bg-background"
-                disabled={isLoading}
-              />
+                disabled={isLoading} id={""}              />
               <Button variant="outline" size="sm" disabled={isLoading}>
                 Edit
               </Button>

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import {
   Search,
@@ -42,6 +44,7 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
+import { useAuth } from "@/components/hooks/useAuth";
 // import SearchBar from "@/components/search-bar/page";
 
 // Types
@@ -87,13 +90,6 @@ const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   month: "30d",
   quarter: "3m",
 };
-//get user by decomposing the token
-const token = localStorage.getItem("token");
-const payload = token ? jwt.decode(token, { complete: true }) : null;
-const userId =
-  typeof payload?.payload === "object"
-    ? (payload.payload as CustomJwtPayload).userId
-    : "";
 
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
@@ -144,29 +140,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
   </div>
 );
 
-const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => (
-  <div className="flex items-center gap-4">
-    <div className="flex items-center gap-3 relative group">
-      <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
-      {/* <motion.div
-        whileHover={{ scale: 1.05 }}
-        className="bg-primary text-primary-foreground w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg shadow-sm"
-      >
-        K
-      </motion.div> */}
-      <div className="hidden md:block">
-        <h2 className="text-lg font-semibold text-foreground">Hello John!</h2>
-        <p className="text-sm text-muted-foreground">
-          {new Date().toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
+const BrandingSection: React.FC<BrandingSectionProps> = ({ timeRange }) => {
+  const { user } = useAuth();
+
+  return (
+    <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary rounded-lg blur opacity-25 group-hover:opacity-45 transition duration-200" />
+
+        <div className="hidden md:block">
+          <h2 className="text-lg font-semibold text-foreground">
+            Hello {user?.name || "Guest"}!
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
@@ -217,6 +214,14 @@ const useScrollEffect = () => {
   return scrolled;
 };
 
+const getInitials = (name: string) => {
+  if (!name) return "";
+  const parts = name.split(" ");
+  const firstInitial = parts[0]?.[0] || "";
+  const secondInitial = parts[1]?.[0] || "";
+  return (firstInitial + secondInitial).toUpperCase();
+};
+
 // Main Component
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   timeRange,
@@ -224,56 +229,34 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   refreshData,
 }) => {
   const router = useRouter();
+  const { user, logout } = useAuth();
   const scrolled = useScrollEffect();
   const [theme, setTheme] = React.useState<"light" | "dark">("light");
   const [searchFocused, setSearchFocused] = React.useState(false);
   const [notifications] = React.useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [user, setUser] = useState<any>();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Authorization token is missing.");
-        }
-
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/mobile/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(response.data);
-        setUser(response.data.data.user);
-      } catch (error) {
-        console.error("Fetching error:", error);
-      }
-    };
-
-    fetchUser();
-
-    // Cleanup function (optional)
-    return () => {
-      // Clean up if necessary
-    };
-  }, [token]); //
-
-  console.log(user);
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  // Add handleNavigation function
   const handleNavigation = (path: Route) => {
     router.push(path);
   };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <header
@@ -370,8 +353,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               >
                 <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-primary to-primary-foreground flex items-center justify-center">
                   <span className="text-sm font-semibold text-white">
-                    {user?.name.split(" ")[0].split("")[0] +
-                      user?.name.split(" ")[1].split("")[0]}
+                    {getInitials(user?.name || "")}
                   </span>
                 </div>
 
@@ -404,7 +386,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   )}
                 >
                   <span className="text-sm font-medium text-primary">
-                    {user?.name.split(" ")[0].split("")[0]}
+                    {getInitials(user?.name || "")}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -444,7 +426,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <Settings size={16} className="text-muted-foreground" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2 rounded-md text-destructive hover:bg-destructive/10">
+              <DropdownMenuItem
+                className="flex items-center gap-2 rounded-md text-destructive hover:bg-destructive/10"
+                onClick={handleLogout}
+              >
                 <LogOut size={16} />
                 <span>Logout</span>
               </DropdownMenuItem>

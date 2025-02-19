@@ -85,24 +85,24 @@ const Sidebar: React.FC<SidebarProps> = ({
       {
         icon: <Users />,
         label: "Users",
-        path: "/all",
+        path: "/dashboard/users",
         notifications: notifications["users"],
         subItems: [
-          { label: "All Users", path: "/users" },
+          { label: "All Users", path: "/dashboard/users" },
           {
             label: "Requests",
-            path: "/requests",
+            path: "/dashboard/users/requests",
             notifications: notifications["requests"],
           },
-          { label: "Suspension", path: "/suspension" },
+          { label: "Suspension", path: "/dashboard/users/suspension" },
           {
             label: "Logs",
-            path: "/logs",
+            path: "/dashboard/users/logs",
             notifications: notifications["logs"],
           },
           {
             label: "Refunds",
-            path: "/refunds",
+            path: "/dashboard/users/refunds",
             notifications: notifications["refunds"],
           },
         ],
@@ -110,28 +110,43 @@ const Sidebar: React.FC<SidebarProps> = ({
       {
         icon: <Navigation />,
         label: "Rides",
-        path: "/rides",
+        path: "/dashboard/rides",
         subItems: [
-          { label: "Ride Analytics", path: "/rides/analytics" },
-          { label: "Ride History", path: "/rides/history" },
-          { label: "Fleet", path: "/rides/fleet" },
+          { label: "Ride Analytics", path: "/dashboard/rides/analytics" },
+          { label: "Ride History", path: "/dashboard/rides/history" },
+          { label: "Fleet", path: "/dashboard/rides/fleet" },
         ],
       },
-      { icon: <TrendingUp />, label: "Revenue", path: "/revenue", badge: 2 },
-      // { icon: <TrendingUp />, label: "Test", path: "/dash", badge: 2 },
+      { 
+        icon: <TrendingUp />, 
+        label: "Revenue", 
+        path: "/dashboard/revenue"
+      },
       {
         icon: <Star />,
         label: "Transactions",
-        path: "/ratings",
+        path: "/dashboard/transactions",
         subItems: [
-          { label: "All Transactions", path: "/transactions" },
-          { label: "Topup History", path: "/topup-history" },
-          { label: "Issues", path: "/issues" },
+          { label: "All Transactions", path: "/dashboard/transactions" },
+          { label: "Topup History", path: "/dashboard/transactions/topup-history" },
+          { label: "Issues", path: "/dashboard/transactions/issues" },
         ],
       },
-      { icon: <BarChart2 />, label: "Performance", path: "/performance" },
-      { icon: <DollarSign />, label: "Payment", path: "/cost" },
-      { icon: <Settings />, label: "Settings", path: "/settings" },
+      { 
+        icon: <BarChart2 />, 
+        label: "Performance", 
+        path: "/dashboard/performance" 
+      },
+      { 
+        icon: <DollarSign />, 
+        label: "Payment", 
+        path: "/dashboard/payment" 
+      },
+      { 
+        icon: <Settings />, 
+        label: "Settings", 
+        path: "/dashboard/settings" 
+      },
     ],
     [notifications]
   );

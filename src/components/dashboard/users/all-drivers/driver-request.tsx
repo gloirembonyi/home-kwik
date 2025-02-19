@@ -1,3 +1,5 @@
+"use client"
+
 import { Filter, Check, Search } from "lucide-react";
 import React, { useState, useMemo } from "react";
 import { Input } from "@/components/ui/Input";

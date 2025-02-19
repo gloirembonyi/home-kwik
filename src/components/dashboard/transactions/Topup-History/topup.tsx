@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback, useEffect } from "react";
 import { Eye, Pencil, Trash2, Filter, Download } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/base/card";
@@ -176,7 +178,7 @@ const TopupHistory = () => {
               placeholder="Search transactions..."
               value={searchQuery}
               onChange={handleSearch}
-              className="w-72 pl-10 pr-4 py-3 bg-background border-2 border-input rounded-lg 
+              className="w-72 pl-10 pr-4 py-3 bg-background border-1 border-input rounded-lg 
                        focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none"
             />
             <MagnifyingGlassIcon className="absolute items-center left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />

@@ -19,7 +19,8 @@ describe('NotificationService', () => {
       dashboard: {
         count: 5,
         severity: 'high',
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
+        isRead: false
       }
     };
 
@@ -37,7 +38,8 @@ describe('NotificationService', () => {
       dashboard: {
         count: 5,
         severity: 'high',
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
+        isRead: false
       }
     };
 
